@@ -1,0 +1,4 @@
+This is LuaHBTeX, Version 1.17.0 (TeX Live 2023)  (format=lualatex 2024.1.1)
+Package lastpage Warning: Hook 'shipout/lastpage' executed on wrong page (285 not 289)
+(lastpage)                Rerun to correct this.
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.

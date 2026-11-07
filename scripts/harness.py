@@ -32,6 +32,10 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-TEPI       tidak ada isi melewati tepi halaman > 3 pt (setelah --render)
   G-TAG        PDF bertag: Tagged yes, pohon struktur Document/H1/P/Figure, /Lang id-ID
                (setelah --render; TAG=0 mematikan untuk proyek tanpa DocumentMetadata)
+  G-LOG        log LaTeX akhir stabil: tanpa "Rerun to correct", "Label(s) may have
+               changed", "Rerun to get", atau label "multiply defined" (setelah --render)
+  G-LN         logaritma natural ditulis ln di rumus naskah; log hanya dengan
+               subskrip basis (log_{10}); kode tetap log() (LN=0 mematikan)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
 
 Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
@@ -731,10 +735,53 @@ def gerbang_render(buku):
     if peringatan:
         pesan.append("render memberi peringatan rujukan:\n" + "\n".join(peringatan[:20]))
     catat("G-RENDER", not pesan, "\n".join(pesan))
+    gerbang_log(buku)
     if os.environ.get("TAG", "1") == "1":
         gerbang_tag(buku)
     if os.environ.get("TEPI", "1") == "1":
         gerbang_tepi(buku)
+
+
+# ---------------------------------------------------------------- G-LOG
+# Telaah pakar seri Bayesian (2026-11-07): Quarto hanya mengulang LuaLaTeX bila
+# log memuat "Rerun to get", "Please (re)run", atau "Rerun LaTeX", tidak untuk
+# "Rerun to correct this" dari hook lastpage, sehingga daftar isi tertinggal satu
+# putaran (Indeks hilang, nomor halaman salah). Obatnya latex-min-runs: 4 di
+# _quarto.yml; label ganda dari kepala longtable diobati \endhead di preamble.tex.
+POLA_LOG_TIDAK_STABIL = [
+    (r"Rerun to correct", "LaTeX meminta kompilasi ulang (hook lastpage); daftar isi/nomor halaman belum stabil"),
+    (r"Label\(s\) may have changed", "label berubah; rujukan silang dan daftar isi belum stabil"),
+    (r"Rerun to get (?:cross-references|outlines) right", "LaTeX meminta kompilasi ulang"),
+    (r"Label `[^']+' multiply defined", "label terdefinisi ganda"),
+]
+
+
+def masalah_log_latex(teks):
+    """Daftar masalah kestabilan dari isi log LaTeX akhir."""
+    masalah = []
+    for pola, arti in POLA_LOG_TIDAK_STABIL:
+        temuan = sorted(set(m.group(0) for m in re.finditer(pola, teks)))
+        if temuan:
+            masalah.append(f"{arti}: " + "; ".join(temuan[:8]))
+    return masalah
+
+
+def log_latex_utama(buku):
+    """Log kompilasi buku (bukan log tikz), yang terakhir ditulis."""
+    logs = sorted((p for p in buku.glob("*.log") if not p.name.startswith("tikz")),
+                  key=lambda p: p.stat().st_mtime)
+    return logs[-1] if logs else None
+
+
+def gerbang_log(buku):
+    """Log LaTeX putaran terakhir tidak boleh meminta kompilasi ulang dan tidak
+    boleh memuat label ganda (perlu latex-clean: false dan latex-min-runs: 4)."""
+    log = log_latex_utama(buku)
+    if log is None:
+        catat("G-LOG", False, "log LaTeX tidak ditemukan; set format.pdf.latex-clean: false di _quarto.yml")
+        return
+    masalah = masalah_log_latex(log.read_text(encoding="utf-8", errors="replace"))
+    catat("G-LOG", not masalah, "\n".join(f"{log.name}: {m}" for m in masalah))
 
 
 def gerbang_tag(buku, pdf=None):
@@ -1113,6 +1160,37 @@ def gerbang_istilah(qmd, peng):
     catat("G-ISTILAH", not t, "\n".join(t[:60]))
 
 
+# ---------------------------------------------------------------- G-LN
+# Keputusan seri Bayesian 2026-11-07 (bawaan skill): logaritma natural ditulis
+# ln di naskah (prosa, rumus, tabel, gambar); kode R/Stan dan keluarannya tetap
+# log(). Gerbang ini memeriksa rumus prosa dan judul chunk: \log tanpa subskrip
+# basis gagal; \log_{10}, \log_2, blok kode, R inline, dan kode sebaris dilewati.
+POLA_LOG_NATURAL = re.compile(r"\\log(?![A-Za-z])(?!\s*_)")
+
+
+def masalah_ln(teks):
+    prosa, chunk = pilah_qmd(teks)
+    baris = list(prosa)
+    for _, isi, awal in chunk:  # fig-cap/tbl-cap tercetak sebagai prosa
+        for k, b in enumerate(isi.splitlines()):
+            if re.match(r"\s*[#%]\|\s*(?:fig|tbl)-(?:cap|subcap|alt)\s*:", b):
+                baris.append((awal + k + 1, b))
+    temuan = []
+    for nomor, b in baris:
+        b = re.sub(r"<!--.*?-->", " ", b)
+        b = re.sub(r"`[^`]*`", " ", b)  # R inline dan kode sebaris
+        for m in POLA_LOG_NATURAL.finditer(b):
+            konteks = b[max(0, m.start() - 30):m.end() + 30].strip()
+            temuan.append(f"baris {nomor}: \\log tanpa basis — tulis \\ln (basis lain: \\log_{{b}}): …{konteks}…")
+    return temuan
+
+
+def gerbang_ln(qmd, peng):
+    abaikan = peng.get("ln-abaikan", [])
+    t = [x for x in masalah_ln(qmd.read_text(encoding="utf-8")) if not any(a in x for a in abaikan)]
+    catat("G-LN", not t, "\n".join(t[:60]))
+
+
 # ---------------------------------------------------------------- G-HALJUDUL
 # Keputusan penulis 2026-11-07: buku tidak memakai subjudul (judul saja,
 # termasuk sampul); halaman judul draf memuat "Draf revisi ke-N" sebelum
@@ -1162,6 +1240,8 @@ def main():
     gerbang_sitasi(qmd, buku)
     gerbang_larangan(qmd, peng)
     gerbang_istilah(qmd, peng)
+    if os.environ.get("LN", "1") == "1":
+        gerbang_ln(qmd, peng)
     bukti_ref = gerbang_referensi(qmd, ident, buku)
     md = gerbang_kode(buku, a.bab)
     if md:

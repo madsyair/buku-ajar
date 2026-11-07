@@ -19,6 +19,8 @@ write.csv(data.frame(x = x), "data-gambar/babbaik.csv",
 mean(x)
 ```
 
+Logaritma natural rerata itu ditulis $\ln \bar x$ di naskah dan `log(mean(x))` di kode, sedangkan logaritma basis sepuluh ditulis $\log_{10} \bar x$. Hasil hitungnya adalah `r angka(log(mean(c(1, 2, 4))), 2)`.
+
 Sebaran ketiga nilai itu tampak pada @fig-baik. Gambar dibuat dengan Python dari berkas yang ditulis R.
 
 ```{python}

@@ -32,7 +32,9 @@ Peran ini dipakai untuk buku **satu disiplin**. Untuk buku multidisiplin (brief,
 
 - Kerjakan daftar kerja editor, MAYOR dulu; jangan mengubah bagian yang tidak terkait.
 - Bila kalimat bersitasi berubah, perbarui `penanda` klaim (kutipan tetap).
-- Tulis `## Tindak lanjut (tanggal)` di setiap berkas ulasan: per butir "diperbaiki: …" atau "tidak diterapkan: alasan".
+- **Periksa dulu, baru ubah.** Setiap temuan yang menyangkut isi (angka, rumus, konvensi, tafsiran) diperiksa seperti reviewer isi: hitung ulang di R, cocokkan dengan keluaran rajut dan registri klaim. Temuan pembaca bisa keliru; temuan yang terbukti keliru tidak diterapkan.
+- Tulis `## Tindak lanjut (tanggal)` di setiap berkas ulasan: per butir "diperbaiki: … (lokasi)", "tidak diterapkan: bukti (angka hitung ulang, baris, kutipan)", atau "ditunda: alasan; usulan untuk penulis no. N" (MINOR yang butuh contoh baru atau keputusan penulis).
+- Penulis yang memperbaiki dari laporan pembaca independen atau telaah pakar bukan agen yang menulis laporan itu.
 - Celah karena kurang sumber diteruskan ke peninjau literatur lewat orkestrator.
 
 ## Daftar periksa

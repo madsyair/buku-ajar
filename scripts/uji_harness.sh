@@ -8,7 +8,7 @@
 #   bash harness/uji_harness.sh
 cd "$(dirname "$0")/.."
 status=0
-GAGAL="babgagal babbahasa babbocor babsitasi babcap babgayasitasi babinf babjudul bablarangan"
+GAGAL="babgagal babbahasa babbocor babsitasi babcap babgayasitasi babinf babjudul bablarangan babln"
 for bab in $GAGAL; do
   if python3 harness/harness.py --buku harness/uji-buku --bab "$bab" > /dev/null 2>&1; then
     echo "SALAH: $bab seharusnya GAGAL"; status=1
@@ -37,5 +37,29 @@ if command -v pdfinfo > /dev/null; then
 else
   echo "dilewati: G-TAG (pdfinfo/poppler-utils tidak terpasang)"
 fi
+# G-LN: \log tanpa basis di rumus prosa GAGAL (babln); babbaik memuat \ln,
+# \log_{10}, kode log() dan R inline log() dan harus bersih.
+for bab in babln babbaik; do
+  if python3 -c "import sys; sys.path.insert(0, 'harness'); import harness
+sys.exit(1 if harness.masalah_ln(open('harness/uji-buku/$bab.qmd', encoding='utf-8').read()) else 0)"; then
+    hasil=LULUS
+  else
+    hasil=GAGAL
+  fi
+  harap=LULUS; [ "$bab" = babln ] && harap=GAGAL
+  if [ "$hasil" = "$harap" ]; then echo "benar: G-LN $bab $hasil"; else echo "SALAH: G-LN $bab seharusnya $harap"; status=1; fi
+done
+# G-LOG: log LaTeX akhir yang meminta kompilasi ulang atau memuat label ganda
+# GAGAL. Fikstur berakhiran .txt karena kemas_sumber.py membuang *.log.
+for log in rerun ganda bersih; do
+  if python3 -c "import sys; sys.path.insert(0, 'harness'); import harness
+sys.exit(1 if harness.masalah_log_latex(open('harness/uji-buku/log/$log.txt', encoding='utf-8').read()) else 0)"; then
+    hasil=LULUS
+  else
+    hasil=GAGAL
+  fi
+  harap=GAGAL; [ "$log" = bersih ] && harap=LULUS
+  if [ "$hasil" = "$harap" ]; then echo "benar: G-LOG $log $hasil"; else echo "SALAH: G-LOG $log seharusnya $harap"; status=1; fi
+done
 rm -rf lampiran-kode/harness harness/laporan/harness_uji-buku-*
 exit $status

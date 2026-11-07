@@ -4,7 +4,7 @@
 
 ## Prinsip
 
-1. **Tidak ada yang meninjau tulisannya sendiri.** Pada buku multidisiplin, penulis ahli bidang tidak menjadi reviewer ahli atas bagiannya dan pemadu tidak meninjau bab paduannya. Peninjau adalah agen baru berkonteks bersih yang hanya membaca berkas (naskah, knit.md, PDF, registri), bukan penalaran penulis. Bila alat subagen tidak tersedia, ulasan dikerjakan berurutan dengan membaca ulang dari berkas, dan berkas ulasan mencatat "tanpa isolasi konteks" (contoh nyata: `bab01-pembaca-uji.md` seri).
+1. **Tidak ada yang meninjau tulisannya sendiri, dan tidak ada yang memperbaiki dari laporannya sendiri.** Pada buku multidisiplin, penulis ahli bidang tidak menjadi reviewer ahli atas bagiannya dan pemadu tidak meninjau bab paduannya. Peninjau adalah agen baru berkonteks bersih yang hanya membaca berkas (naskah, knit.md, PDF, registri), bukan penalaran penulis. Bila alat subagen tidak tersedia, ulasan dikerjakan berurutan dengan membaca ulang dari berkas, dan berkas ulasan mencatat "tanpa isolasi konteks" (contoh nyata: `bab01-pembaca-uji.md` seri). Ulasan seperti itu **tidak menggantikan** uji pembaca pemula independen (langkah 2a): di seri asal, audit tanpa isolasi oleh agen penulis-perbaikan melewatkan 35 MAYOR di 34 bab yang kemudian ditemukan pembaca berkonteks bersih.
 2. **Peninjau hanya membaca.** Peninjau tidak menyunting naskah, tidak menjalankan render, tidak menulis registri; hitung ulang dilakukan di scratchpad.
 3. **Temuan tertulis dan berstatus.** Setiap temuan berlabel MAYOR/MINOR, menyebut baris, kutipan, masalah, usulan. Penulis menanggapi setiap butir di bagian `## Tindak lanjut (tanggal)` berkas ulasan: diperbaiki (bagaimana), tidak diterapkan (alasan), atau diajukan ke penulis buku.
 4. **Harness sebelum dan sesudah ulasan.** Ulasan dimulai hanya dari bab yang LULUS harness; perbaikan ditutup dengan harness LULUS lagi.
@@ -23,15 +23,17 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
    - reviewer isi (`naskah/ulasan/babXX-isi.md`), reviewer rumus (`-rumus.md`), reviewer kode (`-kode.md`), reviewer bahasa (`-bahasa.md`);
    - pembaca pemula, menengah, mahir (`-pembaca-pemula.md`, `-menengah.md`, `-mahir.md`);
    - verifikasi independen angka dan klaim (bagian dari reviewer isi/kode: hitung ulang dari `fit/*.rds`, cek kutipan registri).
-   Paket minimum bila sumber daya terbatas: reviewer isi+rumus (satu agen), reviewer kode, satu pembaca pemula; seri statistika memakai pasangan "verifikasi independen" + "pembaca independen".
+   Paket minimum bila sumber daya terbatas: reviewer isi+rumus (satu agen), reviewer kode, satu pembaca pemula independen; seri statistika memakai pasangan "verifikasi independen" + "pembaca independen".
+2a. **Uji pembaca pemula independen (wajib, setiap bab)**: subagen pembaca 10 baru berkonteks bersih, tidak membaca ulasan lain; satu agen boleh membaca 3–5 bab berurutan, tetapi menulis satu laporan per bab (`naskah/ulasan/babXX-pembaca-pemula-independen.md`). Instruksi: `assets/templat-instruksi-pembaca-independen.md`. Bila subagen tidak tersedia, bab belum boleh dinyatakan selesai; catat sebagai butir terbuka di `STATUS.md`.
 3. **Editor memutuskan** atas temuan yang bertentangan (pemula minta penjelasan tambahan vs mahir minta ringkas) dan menyusun daftar kerja berurutan prioritas: MAYOR ketepatan → MAYOR keterbacaan → MINOR.
-4. **Perbaikan** oleh penulis bab (bukan peninjau), lalu harness sampai LULUS, lalu bagian Tindak lanjut di setiap berkas ulasan.
+4. **Perbaikan** oleh penulis bab atau penyunting (bukan peninjau, bukan agen yang menulis laporan), dengan instruksi tertulis (`assets/templat-instruksi-perbaikan-pembaca.md`). Setiap temuan isi diperiksa dulu seperti reviewer isi (hitung ulang, registri); temuan yang keliru ditulis "tidak diterapkan" beserta bukti. Lalu harness sampai LULUS, lalu bagian Tindak lanjut di setiap berkas ulasan. MINOR yang butuh contoh baru atau keputusan penulis ditunda dan masuk "Usulan untuk diputuskan penulis" (bagian di bawah).
 5. **Telaah pakar buku ajar** (`agents/21-penelaah-pakar-buku-ajar.md`, T2): setelah perbaikan putaran ulasan, penelaah menilai kelayakan bab sebagai bab buku ajar (materi, penyajian, kebahasaan, desain) dan memberi rekomendasi; temuannya masuk daftar kerja editor seperti temuan lain. Telaah rancangan (T1) dijalankan sebelum bab pertama ditulis, dan telaah buku utuh (T3) setelah render semua bab.
 6. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
 
 **Kriteria berhenti** (semua harus terpenuhi):
 
-- harness LULUS dengan `--render` (semua gerbang aktif);
+- harness LULUS dengan `--render` (semua gerbang aktif, termasuk G-LOG);
+- laporan pembaca pemula independen bab itu ada dan setiap temuannya bertindak lanjut;
 - rekomendasi penelaah pakar buku ajar (21) untuk bab minimal "layak dengan perbaikan kecil";
 - tidak ada temuan MAYOR terbuka di berkas ulasan mana pun (setiap MAYOR punya tindak lanjut "diperbaiki" atau keputusan penulis);
 - setiap MINOR punya tindak lanjut (diperbaiki atau alasan tidak diterapkan);
@@ -82,6 +84,19 @@ Bagian tidak disimpan sebagai Div ber-atribut di satu berkas bab karena beberapa
 **Batas iterasi**: harness bagian maks. 6 percobaan per gerbang yang sama; maks. 3 putaran ulasan per bab (sama dengan loop A); maks. 2 putaran bolak-balik pemadu ↔ ahli untuk satu butir sebelum diserahkan ke editor.
 
 **Eskalasi**: dua reviewer ahli (atau ahli dan pemadu) berbeda pendapat tentang substansi → **editor memutuskan** dari sumber primer dan bukti hitung ulang, dan mencatat alasannya di `babXX-editor.md`; bila perbedaan menyangkut **rancangan** (cakupan, pembagian bagian antardisiplin, notasi atau istilah lintas buku, disiplin yang ditugaskan, data) → **penulis buku** memutuskan. Ditambah semua pemicu eskalasi loop A.
+
+## Usulan untuk diputuskan penulis
+
+Telaah pakar (T1, T2, T3), tindak lanjut ulasan, dan MINOR yang ditunda sering menghasilkan butir yang hanya boleh diputuskan penulis buku (cakupan, urutan dan judul bab, data, notasi atau istilah lintas buku, sasaran tebal, suara penulis di prakata). Agar penulis tidak menjawab puluhan pertanyaan lepas:
+
+```
+laporan 21 / ulasan ─▶ penyunting: tindak lanjut (diperbaiki | tidak diterapkan + bukti | ditunda)
+   ─▶ editor: bagian "Usulan untuk diputuskan penulis (<sumber>, <tanggal>)" + nilai bawaan sementara
+   ─▶ orkestrator: daftar bernomor + rekomendasi ─▶ penulis: "setuju semua" / per nomor
+   ─▶ KEPUTUSAN-RANCANGAN.md + "Diputuskan penulis <tanggal>" ─▶ putaran sunting (loop D)
+```
+
+Format setiap butir: nomor; sumber (mis. "R-m6, telaah rancangan"; "Buku 2 Bab 1, MINOR 8"); pertanyaan dalam satu kalimat; pilihan; **rekomendasi** dengan alasan singkat; akibat bagi bab, kunci, dan buku lain; **nilai bawaan sementara** yang dipakai penulis bab sampai ada jawaban (ditandai "diputuskan sementara, menunggu penulis"). Usulan satu buku ditaruh di `01-rancangan-rinci.md`; usulan lintas buku di `naskah-bersama/usulan-penulis-<tanggal>.md`. Pesan ke penulis menutup daftar dengan "Jawab 'setuju semua', atau sebut nomor yang diubah." Jawaban dicatat bertanggal; butir yang ditolak atau diubah (contoh seri: "setuju kecuali butir 8") dicatat beserta pilihan penulis.
 
 ## Loop B — literatur dan klaim
 
@@ -135,4 +150,4 @@ Harness --render LULUS; bab di PDF hlm. …–… (… halaman).
 
 ## Catatan status di orkestrasi
 
-Orkestrator mencatat setiap putaran di `naskah/STATUS.md` buku (atau berkas status proyek): bab, putaran, agen, gerbang, hasil, temuan terbuka, langkah berikut, komit terakhir. Berkas ini yang dibaca pertama kali setelah kontainer dimulai ulang.
+Orkestrator mencatat setiap putaran di `naskah/STATUS.md` buku (atau berkas status proyek): bab, putaran, agen, gerbang, hasil, temuan terbuka, langkah berikut, komit terakhir. Berkas ini yang dibaca pertama kali setelah kontainer dimulai ulang atau batas pemakaian. Agen yang terhenti dilanjutkan lewat pesan ke agen yang sama dengan menyebut langkah terakhirnya; proses latar dianggap mati (`agents/00-orkestrator.md`, bagian Pemulihan).

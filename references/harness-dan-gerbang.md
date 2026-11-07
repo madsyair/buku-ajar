@@ -13,7 +13,7 @@ python3 harness/harness.py --tag-pdf <buku>/_book/<buku>.pdf    # G-TAG saja pad
 
 Keluaran: `[LULUS]/[GAGAL] G-…` per gerbang, rincian temuan (baris qmd atau knit.md), dan laporan `harness/laporan/<buku>-<bab>.md` (tabel status, rincian, bukti referensi, WARNING EYD yang perlu ditinjau manual). Kode keluar 0 = semua gerbang lulus. Bab **tidak** dianggap selesai sebelum Status LULUS.
 
-Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TAG`, `DRAF` (bawaan 1; set 0 hanya untuk masa transisi atau versi terbit, dan catat alasannya), `SKILL_EYD`, `SKILL_GAYA` (jalur skrip skill pendukung bila tidak ditemukan otomatis), `RETICULATE_PYTHON`.
+Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TAG`, `LN`, `DRAF` (bawaan 1; set 0 hanya untuk masa transisi atau versi terbit, dan catat alasannya), `SKILL_EYD`, `SKILL_GAYA` (jalur skrip skill pendukung bila tidak ditemukan otomatis), `RETICULATE_PYTHON`.
 
 ## 2. Daftar gerbang
 
@@ -36,6 +36,7 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-KONJUNGSI | statis | koma sebelum penghubung subordinatif di tengah kalimat; ", karena itu" di tengah kalimat; pengecualian per kalimat `konjungsi-abaikan` | kajian koma konjungsi |
 | G-LARANGAN | statis | kata terlarang di prosa dan keterangan (bawaan: Sokratik/Socrates/Feynman); konfig `larangan` | nama teknik tidak ditulis |
 | G-ISTILAH | statis | istilah yang sudah diganti keputusan penulis (konfig `istilah_terlarang`); pengecualian `istilah-abaikan` | keputusan istilah |
+| G-LN | statis (`LN=1`) | `\log` tanpa subskrip basis di rumus prosa dan `fig/tbl-cap` (logaritma natural ditulis `\ln`); `\log_{10}`, `\log_2` lulus; blok kode, R inline, kode sebaris, dan berkas kode dilewati; pengecualian `ln-abaikan`. Fikstur: `uji-buku/babln.qmd` (GAGAL), `babbaik.qmd` memuat `\ln`, `\log_{10}`, `log()` (LULUS); fungsi `masalah_ln()` juga diuji langsung | ln di naskah, kode `log` |
 | G-HALJUDUL | statis | `subtitle:` di `_quarto.yml`; `date` bukan ISO; `date-format` tanpa "[Draf revisi ke-N · ]" (`DRAF=1`) | halaman judul |
 | G-EYD | rajut | `periksa.py` skill eyd pada prosa hasil rajut: 0 ERROR (WARNING ditinjau manual); pengecualian `eyd-abaikan` | EYD V |
 | G-GAYA | rajut | pemeriksa gaya skill math-article bila ada, atau cadangan ("di mana", koma *tetapi/sedangkan/melainkan*, koma setelah penghubung antarkalimat) | gaya |
@@ -43,6 +44,7 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-SLOP | rajut | frasa basa-basi dan kosakata khas tulisan mesin (daftar `SLOP_ID`); pengecualian `gaya-abaikan` | humanizer-id |
 | G-PENGGALAN | statis / render | `penggalan.py` memperbarui daftar pengecualian; pemenggal lulus contoh EYD V; setelah render: babel indonesian dan daftar dimuat, istilah asing bertanda Inggris, **nama tidak terpenggal** di PDF, setiap penggalan kata Indonesia di PDF sah menurut EYD V, Word: pemenggalan otomatis dan bahasa id-ID | pemenggalan |
 | G-RENDER | `--render` | `quarto render` PDF + Word dalam satu proses tanpa galat; peringatan rujukan/sitasi | render |
+| G-LOG | `--render` | log LaTeX akhir (bukan log TikZ) tanpa "Rerun to correct" (hook `lastpage`), "Label(s) may have changed", "Rerun to get cross-references/outlines right", atau label "multiply defined". Obat: `latex-min-runs: 4` di `_quarto.yml` dan `\endhead` longtable di `preamble.tex`. Perlu `latex-clean: false`. Fikstur `uji-buku/log/{rerun,ganda,bersih}.txt` (berakhiran .txt karena `kemas_sumber.py` membuang `*.log`) diuji lewat `masalah_log_latex()` | daftar isi dan rujukan stabil |
 | G-TEPI | `--render` | Overfull hbox > 3 pt di log LaTeX (rumus, tabel, kode, teks), dilaporkan dengan judul bab dan baris .tex; log LuaLaTeX memakai format *Overfull* yang sama dengan XeLaTeX | tanpa luapan tepi |
 | G-TAG | `--render` (`TAG=1`) atau `--tag-pdf` | PDF bertag: `pdfinfo` melaporkan `Tagged: yes`; pohon struktur (`pdfinfo -struct`) berakar Document dan memuat H1, P, dan Figure; `/Lang` = id-ID (pikepdf bila ada). Gagal bila `pdf-engine` bukan `lualatex` atau partial `doc-class.tex` (`\DocumentMetadata`) tidak dipasang. Fikstur: `uji-buku/tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS), sumbernya di `uji-buku/sumber-tag/`. `TAG=0` hanya untuk proyek lama yang belum pindah ke LuaLaTeX, dengan alasan tercatat | PDF bertag (butir 35) |
 
@@ -55,7 +57,8 @@ Pengecualian hanya lewat `harness/pengecualian.json` dan **wajib beralasan**:
  "gaya-abaikan": [{"pola": "…", "alasan": "…"}],
  "konjungsi-abaikan": ["potongan ±40 karakter unik dari kalimat yang komanya sah"],
  "larangan-abaikan": [],
- "istilah-abaikan": []
+ "istilah-abaikan": [],
+ "ln-abaikan": ["potongan teks temuan G-LN yang sah, mis. kutipan rumus sumber"]
 }
 ```
 
@@ -98,7 +101,7 @@ Setiap kali penulis membuat **keputusan gaya baru**, orkestrator menjalankan pro
    - **hasil render** (PDF, log LaTeX, Word) → fungsi di cabang `if a.render:`;
    - **tidak dapat diperiksa mesin** (kepaduan, kebenaran isi) → butir daftar periksa reviewer di berkas agen yang relevan.
 3. **Pesan temuan** menyebut baris, potongan teks, dan perbaikan yang diharapkan ("tulis faktanya langsung dengan sitasi [@kunci]"), bukan sekadar "salah".
-4. **Fikstur**: tambah satu bab gagal `harness/uji-buku/bab<nama>.qmd` yang hanya melanggar aturan baru, tambahkan namanya ke daftar `GAGAL` di `uji_harness.sh`, dan pastikan `babbaik.qmd` tetap LULUS. Jalankan `bash harness/uji_harness.sh` sampai semua "benar".
+4. **Fikstur**: tambah satu bab gagal `harness/uji-buku/bab<nama>.qmd` yang hanya melanggar aturan baru, tambahkan namanya ke daftar `GAGAL` di `uji_harness.sh`, dan pastikan `babbaik.qmd` tetap LULUS. Untuk gerbang render, pisahkan pemeriksaan teks dari pencarian berkas (pola `masalah_log_latex(teks)` di G-LOG, `masalah_ln(teks)` di G-LN) dan uji fungsinya langsung pada fikstur teks di `uji_harness.sh`, tanpa render. Jalankan `bash harness/uji_harness.sh` sampai semua "benar".
 5. **Audit semua buku**: jalankan gerbang baru pada semua bab semua buku (buku induk dan kunci) tanpa render; kumpulkan temuan per bab; jalankan putaran penyuntingan per kelompok bab (instruksi tertulis di `naskah-bersama/instruksi-<topik>-<tanggal>.md`); naikkan nomor "Draf revisi ke-N" buku yang berubah dan catat di `REVISI.md`.
 6. **Komit** harness, fikstur, konfig, dan keputusan dalam satu titik simpan git ("Harness: G-X untuk keputusan …").
 
@@ -146,7 +149,7 @@ Render dijalankan **orkestrator, berurutan** (satu buku sekali jalan, tidak para
 python3 harness/harness.py --buku <buku> --bab <bab-terakhir-diubah> --render
 ```
 
-Setelah render: G-RENDER, G-TAG (PDF bertag), G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), dan G-PENGGALAN (audit PDF). Sekali per buku editor mengukur panjang baris (median dan persentil-95 karakter per baris prosa dari `pdftotext -layout`, harus 40–70; `aturan-gaya-dan-tampilan.md` bagian 8) dan memastikan `pdffonts` hanya memuat keluarga Libertinus. Sesudah itu editor/pembaca memeriksa tampilan (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
+Setelah render: G-RENDER, G-LOG (log LaTeX akhir stabil, tanpa label ganda), G-TAG (PDF bertag), G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), dan G-PENGGALAN (audit PDF). Sekali per buku editor mengukur panjang baris (median dan persentil-95 karakter per baris prosa dari `pdftotext -layout`, harus 40–70; `aturan-gaya-dan-tampilan.md` bagian 8) dan memastikan `pdffonts` hanya memuat keluarga Libertinus. Sesudah itu editor/pembaca memeriksa tampilan (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
 
 ## 7. Batas harness
 

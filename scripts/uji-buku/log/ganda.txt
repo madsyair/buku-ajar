@@ -1,0 +1,3 @@
+This is LuaHBTeX, Version 1.17.0 (TeX Live 2023)  (format=lualatex 2024.1.1)
+LaTeX Warning: Label `tbl-tokoh' multiply defined.
+LaTeX Warning: There were multiply-defined labels.

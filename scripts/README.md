@@ -8,7 +8,7 @@ Salinan yang digeneralisasi dari harness dan alat seri statistika Bayesian (A. S
 | `harness.py` | `harness/` | Gerbang mutu per bab (daftar di `references/harness-dan-gerbang.md`) |
 | `referensi.py` | `harness/` | G-REFERENSI: registri klaim dan identitas pustaka |
 | `penggalan.py` | `harness/` | Pemenggalan EYD V, daftar nama yang tidak dipenggal, istilah asing (perlu `pip install Sastrawi`) |
-| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS) |
+| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS) |
 | `kemas_sumber.py` | `harness/` atau `alat/` | Mengemas kode sumber per buku (+ kunci) ke zip dengan `BANGUN.md` |
 | `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, fon Libertinus Serif (Type 3), koma desimal, `label_panel()`, `tampil()` |
 | `catatan.lua` | `_bersama/` | Filter Div `::: {.catatan}`: "*Catatan:*" kecil di bawah tabel/gambar (PDF dan Word) |
@@ -55,6 +55,8 @@ Hal lain yang masih tertanam di kode dan mungkin perlu diubah:
 - Daftar penulis G-SITASI dibangun otomatis dari `pustaka.bib`.
 - Gerbang baru: **G-LARANGAN** (nama teknik pengajaran dan kata terlarang lain), **G-ISTILAH** (istilah yang sudah diputuskan), **G-HALJUDUL** (tanpa `subtitle`, `date` ISO, "Draf revisi ke-N" di `date-format`).
 - Fikstur baru `uji-buku/bablarangan.qmd`.
+- G-LOG sama dengan seri (log LaTeX akhir stabil, tanpa label ganda); G-LN baru di skill (`\log` tanpa basis di rumus prosa; sakelar `LN`, pengecualian `ln-abaikan`); fikstur `uji-buku/babln.qmd` dan `uji-buku/log/*.txt`.
+- `siapkan_proyek.py` juga menyalin `assets/hak-cipta.tex` (halaman hak cipta dengan fon dan lisensinya) dan mengisi judul serta penulis di `include-before-body`.
 - G-TAG sama dengan seri, ditambah opsi `--tag-pdf`, sakelar `TAG`, dan cek `/Lang` cadangan tanpa pikepdf; fikstur PDF `uji-buku/tag-*.pdf`.
 - Folder laporan dibuat otomatis; `penggalan.py` menghimpun semua folder buku yang punya `_quarto.yml` (bukan hanya `buku*`).
 - `kemas_sumber.py` mengenali buku otomatis (folder dengan `_quarto.yml`; pasangan `kunci-<buku>`).

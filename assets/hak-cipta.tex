@@ -1,0 +1,46 @@
+% Halaman hak cipta (Keterangan Penerbitan) buku ajar.
+% Dasar: Permendikbudristek Nomor 22 Tahun 2022, Lampiran III, Tabel 1 Bagian
+% Awal Naskah Buku (wajib, tanpa nomor halaman, verso halaman judul) dan
+% Lampiran III hlm. 76 (fon diperoleh secara legal dan dicantumkan).
+% Disalin ke <proyek>/_bersama/hak-cipta.tex dan dimuat lewat include-in-header;
+% dipanggil sekali di include-before-body (_quarto.yml), sesudah \maketitle.
+%
+%   \halamanhakcipta[<lokasi kode sumber>]{<judul>}{<penulis tanpa gelar>}%
+%     {<tahun>}{<keterangan draf>}{<perangkat penyusun>}
+%
+% Data yang belum ada ditulis "belum ditetapkan", tidak dikarang. Bila keluarga
+% huruf diganti, ganti juga kalimat Fon beserta lisensinya.
+
+\providecommand{\LuaLaTeX}{LuaLaTeX}
+\makeatletter
+\newcommand{\halamanhakcipta}[6][belum ditetapkan]{%
+  \clearpage
+  \if@twoside\ifodd\value{page}\null\thispagestyle{empty}\clearpage\fi\fi
+  \thispagestyle{empty}%
+  \begingroup
+  \small
+  \setlength{\parindent}{0pt}%
+  \setlength{\parskip}{0.55\baselineskip}%
+  \raggedright
+  \null\vfill
+  {\bfseries #2\par}
+  Penulis: #3\par
+  #5\par
+  Hak cipta \textcopyright\ #4 #3\par
+  Hak cipta dilindungi Undang-Undang Nomor 28 Tahun 2014 tentang Hak Cipta.
+  Dilarang memperbanyak sebagian atau seluruh isi buku ini dalam bentuk apa pun
+  tanpa izin tertulis dari pemegang hak cipta.\par
+  Penerbit dan alamat penerbit: belum ditetapkan\\
+  ISBN: belum ditetapkan\\
+  Katalog Dalam Terbitan (KDT): belum ditetapkan\\
+  Cetakan: belum dicetak (draf, bukan versi terbit)\par
+  Penyunting, ilustrator, dan desainer: belum ditetapkan\par
+  Disusun dengan #6.\\
+  Fon: satu keluarga Libertinus, yaitu Libertinus Serif (teks, judul, dan
+  gambar), Libertinus Math (matematika), dan Libertinus Mono (kode), dengan
+  lisensi SIL Open Font License 1.1.\par
+  Lisensi kode: belum ditetapkan\\
+  Kode sumber: #1\par
+  \endgroup
+  \clearpage}
+\makeatother

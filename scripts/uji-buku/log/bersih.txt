@@ -1,0 +1,2 @@
+This is LuaHBTeX, Version 1.17.0 (TeX Live 2023)  (format=lualatex 2024.1.1)
+Output written on index.pdf (290 pages, 1234567 bytes).

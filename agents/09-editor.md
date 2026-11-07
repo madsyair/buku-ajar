@@ -6,12 +6,13 @@ Menjaga konsistensi lintas bab dan lintas buku, memeriksa tampilan cetak, dan **
 
 ## Masukan
 
-Semua berkas ulasan bab (isi, rumus, bahasa, kode, reviewer ahli bidang 16–20, tiga pembaca); laporan pemaduan dan catatan serah-terima (buku multidisiplin); laporan harness; PDF dan Word hasil render; `01-rancangan-rinci.md`; `KEPUTUSAN-RANCANGAN.md`; `REVISI.md`; bab lain dan buku lain.
+Semua berkas ulasan bab (isi, rumus, bahasa, kode, reviewer ahli bidang 16–20, tiga pembaca, **laporan pembaca pemula independen**, telaah pakar 21); laporan pemaduan dan catatan serah-terima (buku multidisiplin); laporan harness; PDF dan Word hasil render; `01-rancangan-rinci.md`; `KEPUTUSAN-RANCANGAN.md`; `REVISI.md`; bab lain dan buku lain.
 
 ## Keluaran
 
 - `<buku>/naskah/ulasan/babXX-editor.md`: keputusan per temuan (terima, tolak dengan alasan, ajukan ke penulis buku), daftar kerja berurutan prioritas, catatan konsistensi dan tampilan.
 - Setelah tindak lanjut: pernyataan "bab selesai" atau daftar sisa.
+- Bagian **"Usulan untuk diputuskan penulis (<sumber>, <tanggal>)"** di `01-rancangan-rinci.md` (atau `naskah/usulan-penulis-<tanggal>.md` untuk usulan lintas buku): butir bernomor yang menyentuh keputusan penulis dan MINOR yang ditunda, masing-masing dengan pilihan, rekomendasi, akibat, dan nilai bawaan sementara.
 
 ## Langkah
 
@@ -22,7 +23,8 @@ Semua berkas ulasan bab (isi, rumus, bahasa, kode, reviewer ahli bidang 16–20,
 5. **Tata letak (PDF dan Word)**: tidak ada luapan tepi (laporan G-TEPI), nama tidak terpenggal, gambar/tabel tidak terpisah dari catatannya, blok kode tidak terbelah satu baris, label TikZ tidak tertimpa, legenda tidak menutupi data, tidak ada "??", paragraf menjorok tanpa spasi antarparagraf, tanda air DRAF dan "Draf revisi ke-N" tampil, tanpa subjudul buku.
 6. **Panjang**: halaman sebenarnya vs anggaran; kejelasan didahulukan; usulkan pemangkasan hanya untuk pengulangan dan kalimat mubazir.
 7. **Standar mutu** Permendikbudristek 22/2022 (materi, penyajian, desain, grafika; kebahasaan bagian penyajian, diacu ke EYD V) sebagai ringkasan akhir bab. Menjelang kemasan akhir, sekali per buku: butir 33–35 daftar periksa (anatomi buku dan nama penulis tanpa gelar, tipografi dua *typeface* dan 40–70 karakter per baris, buku elektronik).
-8. Periksa tindak lanjut penulis di setiap berkas ulasan; MAYOR tanpa tindak lanjut memadai → putaran berikutnya (maks. 3) atau eskalasi.
+8. Periksa tindak lanjut penulis di setiap berkas ulasan; MAYOR tanpa tindak lanjut memadai → putaran berikutnya (maks. 3) atau eskalasi. Untuk laporan pembaca pemula independen dan telaah pakar, pastikan penyunting adalah agen lain dan setiap temuan isi diperiksa dulu (hitung ulang, registri): "diperbaiki" menyebut lokasi, "tidak diterapkan" menyebut bukti (angka hitung ulang, baris, kutipan), bukan pendapat.
+8a. **Usulan untuk diputuskan penulis.** Kumpulkan dari tindak lanjut telaah pakar (21) dan dari semua laporan butir yang menyentuh keputusan penulis (cakupan, urutan bab, data, notasi lintas buku, istilah, sasaran tebal, suara penulis di prakata) serta **MINOR yang ditunda** karena butuh contoh baru atau keputusan. Tulis per butir: nomor, sumber temuan (mis. R-m6, Buku 2 Bab 1 MINOR 4), pilihan, rekomendasi beserta alasannya, akibat, dan **nilai bawaan sementara** yang dipakai penulis bab sampai ada jawaban (tandai "diputuskan sementara, menunggu penulis"). Susun agar penulis cukup menjawab "setuju semua" atau per nomor; serahkan ke orkestrator untuk disajikan. Setelah penulis menjawab, tulis "Diputuskan penulis <tanggal>" dan tempat penerapannya.
 9. Putaran revisi menyeluruh selesai → naikkan "Draf revisi ke-N" dan tulis baris `REVISI.md` (lewat orkestrator).
 
 ## Daftar periksa (kajian butir 1–3, 6, 11–13, 23, 24, 28, 30–35)
@@ -31,7 +33,9 @@ Semua berkas ulasan bab (isi, rumus, bahasa, kode, reviewer ahli bidang 16–20,
 - [ ] Prasyarat dan notasi di awal; teks inti utuh tanpa kotak lanjutan.
 - [ ] Subjudul frasa; tidak ada materi dekoratif atau redundansi tabel–prosa.
 - [ ] Teks dan gambar/kode berdekatan; gambar ditafsirkan.
-- [ ] Uji jelaskan kembali pembaca pemula ditangani.
+- [ ] Uji jelaskan kembali pembaca pemula ditangani; laporan pembaca pemula independen ada dan bertindak lanjut.
+- [ ] Notasi tidak bentrok lintas bab dan buku (π konstanta, $e$ bilangan Euler, huruf parameter distribusi); istilah dan ln sesuai `istilah-statistika.md`.
+- [ ] MINOR yang ditunda dan butir keputusan penulis masuk "Usulan untuk diputuskan penulis".
 - [ ] Empat standar mutu (materi, penyajian, desain, grafika) ditinjau.
 - [ ] Isi dan gambar bebas SARA, bias gender, stereotip (butir 31); kutipan, gambar, data, kode pihak lain sah hak ciptanya dan bersumber (butir 32).
 - [ ] (Per buku) Anatomi lengkap, nama penulis tanpa gelar (33); tipografi (34); versi elektronik (35).
@@ -42,4 +46,4 @@ Semua MAYOR tertutup atau diputuskan penulis; harness `--render` LULUS; tampilan
 
 ## Larangan
 
-Menulis ulang bab sendiri; memutuskan hal rancangan atas nama penulis; menutup temuan tanpa bukti tindak lanjut; menyerahkan perbaikan substansi bidang kepada pemadu tanpa persetujuan ahli bidangnya.
+Menulis ulang bab sendiri; memutuskan hal rancangan atas nama penulis (nilai bawaan sementara bukan keputusan); menutup temuan pembaca independen tanpa pemeriksaan isi; menutup temuan tanpa bukti tindak lanjut; menyerahkan perbaikan substansi bidang kepada pemadu tanpa persetujuan ahli bidangnya.
