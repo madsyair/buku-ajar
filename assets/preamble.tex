@@ -76,7 +76,57 @@
     \advance\linewidth 2\tambahini \advance\hsize 2\tambahini
     \par\seritagstop\seriLTawal}{\endseriLTawal\seritagstart}%
 }
+% Keterangan longtable Pandoc berada di \endhead sehingga kotak kepala tabel
+% (beserta \write dari \label dan anchor tautannya) disalin ulang di setiap
+% halaman lanjutan: label terdefinisi ganda (telaah pakar seri Bayesian,
+% 2026-11-07; dicegat G-LOG). Kepala asli menjadi kepala halaman pertama
+% (\LT@firsthead); salinan untuk halaman lanjutan dibersihkan dari whatsit
+% write dan pdf_dest (LuaTeX). Keterangan tetap diulang di halaman lanjutan.
+\ifdefined\directlua
+\directlua{
+  function seri_buang_tulis(n)
+    local WH, HL, VL = node.id("whatsit"), node.id("hlist"), node.id("vlist")
+    local hapus = {[node.subtype("write")] = true, [node.subtype("pdf_dest")] = true}
+    local function bersih(head)
+      local cur = head
+      while cur do
+        local nxt = cur.next
+        if cur.id == WH and hapus[cur.subtype] then
+          head = node.remove(head, cur); node.free(cur)
+        elseif cur.id == HL or cur.id == VL then
+          cur.list = bersih(cur.list)
+        end
+        cur = nxt
+      end
+      return head
+    end
+    local b = tex.getbox(n)
+    if b then b.list = bersih(b.list) end
+  end
+}
+% \endhead = \LT@end@hd@ft\LT@head (longtable 4.17) dengan penyalinan kepala
+% sebelum \LT@bchunk membuka potongan tabel berikutnya.
+\AtBeginDocument{%
+  \def\endhead{%
+    \LT@echunk
+    \ifx\LT@start\endgraf
+      \LT@err{Longtable head or foot not at start of table}{Increase LTchunksize}%
+    \fi
+    \setbox\LT@head\box\z@
+    \ifvoid\LT@firsthead
+      \setbox\LT@firsthead\copy\LT@head
+      \directlua{seri_buang_tulis(\number\LT@head)}%
+    \fi
+    \LT@get@widths
+    \LT@bchunk}}
+\fi
 \makeatother
+
+% Baris yatim dan janda dicegah (Permendikbudristek 22/2022, Lampiran III:
+% bebas baris tunggal; telaah pakar seri Bayesian 2026-11-07)
+\widowpenalty=10000
+\clubpenalty=10000
+\displaywidowpenalty=10000
 
 % Cegah tabel pendek dan blok kode terbelah halaman (\needspace di bab)
 \usepackage{needspace}

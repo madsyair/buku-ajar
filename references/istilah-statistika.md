@@ -8,7 +8,7 @@ Berkas ini memuat keputusan istilah bawaan skill, disarikan dari keputusan penul
 2. Istilah yang dalam praktik lebih dikenal dalam bahasa Inggris dan padanannya **belum lazim** ditulis dalam bahasa Inggris **bercetak miring** dan dijelaskan dengan kata sehari-hari pada kemunculan pertama di setiap bab (*likelihood*, *shrinkage*, *draws*, *noise*, *overfitting*, *offset*).
 3. Kelas istilah mengikuti skill eyd (`references/istilah-dan-kbbi.md`): A = padanan baku dipakai; B = serapan; C = tetap asing, miring.
 4. Kata sifat Inggris yang menerangkan kata Indonesia mengikuti urutan Indonesia: prior *weakly informative*, posterior *improper*.
-5. Verba tetap Indonesia: dicocokkan (bukan di-*fit*), disusutkan, diimputasi.
+5. Verba tetap Indonesia: dicocokkan (bukan di-*fit*), disusutkan, diimputasi. Rincian *fit* di bagian "Istilah *fit*".
 6. Akhiran pada istilah asing: *likelihood*-nya, *shrinkage*-nya.
 7. Nama fungsi, argumen, keluarga distribusi paket ditulis sebagai kode dan tidak dimiringkan atau diterjemahkan (`pp_check()`, `family`, `zi`).
 8. Singkatan (GLM, LOO, ESS, DAG, MRP) ditulis tegak; kepanjangannya disebut sekali.
@@ -38,10 +38,42 @@ Berkas ini memuat keputusan istilah bawaan skill, disarikan dari keputusan penul
 | random/fixed effect | efek acak, efek tetap; pertama: efek tingkat kelompok (efek acak) | | brms menyebut *group-level*/*population-level*. |
 | *robust regression* | regresi *robust* [RAGU] | regresi kekar | |
 | *spline* | *spline* | splin | |
-| *overfitting* | *overfitting* (glosa: terlalu pas dengan data yang dipakai mencocokkan) | | |
+| *overfitting* | *overfitting* (miring; glosa: terlalu pas dengan data yang dipakai mencocokkan) | | |
+| *fit* (verba), *model fitting* | mencocokkan (model dengan data); pencocokan (model); pertama per buku: "mencocokkan model dengan data (*fit*; prosesnya *model fitting*)" | mengestimasi model, penyesuaian/pengepasan model, di-*fit*, *fit* sebagai kata benda | Lihat bagian "Istilah *fit*". |
+| objek hasil *fit* | di prosa "objek hasil pencocokan"; nama objek kode tetap (`fit`, `fit_m1`) | "*fit* yang diagnostiknya gagal" | |
+| *fitted values* | nilai prediksi | nilai dugaan, nilai taksiran | Sumbu plot residu. |
+| *goodness of fit* | kecocokan model | | |
+| logaritma natural | **ln** di naskah (prosa, rumus, tabel, gambar, glosarium); kode R/Stan tetap `log()` | `\log` tanpa basis di rumus; "log" untuk logaritma natural di prosa | Lihat bagian "Logaritma natural". Gerbang G-LN. |
 | fake data | data palsu (data yang disimulasikan dari model dengan parameter yang ditetapkan sendiri) | | |
 | effective sample size | ukuran sampel efektif (ESS) *bulk*/*tail* | | Glosa sekali per bab bila dilaporkan. |
 | *divergent transition* | *divergent transition* (tanda bahwa *sampler* gagal menjelajahi bagian posterior yang melengkung tajam) | | |
+
+## Istilah *fit* (keputusan seri, 2026-11-07)
+
+Dasar: kajian pemakaian di seri (tiga bentuk bersaing: "mencocokkan", *fit* miring sebagai kata benda, "mengestimasi model"; "mencocokkan" juga dipakai dalam arti membandingkan).
+
+- Kata kerja **mencocokkan** (model dengan data); kata benda proses **pencocokan** (model). "Model dicocokkan ulang", "LOO memerlukan $n$ kali pencocokan".
+- Objek hasil: nama kode tetap; di prosa "**objek hasil pencocokan**".
+- *fitted values* → **nilai prediksi**; *goodness of fit* → **kecocokan model**; *overfitting* tetap Inggris, **miring**, dengan glosa "terlalu pas dengan data yang dipakai mencocokkan".
+- Dihindari: "mengestimasi model" (yang diestimasi parameter), "penyesuaian/pengepasan model", "nilai dugaan/taksiran", "di-*fit*". Masukkan ke `istilah_terlarang` di `konfig.json` bila buku sudah selesai disunting.
+- "Mencocokkan" yang **berarti membandingkan** (hasil dengan grid, kunci dengan keluaran) diganti "membandingkan" agar kata itu hanya punya satu arti teknis.
+- **Kemunculan pertama di setiap buku** menyebut istilah Inggrisnya: "mencocokkan model dengan data (*fit*; prosesnya *model fitting*)"; entri ditambahkan ke glosarium dan `keputusan-istilah.md`.
+
+## Logaritma natural (keputusan seri, 2026-11-07)
+
+- Logaritma natural ditulis **ln** di prosa, rumus (`\ln`), keterangan, tabel, gambar, dan glosarium: "ln *likelihood*", "ln *odds*", "skala ln", $\ln p(y \mid \theta)$. Istilah Inggris asalnya boleh disebut dalam kurung: "ln *likelihood* (*log-likelihood*)".
+- **Kode tetap `log`**: R (`log()`), Stan (`log`, `log_lik`, `log_sum_exp`, `lp__`), nama objek, argumen, keluaran tercetak, dan R inline tidak diubah.
+- Basis lain tetap `\log_{10}`, `\log_2`, `\log_b`. Sumbu grafik berskala logaritma basis 10 ditulis "skala logaritma".
+- **Paragraf penjelas pada kemunculan pertama di setiap buku induk** (buku kunci merujuknya dalam satu kalimat), misalnya "Di naskah buku ini logaritma natural ditulis ln. Di R dan Stan, fungsi `log()` sudah berarti logaritma natural; basis lain ditulis `log10()`, `log2()`, atau `log(x, base = b)`. Jadi, `log(x)` di kode sama dengan $\ln x$ di naskah."
+- **Tabel** memakai ln pada judul, judul kolom, dan isi. Nama kolom tampilan tabel dari objek R diganti lewat `col.names` (`knitr::kable(d, col.names = c("Model", "ln *likelihood*"))`); nama variabel kode tetap.
+- Label gambar (sumbu, legenda, anotasi; mathtext `\log` → `\ln`) diganti ln; nama kolom data tidak.
+- Kata yang **bukan logaritma** tidak diubah: logit, logistik, katalog, "log keputusan", "log LaTeX". Periksa makna setiap kemunculan; jangan mengganti otomatis buta.
+- Kutipan verbatim di `harness/klaim.json` tidak diubah; bila kalimat penanda berubah, perbarui penandanya saja.
+- Gerbang **G-LN** gagal bila `\log` tanpa subskrip basis muncul di rumus prosa atau keterangan (di luar blok kode, R inline, kode sebaris, dan berkas kode). Pengecualian beralasan: `ln-abaikan` di `pengecualian.json`.
+
+## Notasi: periksa bentrok sebelum memilih
+
+Simbol baru dipilih setelah memeriksa pemakaiannya di semua bab dan buku seri (rumus, kode, latihan, kunci) dan tabel notasi rancangan rinci. Contoh seri: π untuk distribusi stasioner diganti **ω** karena π dipakai sebagai konstanta (densitas normal); estimasi (tindakan) ditulis **$\hat\theta$**, bukan $a$ (bentrok dengan Beta($a$, $b$)) dan bukan $d$ (bentrok dengan $d\theta$). Simbol yang sama tidak berganti arti dalam satu bab ($\sigma$, $e$). Penggantian simbol adalah keputusan penulis dan diterapkan ke buku induk beserta kuncinya.
 
 ## Jembatan istilah antarbab dan antarbuku
 

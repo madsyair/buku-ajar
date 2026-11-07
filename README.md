@@ -17,10 +17,11 @@ references/                  aturan gaya dan tampilan, istilah, data dan sumber,
                              gerbang, loop kerja, kunci jawaban, ilustrasi, pelajaran proyek,
                              prinsip buku ajar (ringkasan) + kajian lengkap
 assets/                      templat brief, rancangan rinci, kerangka bab, bab .qmd, bab kunci,
-                             laporan ulasan, temuan soal, serah-terima bagian, pemaduan, KEPUTUSAN-RANCANGAN, REVISI, STATUS;
-                             _quarto.yml, preamble.tex, tikz-preamble.tex, konfig.json,
+                             laporan ulasan, temuan soal, serah-terima bagian, pemaduan, KEPUTUSAN-RANCANGAN, REVISI, STATUS,
+                             instruksi pembaca independen dan instruksi perbaikan;
+                             _quarto.yml, preamble.tex, hak-cipta.tex, tikz-preamble.tex, konfig.json,
                              apa.csl, reference-b5.docx
-scripts/                     harness.py (26 gerbang), referensi.py, penggalan.py,
+scripts/                     harness.py (28 gerbang), referensi.py, penggalan.py,
                              uji_harness.sh + uji-buku/, gaya_gambar.py, catatan.lua,
                              bahasa-asing.lua, kemas_sumber.py, siapkan_proyek.py, README.md
 ```
@@ -36,7 +37,7 @@ scripts/                     harness.py (26 gerbang), referensi.py, penggalan.py
 | Sitasi | dengan lokasi (`[@k, hlm. 212]`); buku besar klaim berupa tabel parafrase berstatus | **penulis–tahun tanpa lokasi**; subjek hanya penulis orang; registri JSON dengan **kutipan verbatim** yang dicocokkan ulang otomatis ke teks sumber, Rd, DESCRIPTION, `citation()`, atau hitung ulang (G-REFERENSI) |
 | Angka di prosa | diisi dari keluaran setelah loop kode (penanda `[[...]]`) | **selalu R inline**; gerbang G-ANGKA menolak angka diketik; klaim "sama/tidak satu pun" dikunci `stopifnot` |
 | Gambar | tidak diatur rinci | R → parquet → Python `gaya_gambar` (Python tidak menghitung, G-PYTHON); TikZ untuk DAG; judul ≤ 12 kata, panel (a)(b), Div catatan; gambar tidak mengambang |
-| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 26 gerbang memeriksa isi bab, hasil rajut, dan hasil render (PDF bertag, tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
+| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 28 gerbang memeriksa isi bab, hasil rajut, dan hasil render (PDF bertag, tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
 | Uji harness | tidak ada | fikstur gagal/lulus `uji-buku/` + `uji_harness.sh`; setiap gerbang baru wajib berfikstur |
 | Keputusan penulis | dicatat di STATE | `KEPUTUSAN-RANCANGAN.md` bertanggal → gerbang/konfig baru → **audit semua buku** → putaran sunting → "Draf revisi ke-N" + `REVISI.md` (loop D) |
 | Penulis dan reviewer ahli | satu penulis | buku multidisiplin: penulis ahli per bidang menulis bagiannya, penulis pemadu menggabungkan; reviewer ahli per bidang (matematika, kode, pemodelan, *machine learning*, survei, domain, pedagogi, bahasa) dan penelaah pakar pendidikan yang menilai kelayakan buku ajar |
@@ -67,7 +68,7 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
 
 ## Status draf
 
-- Diuji 2026-11-07: `uji_harness.sh` (9 fikstur gagal, 1 lulus) dan templat bab/kunci LULUS harness pada proyek baru hasil `siapkan_proyek.py` (tanpa render). Render penuh dengan templat belum diuji di proyek baru.
+- Diuji 2026-11-07 (perubahan e): `uji_harness.sh` hijau pada proyek baru hasil `siapkan_proyek.py` (10 fikstur bab gagal, 1 lulus; G-TAG, G-LN, dan G-LOG pada fikstur masing-masing); render PDF proyek uji dengan tabel panjang lintas halaman: G-LOG LULUS (tanpa label ganda), PDF bertag, halaman hak cipta menyebut lisensi huruf. Sebelumnya: `uji_harness.sh` (9 fikstur gagal, 1 lulus) dan templat bab/kunci LULUS harness pada proyek baru hasil `siapkan_proyek.py` (tanpa render). Render penuh dengan templat belum diuji di proyek baru.
 - `references/kajian-prinsip-buku-ajar.md` sebagian bersumber sekunder ([S]); Permendikbudristek 22/2022 sudah diverifikasi ke teks peraturan.
 - Uji perilaku skill-creator iterasi 1 (2026-11-07, `evals/`): dua kasus, masing-masing dengan dan tanpa skill.
 
@@ -78,9 +79,11 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
   | Rata-rata waktu / token | 343 s / 171,8 ribu | 127 s / 77,4 ribu |
 
   Butir yang hanya lulus dengan skill: subjudul bukan kalimat tanya, tidak ada angka hasil yang diketik (termasuk di `fig-alt` dan kunci), dan penilaian dari tiga tingkat pembaca. Ulasan dalam uji dijalankan berurutan oleh satu agen ("tanpa isolasi konteks") karena subagen uji tidak punya alat subagen.
-- Deskripsi skill (997 karakter setelah perubahan 2026-11-07) semula dipendekkan menjadi 912 karakter agar lolos validasi (batas 1.024); pemicuannya belum dioptimalkan dengan evaluasi pemicuan skill-creator.
+- Deskripsi skill (1.012 karakter setelah perubahan 2026-11-07 e) semula dipendekkan menjadi 912 karakter agar lolos validasi (batas 1.024); pemicuannya belum dioptimalkan dengan evaluasi pemicuan skill-creator.
 
 ## Riwayat perubahan
+
+- **2026-11-07 (e)** — Pelajaran putaran telaah seri statistika Bayesian. (1) **Uji pembaca pemula independen wajib per bab** di loop A: audit tanpa isolasi konteks oleh agen penulis-perbaikan melewatkan 35 MAYOR di 34 bab, termasuk kesalahan isi nyata. Satu subagen berkonteks bersih membaca 3–5 bab dan menulis satu laporan per bab; penyunting adalah agen lain yang memeriksa temuan isi dulu (hitung ulang, registri) dan menulis "tidak diterapkan" beserta bukti bila temuan keliru. Templat baru `assets/templat-instruksi-pembaca-independen.md` dan `templat-instruksi-perbaikan-pembaca.md`; pola temuan berulang di `pelajaran-proyek.md` (bagian 14–19). (2) **Telaah pakar → tindak lanjut → "Usulan untuk diputuskan penulis"** dengan nilai bawaan sementara, disajikan bernomor dengan rekomendasi (juga untuk MINOR yang ditunda): `agents/00`, `09`, `21`, `loop-kerja.md`. (3) **Istilah dan notasi**: ln untuk logaritma natural di naskah dan kode tetap `log` (paragraf penjelas per buku, tabel lewat `col.names`); istilah *fit* menjadi mencocokkan/pencocokan; periksa bentrok simbol (ω, $\hat\theta$). Gerbang baru **G-LN** dengan fikstur `babln.qmd`. (4) **Tata letak**: gerbang **G-LOG** (log LaTeX akhir stabil, tanpa label ganda) dengan fikstur `uji-buku/log/*.txt`; `latex-min-runs: 4` di `assets/_quarto.yml`; `\endhead` longtable dan penalti baris yatim/janda di `assets/preamble.tex`; `assets/hak-cipta.tex` baru (fon beserta lisensi SIL OFL 1.1), disalin `siapkan_proyek.py`. (5) **Pemulihan** setelah batas pemakaian: lanjutkan agen yang sama lewat pesan, anggap proses latar mati (`agents/00`, bagian Pemulihan). (6) **Pengungkapan konflik kepentingan** bila penulis membuat atau memelihara paket yang dipakai, dengan jalur alternatif tetap lengkap.
 
 - **2026-11-07 (d)** — Tipografi dari seri statistika Bayesian (diterapkan dan diuji): satu keluarga huruf **Libertinus** (Serif 12 pt untuk teks dan judul, Mono untuk kode, Math untuk rumus; juga gambar matplotlib bertipe Type 3, TikZ, sampul, dan `reference-b5.docx`; ikon kotak dimatikan); kolom prosa ±118 mm pada B5 agar teks inti 40–70 karakter per baris (diukur median/persentil-95 dari `pdftotext -layout`), blok lebar 140 mm untuk kode, keluaran, gambar, tabel, dan rumus tampilan. Mesin **LuaLaTeX** dengan partial baru `assets/doc-class.tex` (`\DocumentMetadata`) menghasilkan PDF bertag dengan batasan TeX Live 2023 (belum PDF/UA). Berkas `assets/_quarto.yml`, `preamble.tex`, `tikz-preamble.tex`, `reference-b5.docx`, dan `scripts/gaya_gambar.py` diperbarui; `siapkan_proyek.py` menyalin `doc-class.tex`. Gerbang baru **G-TAG** (`pdfinfo`: bertag, pohon struktur Document/H1/P/Figure, `/Lang` id-ID; opsi `--tag-pdf`) dengan fikstur PDF gagal/lulus di `uji_harness.sh`. Aturan final menggantikan catatan "sedang diterapkan" di `aturan-gaya-dan-tampilan.md` dan `prinsip-buku-ajar.md`.
 - **2026-11-07 (c)** — Atas permintaan penulis: peran baru `21` penelaah pakar pendidikan dan penulisan buku ajar, wajib untuk setiap buku pada tiga tahap (telaah rancangan T1, telaah per bab T2, telaah buku utuh T3). Penelaah menilai kelayakan naskah sebagai buku ajar pada aspek materi, penyajian, kebahasaan, serta desain dan grafika (Permendikbudristek 22/2022), memetakan tujuan buku → bab → latihan, menghitung sebaran tingkat kognitif latihan, mengisi daftar periksa 35 butir dengan bukti lokasi, dan memberi rekomendasi kelayakan. Alur di `SKILL.md` dan kriteria berhenti loop A diperbarui.

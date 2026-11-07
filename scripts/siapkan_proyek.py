@@ -73,7 +73,7 @@ def main():
     tulis(P / "harness" / "referensi.json", "{}\n", False)
     tulis(P / "harness" / "pengecualian.json", json.dumps(
         {"angka-tetap": {}, "eyd-abaikan": [], "gaya-abaikan": [], "konjungsi-abaikan": [],
-         "larangan-abaikan": [], "istilah-abaikan": []}, indent=1) + "\n", False)
+         "larangan-abaikan": [], "istilah-abaikan": [], "ln-abaikan": []}, indent=1) + "\n", False)
     salin(ASET / "konfig.json", P / "harness" / "konfig.json", False)
     (P / "harness" / "sumber").mkdir(parents=True, exist_ok=True)
     (P / "harness" / "laporan").mkdir(parents=True, exist_ok=True)
@@ -82,7 +82,7 @@ def main():
     for f in ["gaya_gambar.py", "catatan.lua", "bahasa-asing.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
     for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
-              "reference-b5.docx"]:
+              "reference-b5.docx", "hak-cipta.tex"]:
         salin(ASET / f, P / "_bersama" / f, t)
 
     # dokumen proyek
@@ -96,6 +96,7 @@ def main():
     q = (ASET / "_quarto.yml").read_text(encoding="utf-8")
     q = q.replace('"JUDUL BUKU"', json.dumps(a.judul, ensure_ascii=False))
     q = q.replace('"PENULIS"', json.dumps(a.penulis, ensure_ascii=False))
+    q = q.replace("{JUDUL BUKU}{PENULIS}{2026}", "{" + a.judul + "}{" + a.penulis + "}{" + f"{date.today():%Y}" + "}")
     q = q.replace('date: "2026-11-07"', f'date: "{date.today():%Y-%m-%d}"')
     tulis(B / "_quarto.yml", q, t)
     tulis(B / "pustaka.bib", "", False)

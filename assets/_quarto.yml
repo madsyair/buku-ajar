@@ -88,8 +88,15 @@ format:
     tbl-pos: "H"
     include-in-header:
       - ../_bersama/preamble.tex      # huruf, blok lebar, tag judul, indentfirst, draf, penggalan
+      - ../_bersama/hak-cipta.tex     # \halamanhakcipta (fon dan lisensinya, data "belum ditetapkan")
+    include-before-body:              # halaman hak cipta sesudah halaman judul (Word: tulis di index.qmd)
+      - text: '\halamanhakcipta{JUDUL BUKU}{PENULIS}{2026}{Draf revisi ke-1}{Quarto, R, Python, \LuaLaTeX}'
     keep-tex: true                    # perlu untuk G-TEPI dan G-PENGGALAN
-    latex-clean: false
+    latex-clean: false                # perlu untuk G-TEPI dan G-LOG
+    # Quarto tidak mengulang LuaLaTeX untuk "Rerun to correct this" (hook
+    # lastpage), sehingga daftar isi tertinggal satu putaran (Indeks hilang,
+    # nomor halaman salah). Empat putaran: awal, indeks, makeindex, lalu stabil.
+    latex-min-runs: 4
   docx:
     reference-doc: ../_bersama/reference-b5.docx   # Body Text/First Paragraph: indent 0,75 cm, spasi 0
     toc: true

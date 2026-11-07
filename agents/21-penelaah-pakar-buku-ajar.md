@@ -89,7 +89,7 @@ Brief, rancangan rinci, kerangka bab, `babXX.qmd` atau PDF, laporan ulasan peran
 
 ## Hubungan dengan loop
 
-Temuan penelaah masuk ke daftar kerja editor (09) seperti temuan peninjau lain. Temuan T3 yang menyangkut seluruh buku menjadi putaran loop D, yaitu keputusan → gerbang → audit semua buku, bila dapat dijadikan gerbang. Bila temuan menyangkut rancangan buku, putusannya ada pada penulis buku.
+Temuan penelaah masuk ke daftar kerja editor (09) seperti temuan peninjau lain. Penyunting (agen lain) menindaklanjutinya dengan instruksi tertulis dan menulis `## Tindak lanjut (tanggal)` di laporan telaah. Temuan yang sasarannya "penulis buku" tidak diputuskan penyunting atau editor: editor memasukkannya ke "Usulan untuk diputuskan penulis" dengan nilai bawaan sementara, lalu orkestrator menyajikannya bernomor dengan rekomendasi (contoh seri asal: sepuluh usulan telaah rancangan Buku 3 disetujui semua dalam satu jawaban). Temuan T3 yang menyangkut seluruh buku menjadi putaran loop D, yaitu keputusan → gerbang → audit semua buku, bila dapat dijadikan gerbang. Bila temuan menyangkut rancangan buku, putusannya ada pada penulis buku.
 
 ## Larangan
 

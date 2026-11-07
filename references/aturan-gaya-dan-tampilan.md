@@ -67,6 +67,9 @@ dari posterior ...
 | Rumus tampilan yang terlalu lebar dipecah (`aligned`, `split`) atau ditulis ulang. | G-TEPI |
 | Notasi ditetapkan sekali per buku (rancangan rinci) dan sama lintas buku seri; padanan notasi sumber disebut sekali bila berbeda. | reviewer rumus, editor |
 | Tanda khusus ditulis karakter Unicode langsung di prosa (± bukan `$\pm$` yang menempel ke kode inline). | pembaca |
+| **Logaritma natural ditulis ln** di prosa, rumus (`\ln`), tabel (judul kolom tampilan lewat `col.names`, nama variabel kode tetap), gambar, dan glosarium; **kode R/Stan dan keluarannya tetap `log`**. Basis lain `\log_{10}`, `\log_2`. Kemunculan pertama per buku induk diberi paragraf penjelas: ln di naskah; `log()` di R/Stan sudah logaritma natural; basis lain `log10()`, `log2()`, `log(x, base = b)`. Kata yang bukan logaritma (logit, logistik, katalog, log LaTeX) tidak diubah. Rincian: `istilah-statistika.md`. | G-LN (rumus prosa, keterangan); reviewer rumus (prosa, tabel, gambar) |
+| **Periksa bentrok simbol lintas bab dan buku sebelum memilih notasi**: π konstanta (distribusi stasioner memakai ω), $e$ bilangan Euler, huruf parameter distribusi (estimasi $\hat\theta$, bukan $a$ yang bentrok dengan Beta($a$, $b$) dan bukan $d$ yang bentrok dengan $d\theta$); satu simbol satu arti dalam satu bab. | reviewer rumus, pembaca pemula, editor |
+| Inti penurunan yang dipakai teks inti, Ringkasan, tujuan belajar, atau latihan ditulis satu atau dua kalimat di teks inti; kotak Penurunan hanya rinciannya (pola temuan pembaca pemula yang paling sering). | pembaca pemula |
 
 ## 5. Sitasi
 
@@ -117,6 +120,9 @@ Struktur bawaan setiap bab (sesuaikan di brief):
 | Blok kode dan tabel pendek tidak terbelah halaman: `\needspace{N\baselineskip}` sebelum chunk bila perlu. | editor |
 | Render buku hanya **berurutan**, satu buku sekali jalan, setelah semua agen bab selesai (lihat orkestrator). | — |
 | Keluaran PDF dan Word dirender dalam satu `quarto render` (render terpisah menghapus berkas format pertama). | G-RENDER |
+| **Daftar isi dan rujukan stabil**: `latex-min-runs: 4` di format pdf `_quarto.yml` (Quarto tidak mengulang LuaLaTeX untuk "Rerun to correct this" dari `lastpage` sehingga daftar isi tertinggal satu putaran: Indeks hilang, nomor halaman salah). Log akhir tanpa "Rerun to correct", "Label(s) may have changed", "Rerun to get … right", dan label ganda. | G-LOG |
+| **Tanpa label ganda dari tabel panjang**: keterangan `longtable` Pandoc ada di `\endhead` dan disalin ke setiap halaman lanjutan beserta `\label`-nya; `preamble.tex` mendefinisikan ulang `\endhead` sehingga salinan untuk halaman lanjutan dibersihkan dari `\write` dan anchor (LuaTeX). Keterangan tetap diulang. | G-LOG |
+| **Tanpa baris yatim dan janda**: `\widowpenalty`, `\clubpenalty`, `\displaywidowpenalty` 10000 di `preamble.tex` (Permendikbudristek 22/2022, Lampiran III). | editor |
 
 ### Halaman judul, draf, dan paragraf (keputusan penulis 2026-11-07)
 
@@ -133,7 +139,8 @@ Struktur bawaan setiap bab (sesuaikan di brief):
 
 | Aturan | Gerbang |
 |---|---|
-| Setiap buku (induk dan kunci) punya **halaman hak cipta**: judul, penulis, penerbit, tahun, ISBN, edisi/revisi, fon yang dipakai, lisensi. Data yang belum ada ditulis **"belum ditetapkan"**, tidak dikarang (mis. "ISBN: belum ditetapkan"). | editor |
+| Setiap buku (induk dan kunci) punya **halaman hak cipta**: judul, penulis, penerbit, tahun, ISBN, edisi/revisi, fon yang dipakai **beserta lisensinya** (Libertinus: SIL Open Font License 1.1), lisensi kode. Data yang belum ada ditulis **"belum ditetapkan"**, tidak dikarang (mis. "ISBN: belum ditetapkan"). Templat PDF: `assets/hak-cipta.tex` (`\halamanhakcipta`, dipanggil lewat `include-before-body`); Word: versi teks di awal `index.qmd`. | editor |
+| **Pengungkapan konflik kepentingan**: bila penulis buku adalah pembuat atau pemelihara paket yang dipakai (cocokkan `Author`/`Maintainer` di DESCRIPTION dengan penulis di `_quarto.yml`), tulis **satu kalimat pengungkapan** di tempat paket pertama dipakai atau di prakata, dengan bukti DESCRIPTION di registri klaim. Jalur alternatif tanpa paket itu tetap lengkap (paket penulis cukup satu subbab "perangkat siap pakai"). | editor, penelaah pakar |
 | Setiap buku punya **glosarium** (istilah dari `keputusan-istilah.md`, istilah asing miring dengan padanan atau penjelasan singkat) dan **indeks** di keluaran PDF (entri dari istilah glosarium dan nama metode; Word tidak wajib berindeks). | editor |
 | **Riwayat hidup penulis** hanya berisi fakta dari sumber resmi (laman profil lembaga, SK, publikasi resmi) yang **salinannya disimpan** di proyek (mis. `naskah/sumber-riwayat/`, dengan tanggal unduh); fakta tanpa salinan sumber tidak ditulis. | editor |
 
@@ -160,3 +167,4 @@ Rinci di skill **eyd** (`references/kalimat-efektif.md`, `kata-hubung.md`, `inve
 - **Koma konjungsi** (EYD V B.2–B.5, B.13): **tanpa** koma sebelum penghubung subordinatif bila induk mendahului anak kalimat (*sehingga, karena, sebab, agar, supaya, bahwa, jika, bila, apabila, kalau, meskipun, walaupun, ketika, setelah, sebelum, sejak, selama*), termasuk bila kalimat diawali anak kalimat lain. **Dengan** koma sebelum *tetapi, melainkan, sedangkan, padahal*; sesudah anak kalimat yang mendahului induk; sesudah penghubung antarkalimat (*Akibatnya,* *Oleh karena itu,* *Namun,*); sebagai penutup aposisi/sisipan. ", karena itu" di tengah kalimat → pecah kalimat. *Sehingga* tidak mengawali kalimat. Kalimat > 30 kata dipecah. Gerbang: G-KONJUNGSI; pengecualian sah per kalimat di `pengecualian.json` (`konjungsi-abaikan`), dinilai satu per satu, tidak dihapus massal.
 - Istilah asing yang **diputuskan tetap dalam bahasa Inggris** (contoh: *odds*) selalu dicetak miring di prosa, judul, keterangan, dan latihan. Bila kalimat yang memuat istilah itu menjadi `penanda` klaim di `harness/klaim.json`, penanda ikut diperbarui agar tetap sama persis dengan teks `.qmd` (mis. `*odds*`); kutipan bukti tidak diubah (keputusan penulis seri, dicatat 2026-11-07).
 - Istilah asing tanpa padanan lazim dicetak miring dan dijelaskan pada kemunculan pertama **di setiap bab**; verba tidak dibuat hibrida ("di-*fit*" → "dicocokkan"); akhiran pada istilah asing memakai tanda hubung (*shrinkage*-nya).
+- *fit*: **mencocokkan/pencocokan** (model dengan data), "objek hasil pencocokan", *fitted values* = nilai prediksi, *goodness of fit* = kecocokan model, *overfitting* miring; "mencocokkan" dalam arti membandingkan → "membandingkan"; istilah Inggrisnya disebut pada kemunculan pertama per buku (`istilah-statistika.md`).

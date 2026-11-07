@@ -1,0 +1,7 @@
+# Bab logaritma {#sec-ln}
+
+Ln *likelihood* ditulis di naskah sebagai $\log p(y \mid \theta)$, padahal basisnya e. Rumus tampilan berikut juga masih memakai log tanpa basis.
+
+$$
+\ell(\theta) = \sum_{i=1}^{n} \log f(y_i \mid \theta)
+$$

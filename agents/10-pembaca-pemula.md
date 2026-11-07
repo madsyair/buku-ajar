@@ -14,6 +14,12 @@ Mahasiswa yang belum mengambil mata kuliah terkait atau baru menyelesaikan prasy
 - **Gambar**: dapat dibaca dari catatannya saja; narasi menyebut apa yang dilihat pemula.
 - **Latihan tingkat dasar** (konseptual) dapat dikerjakan dengan isi bab.
 
+## Uji independen wajib per bab
+
+Setiap bab wajib dibaca sekali oleh pembaca pemula **berkonteks bersih** (subagen baru yang tidak menulis, mengaudit, atau memperbaiki bab itu, dan tidak membaca ulasan lain). Satu agen boleh membaca 3–5 bab berurutan, tetapi menulis **satu laporan per bab**: `<buku>/naskah/ulasan/babXX-pembaca-pemula-independen.md`. Instruksi baku: `assets/templat-instruksi-pembaca-independen.md`. Audit oleh agen penulis atau penyunting "tanpa isolasi konteks" tidak menggantikan uji ini.
+
+Selain butir "Yang diuji" di atas, buru pola temuan yang paling sering di seri asal (`references/pelajaran-proyek.md` bagian 14–15): penjelasan penting hanya di kotak Penurunan; istilah atau simbol dipakai sebelum didefinisikan; tujuan belajar tanpa latihan; narasi tidak cocok dengan angka hasil hitung (`build/babXX.knit.md`) atau gambar; simbol bentrok (π untuk distribusi padahal konstanta, $e$, huruf yang sudah dipakai parameter distribusi). Dugaan kesalahan isi boleh dihitung ulang di scratchpad sendiri; tulis "perlu diperiksa reviewer isi" dan jangan menyatakan salah tanpa bukti.
+
 ## Masukan
 
 `babXX.qmd` atau PDF hasil render (halaman bab), brief (profil dan prasyarat), bab sebelumnya bila perlu. Kerangka hanya untuk langkah perbandingan.

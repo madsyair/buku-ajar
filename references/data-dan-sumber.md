@@ -99,3 +99,5 @@ Skrip membaca berkas, menambah/mengganti **entri bab sendiri saja**, lalu menuli
 ### Sitasi data dan paket
 
 Paket yang datanya dipakai disitasi dari `citation("paket")` (entri bib + `referensi.json`). Dataset repositori disitasi dengan DOI dari halaman dataset. Rilis lembaga disitasi dengan entri berpenulis lembaga (hanya sitasi kurung).
+
+**Konflik kepentingan.** Untuk setiap paket yang dipakai, cocokkan `Author`/`Maintainer` di DESCRIPTION dengan penulis buku. Bila penulis adalah pembuat atau pemelihara paket, tulis satu kalimat pengungkapan (mis. "Penulis buku ini adalah pembuat dan pemelihara paket X.") di tempat paket pertama dipakai atau di prakata, catat bukti DESCRIPTION (jenis `description`) di registri klaim, dan pastikan jalur alternatif tanpa paket itu tetap lengkap.
