@@ -1,0 +1,29 @@
+% Preamble bersama buku ajar (dimuat Quarto untuk PDF lewat include-in-header).
+% Salin ke <proyek>/_bersama/preamble.tex dan sesuaikan warna seri.
+\usepackage{tikz}
+\usetikzlibrary{bayesnet,calc,arrows.meta,positioning,shapes.geometric}
+\usepackage{xcolor}
+\definecolor{seriutama}{HTML}{0F3D3E}
+\definecolor{seriabu}{HTML}{6B7280}
+% Judul bab dan subbab berwarna (KOMA-Script)
+\addtokomafont{disposition}{\color{seriutama}}
+\addtokomafont{chapter}{\Huge}
+% Paragraf menjorok, tanpa spasi antarparagraf, termasuk paragraf pertama
+% setelah judul (keputusan penulis 2026-11-07; pasangannya indent: true di _quarto.yml)
+\usepackage{indentfirst}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt plus 1pt}
+% Baris kode panjang dipenggal, tidak terpotong di tepi halaman
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+% Cegah tabel pendek dan blok kode terbelah halaman (\needspace di bab)
+\usepackage{needspace}
+% Pemenggalan EYD V dan nama yang tidak dipenggal (dibangkitkan harness/penggalan.py)
+\IfFileExists{../_bersama/penggalan-id.tex}{\input{../_bersama/penggalan-id.tex}}{}
+% Sampul (opsional): halaman sampul dimuat sebelum halaman judul Quarto
+% \providecommand{\halamansampul}{1}
+% \AtBeginDocument{\includepdf[pages=\halamansampul]{../sampul/sampul-seri.pdf}}
+% Tanda air draf di setiap halaman (keputusan penulis 2026-11-07).
+% Hapus dua baris ini untuk versi terbit.
+\usepackage{draftwatermark}
+\DraftwatermarkOptions{text={DRAF}, fontsize=120pt, angle=45, color={gray!14}}

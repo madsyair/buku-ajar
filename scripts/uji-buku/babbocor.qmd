@@ -1,0 +1,9 @@
+# Bab bocor {#sec-bocor}
+
+Bab ini sengaja mencetak repr objek Python. Harness harus menolaknya.
+
+```{python}
+class Benda:
+    pass
+Benda()
+```

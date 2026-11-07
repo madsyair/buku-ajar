@@ -1,0 +1,8 @@
+# Bab tak hingga {#sec-inf}
+
+```{r}
+#| include: false
+batas <- log(2^-1075)
+```
+
+Bab ini sengaja mencetak nilai tak hingga di prosa: batasnya sekitar `r batas`. Harness harus menolaknya.

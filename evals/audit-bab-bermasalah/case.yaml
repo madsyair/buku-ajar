@@ -1,0 +1,8 @@
+schema_version: "1.1"
+name: audit-bab-bermasalah
+context:
+  scaffold_script: place-files.sh
+expected_outcome: |
+  Laporan audit yang menilai bab terhadap prinsip buku ajar (tujuan, pertanyaan pembaca,
+  intuisi sebelum rumus, contoh, latihan, status data, sudut pandang pembaca pemula sampai mahir)
+  dan menemukan cacat yang ditanam; bab perbaikan menghilangkan cacat itu tanpa mengarang data.

@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: tulis-bab-binomial
+expected_outcome: |
+  Proyek Quarto baru dengan bab Distribusi Binomial berbahasa Indonesia (EYD V): subbab dibuka
+  pertanyaan wajar pembaca, intuisi sebelum rumus, contoh sehari-hari Indonesia, angka di prosa
+  dihitung inline dari kode R, subjudul bukan kalimat tanya, status data disebut, tiga latihan,
+  tanpa kata Sokratik/Feynman, dan laporan harness berstatus LULUS.

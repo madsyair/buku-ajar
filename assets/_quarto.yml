@@ -1,0 +1,92 @@
+# Contoh _quarto.yml buku ajar (B5, PDF + Word), diturunkan dari seri statistika Bayesian.
+# Salin ke <proyek>/<buku>/_quarto.yml; ganti JUDUL, PENULIS, N, dan bab.
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "JUDUL BUKU"            # judul saja; TANPA subtitle (keputusan penulis, G-HALJUDUL)
+  author: "PENULIS"
+  date: "2026-11-07"             # tanggal ISO saja; teks di sini mencetak "Invalid Date"
+  date-format: "[Draf revisi ke-1 · ]D MMMM YYYY"   # naikkan N tiap putaran revisi; catat di REVISI.md
+  # Bab ditambahkan satu per satu setelah lulus harness (urutan nomor)
+  chapters:
+    - index.qmd                  # prakata, termasuk "Data yang digunakan dan batasannya"
+    - bab01.qmd
+    - references.qmd
+  # appendices:
+  #   - lampiran-a.qmd
+  #   - lampiran-c-sumber-data.qmd
+
+lang: id-ID
+language:
+  crossref-eq-prefix: "persamaan"     # "persamaan" huruf kecil (G-PERSAMAAN); @Eq- di awal kalimat
+  crossref-sec-prefix: "Subbab"
+  crossref-apx-prefix: "Lampiran"
+  section-title-appendices: "Lampiran"
+  callout-note-title: "Penurunan"
+  callout-tip-title: "Ingat"
+  callout-important-title: "Tujuan belajar"
+
+filters:
+  - ../_bersama/bahasa-asing.lua      # istilah asing miring -> lang=en (pemenggalan Inggris)
+  - ../_bersama/catatan.lua           # ::: {.catatan} di bawah tabel/gambar
+
+bibliography: pustaka.bib
+csl: ../_bersama/apa.csl              # penulis-tahun
+number-sections: true
+crossref:
+  chapters: true
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: false
+
+knitr:
+  opts_chunk:
+    comment: "##"
+    collapse: false
+    fig.align: center
+
+format:
+  pdf:
+    documentclass: scrbook
+    classoption: [oneside, open=any, headings=small]
+    pdf-engine: xelatex
+    geometry:
+      - paperwidth=176mm
+      - paperheight=250mm
+      - inner=22mm
+      - outer=18mm
+      - top=22mm
+      - bottom=24mm
+    mainfont: TeX Gyre Pagella
+    sansfont: TeX Gyre Heros
+    mathfont: TeX Gyre Pagella Math
+    monofont: DejaVu Sans Mono
+    monofontoptions: [Scale=0.78]
+    fontsize: 10.5pt
+    linestretch: 1.15
+    indent: true                      # paragraf menjorok, tanpa spasi antarparagraf (lihat preamble)
+    toc: true
+    toc-depth: 2
+    lof: false
+    fig-format: pdf
+    fig-width: 5.2
+    fig-height: 3.2
+    fig-pos: "H"                      # gambar dan tabel tidak mengambang
+    tbl-pos: "H"
+    include-in-header:
+      - ../_bersama/preamble.tex      # indentfirst, parindent, draftwatermark, penggalan
+    keep-tex: true                    # perlu untuk G-TEPI dan G-PENGGALAN
+    latex-clean: false
+  docx:
+    reference-doc: ../_bersama/reference-b5.docx   # Body Text/First Paragraph: indent 0,75 cm, spasi 0
+    toc: true
+    toc-depth: 2
+    fig-format: png
+    fig-dpi: 300
+    fig-width: 5.2
+    fig-height: 3.2

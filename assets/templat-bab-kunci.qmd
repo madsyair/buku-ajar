@@ -1,0 +1,100 @@
+# Judul Bab yang Sama dengan Bab Induk {#sec-kunci-k1-01}
+
+```{r}
+#| label: setup-k1bab01
+#| include: false
+invisible(Sys.setlocale("LC_CTYPE", "C.UTF-8"))
+angka <- function(x, d = 2) {
+  sub("^-", "−", formatC(x, format = "f", digits = d,
+                               decimal.mark = ",", big.mark = "."))
+}
+persen <- function(x, d = 1) paste0(angka(100 * x, d), "%")
+dir.create("fit", showWarnings = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+set.seed(2026)
+# tabel rubrik penilaian: unsur dan skor, total wajib 10
+rubrik <- function(kolom, unsur, skor) {
+  stopifnot(length(unsur) == length(skor), sum(skor) == 10)
+  knitr::kable(data.frame(
+    U = c(unsur, "**Total**"),
+    S = c(skor, paste0("**", sum(skor), "**"))),
+    col.names = c(kolom, "Skor"), align = "lr", row.names = FALSE)
+}
+# data dan objek bab induk dibangun ulang di sini (tanpa source())
+```
+
+Bab ini membahas latihan Bab 1 buku induk. Paragraf pembuka menyebut apa yang dilatih dan status data yang dipakai, yaitu riil, sintetis paket, atau simulasi dengan *seed* sama dengan buku induk.
+
+## Konseptual {.unnumbered}
+
+### Latihan 1 {#sec-k1-01-l1}
+
+```{r}
+#| label: l1-k1-01
+#| include: false
+nilai <- 0.25
+```
+
+Soal meminta pembaca menjelaskan arti suatu besaran. Jenisnya konseptual, jadi jawabannya berupa urutan penalaran dengan angka pendukung.
+
+#### Pembahasan langkah demi langkah {.unnumbered}
+
+1. Langkah pertama dengan alasannya.
+2. Langkah kedua dengan angka inline `r angka(nilai, 2)`.
+3. Simpulkan.
+
+> **Jawaban akhir:** satu kalimat jawaban.
+
+#### Pedoman penilaian {.unnumbered}
+
+Rubrik @tbl-rubrik-k1-01-l1 membagi 10 poin ke 3 unsur jawaban. Catatan di bawahnya memuat pengurangan poin, contoh jawaban sebagian, dan variasi jawaban yang tetap benar.
+
+```{r}
+#| label: tbl-rubrik-k1-01-l1
+#| tbl-cap: "Rubrik Latihan 1 Bab 1"
+#| echo: false
+rubrik("Unsur jawaban", c(
+    "Unsur pertama",
+    "Unsur kedua",
+    "Unsur ketiga"),
+  c(4, 3, 3))
+```
+
+::: {.catatan}
+Kesalahan umum: … (kurangi 3 poin). Jawaban sebagian "…" bernilai 4 poin (unsur pertama saja). Variasi yang tetap benar: …
+:::
+
+## Hitungan {.unnumbered}
+
+### Latihan 2 {#sec-k1-01-l2}
+
+Soal meminta rata-rata tiga pengamatan. Jawaban memakai kode yang dijalankan.
+
+#### Pembahasan langkah demi langkah {.unnumbered}
+
+1. Siapkan data.
+
+```{r}
+#| label: l2-k1-01
+hasil <- mean(c(3, 5, 7))
+```
+
+2. Hitung: hasilnya `r angka(hasil, 1)`.
+
+> **Jawaban akhir:** nilainya `r angka(hasil, 1)`.
+
+#### Pedoman penilaian {.unnumbered}
+
+Rubrik @tbl-rubrik-k1-01-l2 membagi 10 poin ke 2 langkah. Catatan di bawahnya memuat pengurangan poin dan variasi jawaban.
+
+```{r}
+#| label: tbl-rubrik-k1-01-l2
+#| tbl-cap: "Rubrik Latihan 2 Bab 1"
+#| echo: false
+rubrik("Langkah", c("Kode benar dan berjalan", "Angka dan tafsiran"),
+       c(5, 5))
+```
+
+::: {.catatan}
+Kesalahan umum adalah salah membagi jumlah (kurangi 3 poin). Jawaban dengan kode benar tanpa tafsiran bernilai 5 poin. Variasi yang tetap benar adalah menghitung dengan tangan.
+:::

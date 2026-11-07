@@ -1,0 +1,30 @@
+# Rata-rata dan Simpangan Baku {#sec-rerata}
+
+Bab ini memakai teknik Feynman dan metode Sokratik agar mahasiswa paham.
+
+## Apa itu rata-rata?
+
+Rata-rata didefinisikan sebagai $\bar{x} = \frac{1}{n}\sum_{i=1}^n x_i$. Rata-rata sangat penting, sehingga harus dipahami dengan baik. Dalam era digital saat ini, rata-rata memainkan peran yang sangat krusial.
+
+```{r}
+x <- c(52, 61, 58, 70, 49, 66, 73, 55)
+mean(x)
+sd(x)
+```
+
+Jadi rata-rata nilai ujian adalah 60,5 dan simpangan bakunya 8,9.
+
+## Bagaimana menghitung simpangan baku?
+
+Rumus simpangan baku adalah $s = \sqrt{\frac{1}{n-1}\sum (x_i-\bar{x})^2}$, karena itu kita bagi dengan n-1.
+
+```{r}
+#| label: fig-hist
+#| fig-cap: "Histogram nilai ujian delapan mahasiswa kelas statistika semester dua yang menunjukkan bahwa sebaran nilai agak menceng ke kanan"
+hist(x)
+```
+
+## Latihan
+
+1. Hitung rata-rata.
+2. Jelaskan.

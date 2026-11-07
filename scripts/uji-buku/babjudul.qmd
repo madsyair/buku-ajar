@@ -1,0 +1,13 @@
+# Bab judul {#sec-judul}
+
+```{r}
+#| label: tbl-panjang
+#| tbl-cap: "Ringkasan posterior empat model untuk data contoh yang sengaja dibuat panjang. Kolom kedua adalah rata-rata posterior."
+knitr::kable(data.frame(a = 1, b = 2))
+```
+
+@tbl-panjang sengaja memakai judul panjang. Panel kiri pada gambar juga dirujuk dengan arah. Harness harus menolaknya.
+
+## Mengapa subjudul ini bertanya? {#sec-tanya}
+
+Subjudul di atas sengaja berupa kalimat tanya.
