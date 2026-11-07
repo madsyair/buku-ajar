@@ -1,29 +1,176 @@
 % Preamble bersama buku ajar (dimuat Quarto untuk PDF lewat include-in-header).
 % Salin ke <proyek>/_bersama/preamble.tex dan sesuaikan warna seri.
+% Mesin: LuaLaTeX, PDF bertag (\DocumentMetadata di _bersama/doc-class.tex).
+% Tipografi: skill buku-ajar, references/aturan-gaya-dan-tampilan.md.
 \usepackage{tikz}
 \usetikzlibrary{bayesnet,calc,arrows.meta,positioning,shapes.geometric}
 \usepackage{xcolor}
 \definecolor{seriutama}{HTML}{0F3D3E}
 \definecolor{seriabu}{HTML}{6B7280}
-% Judul bab dan subbab berwarna (KOMA-Script)
-\addtokomafont{disposition}{\color{seriutama}}
+
+% Satu keluarga huruf: Libertinus Serif untuk teks dan judul, Libertinus Mono
+% untuk kode, Libertinus Math untuk rumus (diatur di _quarto.yml). Judul KOMA
+% memakai huruf teks tebal, bukan huruf sans.
+\setkomafont{disposition}{\normalfont\bfseries\color{seriutama}}
 \addtokomafont{chapter}{\Huge}
-% Paragraf menjorok, tanpa spasi antarparagraf, termasuk paragraf pertama
-% setelah judul (keputusan penulis 2026-11-07; pasangannya indent: true di _quarto.yml)
-\usepackage{indentfirst}
-\setlength{\parindent}{1.5em}
-\setlength{\parskip}{0pt plus 1pt}
-% Baris kode panjang dipenggal, tidak terpotong di tepi halaman
+% Glif yang tidak ada di Libertinus Mono (mis. huruf Yunani di kode) diambil
+% dari Libertinus Serif (fallback didefinisikan di _bersama/doc-class.tex).
+\ifdefined\directlua\setmonofont{Libertinus Mono}[Scale=0.8,RawFeature={fallback=serimono}]\fi
+
+% Blok lebar: kode, keluaran, dan gambar boleh lebih lebar daripada kolom
+% prosa (kolom prosa dipersempit agar baris teks 40–70 karakter), tetapi
+% tetap di dalam batas 18 mm dari tepi kertas. Di dalam kotak atau daftar
+% (\linewidth < \textwidth) blok tidak dilebarkan.
+\newlength{\tambahlebar}
+\newlength{\tambahini}
+\AtBeginDocument{\setlength{\tambahlebar}{\dimexpr(\paperwidth-36mm-\textwidth)/2\relax}}
+% Tabel panjang belum didukung tagging LaTeX 2023: isinya tidak ditag agar
+% struktur dokumen tetap sah (lihat KEPUTUSAN-RANCANGAN.md proyek).
+\providecommand{\seritagstop}{\ifdefined\tagstop\tagstop\fi}
+\providecommand{\seritagstart}{\ifdefined\tagstart\tagstart\fi}
+\newcommand{\aturtambah}{%
+  \ifdim\linewidth<\textwidth\setlength{\tambahini}{0pt}\fvset{breaklines,breakanywhere}%
+  \else\setlength{\tambahini}{\tambahlebar}\fi}
+
+% Ukuran huruf blok kode dan keluaran: Libertinus Mono 7,8 pt (Scale 0,8 di
+% _quarto.yml dikalikan 9,75 pt) agar 72 karakter kode dan 78 karakter
+% keluaran muat tanpa dipenggal.
+\newcommand{\kodekecil}{\fontsize{9.75pt}{11.6pt}\selectfont}
+% Di blok lebar, kode (maks. 72 karakter) dan keluaran (maks. 78) muat utuh.
+% Di blok sempit (kotak, daftar) baris panjang dipenggal agar tidak melewati
+% tepi; breaklines hanya dipakai di sana karena memecah tag paragraf PDF.
 \usepackage{fvextra}
-\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,breakanywhere,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\},fontsize=\kodekecil}
+\makeatletter
+\AtBeginDocument{%
+  % Keluaran R (verbatim) memakai blok lebar yang sama. Didefinisikan di sini
+  % karena tcolorbox memuat paket verbatim yang menimpa definisi di preamble.
+  \renewenvironment{verbatim}{\VerbatimEnvironment\aturtambah
+    \begin{Verbatim}[fontsize=\kodekecil,
+      xleftmargin=-\tambahini,xrightmargin=-\tambahini]}%
+    {\end{Verbatim}}%
+  % Kotak kode Quarto dibungkus blok lebar
+  \ifdefined\Shaded
+    \renewenvironment{Shaded}{\aturtambah\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor},
+      boxrule=0pt, breakable, colback={codebgcolor}, enhanced, frame hidden, sharp corners,
+      left=2mm, right=1mm, top=1mm, bottom=1mm, boxsep=0pt,
+      grow to left by=\tambahini, grow to right by=\tambahini]}{\end{tcolorbox}}%
+  \fi
+  % Gambar diperkecil hanya bila lebih lebar daripada blok lebar
+  \ifdefined\pandocbounded
+    \renewcommand*\pandocbounded[1]{%
+      \aturtambah
+      \sbox\pandoc@box{#1}%
+      \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+      \Gscale@div\@tempb{\dimexpr\linewidth+2\tambahini\relax}{\wd\pandoc@box}%
+      \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi
+      \makebox[\linewidth][c]{\ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+        \else\usebox{\pandoc@box}\fi}}%
+  \fi
+  % Tabel (longtable Pandoc) memakai blok lebar; lebar kolom relatif
+  % dihitung dari \linewidth blok lebar
+  \let\seriLTawal\longtable \let\endseriLTawal\endlongtable
+  \renewenvironment{longtable}{\aturtambah
+    \LTleft=-\dimexpr\tambahini\relax plus 1fill\relax
+    \LTright=\dimexpr\tambahini\relax plus 1fill\relax
+    \advance\linewidth 2\tambahini \advance\hsize 2\tambahini
+    \par\seritagstop\seriLTawal}{\endseriLTawal\seritagstart}%
+}
+\makeatother
+
 % Cegah tabel pendek dan blok kode terbelah halaman (\needspace di bab)
 \usepackage{needspace}
 % Pemenggalan EYD V dan nama yang tidak dipenggal (dibangkitkan harness/penggalan.py)
 \IfFileExists{../_bersama/penggalan-id.tex}{\input{../_bersama/penggalan-id.tex}}{}
-% Sampul (opsional): halaman sampul dimuat sebelum halaman judul Quarto
+% Sampul (opsional): halaman sampul dimuat sebelum halaman judul Quarto.
+% Sampul dikompilasi dengan LuaLaTeX dan huruf Libertinus Serif/Math.
+% \usepackage{pdfpages}
 % \providecommand{\halamansampul}{1}
 % \AtBeginDocument{\includepdf[pages=\halamansampul]{../sampul/sampul-seri.pdf}}
 % Tanda air draf di setiap halaman (keputusan penulis 2026-11-07).
 % Hapus dua baris ini untuk versi terbit.
 \usepackage{draftwatermark}
 \DraftwatermarkOptions{text={DRAF}, fontsize=120pt, angle=45, color={gray!14}}
+% Paragraf menjorok, tanpa spasi antarparagraf, termasuk paragraf pertama
+% setelah judul (keputusan penulis 2026-11-07; pasangannya indent: true di _quarto.yml)
+\usepackage{indentfirst}
+\setlength{\parindent}{1.5em}
+\setlength{\parskip}{0pt plus 1pt}
+
+% Penyesuaian tagging (latex-lab, TL2023) untuk judul KOMA-Script: judul
+% subbab menjadi struktur H2/H3 yang tertutup dan paragraf sesudahnya P.
+\usepackage{etoolbox}
+\makeatletter
+\ExplSyntaxOn
+\cs_if_exist:NT \__tag_setup_restore_para_default:
+  {
+    \cs_new_protected:Npn \buku_judul_awal:n #1 { \tagtool{para-flattened=true} }
+    \clist_map_inline:nn { section, subsection, subsubsection, paragraph, subparagraph }
+      {
+        \AddtoDoHook{heading/begingroup/#1}{\buku_judul_awal:n}
+        \AddtoDoHook{heading/branch/star/#1}{\buku_judul_awal:n}
+      }
+    \pretocmd{\@xsect}
+      { \tag_tool:n {restore-para} \bool_set_false:N \l__tag_para_flattened_bool }
+      {}{ \PackageWarning{bukuajar}{\string\@xsect\space tidak dapat ditambal} }
+    \renewcommand{\sectionlinesformat}[4]
+      {
+        \IfUseNumber
+          { \@kernel@tag@hangfrom{\hskip #2#3}{#4} }
+          { \@hangfrom{\hskip #2#3}{#4} }
+      }
+  }
+\ExplSyntaxOff
+% Judul bab yang memuat koma dipecah latex-lab menjadi beberapa kunci
+% (sec-start-chapter=#2, lalu title=#1); argumen dibungkus tiga lapis kurung
+% kurawal (satu dilepas xparse, satu per tingkat keyval).
+\ifcsname tag_tool:n\endcsname
+  \NewCommandCopy\seribabasli\chapter
+  \RenewDocumentCommand\chapter{s o m}{%
+    \IfBooleanTF{#1}%
+      {\IfNoValueTF{#2}{\seribabasli*[{{{#3}}}]{#3}}{\seribabasli*[{{{#2}}}]{#3}}}%
+      {\IfNoValueTF{#2}{\seribabasli[{{{#3}}}]{#3}}{\seribabasli[{{{#2}}}]{#3}}}}
+\fi
+% Kode sebaris (\texttt) boleh dipatahkan sesudah _ / . < > = [ ( , tanpa
+% tanda hubung, agar nama fungsi dan berkas panjang tidak melewati tepi kolom.
+% Dikerjakan di Lua (LuaLaTeX): penalti 200 disisipkan sesudah karakter itu
+% bila hurufnya Libertinus Mono dan karakter berikutnya masih huruf kode.
+\ifdefined\directlua
+\directlua{
+  local patah = {[0x5F]=true, [0x2F]=true, [0x2E]=true, [0x3C]=true, [0x3E]=true,
+                 [0x3D]=true, [0x5B]=true, [0x28]=true, [0x2C]=true}
+  local GLYPH = node.id("glyph")
+  local mono = {}
+  local function ismono(f)
+    if mono[f] == nil then
+      local d = font.getfont(f)
+      mono[f] = d ~= nil and d.name ~= nil and string.find(d.name, "LibertinusMono", 1, true) ~= nil
+    end
+    return mono[f]
+  end
+  local function sisip(head)
+    for n in node.traverse_id(GLYPH, head) do
+      local s = n.next
+      if patah[n.char] and ismono(n.font) and s and s.id == GLYPH and ismono(s.font) then
+        local p = node.new("penalty")
+        p.penalty = 200
+        node.insert_after(head, n, p)
+      end
+    end
+    return head
+  end
+  luatexbase.add_to_callback("pre_linebreak_filter", sisip, "seri.kodepatah")
+}
+\fi
+% Kolom prosa lebih sempit: beri kelonggaran spasi lebih besar sebelum baris luap
+\setlength{\emergencystretch}{5em}
+% Nomor halaman tiga digit muat di daftar isi
+\renewcommand*{\@pnumwidth}{2.4em}
+% Rumus tampilan memakai blok lebar yang sama dengan kode (di luar kotak).
+\newcommand{\serirumuslebar}{%
+  \ifdim\hsize=\textwidth
+    \displayindent=\dimexpr\displayindent-\tambahlebar\relax
+    \displaywidth=\dimexpr\displaywidth+2\tambahlebar\relax
+  \fi}
+\AtBeginDocument{\everydisplay\expandafter{\the\everydisplay\serirumuslebar}}
+\makeatother

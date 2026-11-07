@@ -8,11 +8,12 @@
 python3 harness/harness.py --buku <buku> --bab bab02            # tanpa render (agen bab)
 python3 harness/harness.py --buku <buku> --bab bab02 --render   # dengan render (orkestrator, berurutan)
 bash harness/uji_harness.sh                                     # uji regresi harness
+python3 harness/harness.py --tag-pdf <buku>/_book/<buku>.pdf    # G-TAG saja pada PDF jadi
 ```
 
 Keluaran: `[LULUS]/[GAGAL] G-…` per gerbang, rincian temuan (baris qmd atau knit.md), dan laporan `harness/laporan/<buku>-<bab>.md` (tabel status, rincian, bukti referensi, WARNING EYD yang perlu ditinjau manual). Kode keluar 0 = semua gerbang lulus. Bab **tidak** dianggap selesai sebelum Status LULUS.
 
-Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `DRAF` (bawaan 1; set 0 hanya untuk masa transisi atau versi terbit, dan catat alasannya), `SKILL_EYD`, `SKILL_GAYA` (jalur skrip skill pendukung bila tidak ditemukan otomatis), `RETICULATE_PYTHON`.
+Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TAG`, `DRAF` (bawaan 1; set 0 hanya untuk masa transisi atau versi terbit, dan catat alasannya), `SKILL_EYD`, `SKILL_GAYA` (jalur skrip skill pendukung bila tidak ditemukan otomatis), `RETICULATE_PYTHON`.
 
 ## 2. Daftar gerbang
 
@@ -42,7 +43,8 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `DR
 | G-SLOP | rajut | frasa basa-basi dan kosakata khas tulisan mesin (daftar `SLOP_ID`); pengecualian `gaya-abaikan` | humanizer-id |
 | G-PENGGALAN | statis / render | `penggalan.py` memperbarui daftar pengecualian; pemenggal lulus contoh EYD V; setelah render: babel indonesian dan daftar dimuat, istilah asing bertanda Inggris, **nama tidak terpenggal** di PDF, setiap penggalan kata Indonesia di PDF sah menurut EYD V, Word: pemenggalan otomatis dan bahasa id-ID | pemenggalan |
 | G-RENDER | `--render` | `quarto render` PDF + Word dalam satu proses tanpa galat; peringatan rujukan/sitasi | render |
-| G-TEPI | `--render` | Overfull hbox > 3 pt di log LaTeX (rumus, tabel, kode, teks), dilaporkan dengan judul bab dan baris .tex | tanpa luapan tepi |
+| G-TEPI | `--render` | Overfull hbox > 3 pt di log LaTeX (rumus, tabel, kode, teks), dilaporkan dengan judul bab dan baris .tex; log LuaLaTeX memakai format *Overfull* yang sama dengan XeLaTeX | tanpa luapan tepi |
+| G-TAG | `--render` (`TAG=1`) atau `--tag-pdf` | PDF bertag: `pdfinfo` melaporkan `Tagged: yes`; pohon struktur (`pdfinfo -struct`) berakar Document dan memuat H1, P, dan Figure; `/Lang` = id-ID (pikepdf bila ada). Gagal bila `pdf-engine` bukan `lualatex` atau partial `doc-class.tex` (`\DocumentMetadata`) tidak dipasang. Fikstur: `uji-buku/tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS), sumbernya di `uji-buku/sumber-tag/`. `TAG=0` hanya untuk proyek lama yang belum pindah ke LuaLaTeX, dengan alasan tercatat | PDF bertag (butir 35) |
 
 Pengecualian hanya lewat `harness/pengecualian.json` dan **wajib beralasan**:
 
@@ -144,7 +146,7 @@ Render dijalankan **orkestrator, berurutan** (satu buku sekali jalan, tidak para
 python3 harness/harness.py --buku <buku> --bab <bab-terakhir-diubah> --render
 ```
 
-Setelah render: G-RENDER, G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), G-PENGGALAN (audit PDF), lalu pemeriksaan visual oleh editor/pembaca (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
+Setelah render: G-RENDER, G-TAG (PDF bertag), G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), dan G-PENGGALAN (audit PDF). Sekali per buku editor mengukur panjang baris (median dan persentil-95 karakter per baris prosa dari `pdftotext -layout`, harus 40–70; `aturan-gaya-dan-tampilan.md` bagian 8) dan memastikan `pdffonts` hanya memuat keluarga Libertinus. Sesudah itu editor/pembaca memeriksa tampilan (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
 
 ## 7. Batas harness
 

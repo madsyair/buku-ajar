@@ -23,7 +23,7 @@ Konvensi DAG (dari seri): data teramati lingkaran abu-abu, parameter lingkaran b
 ## Ukuran dan tampilan
 
 - Lebar ≤ 5,2 inci (B5); tinggi 2–3,2 inci; dua panel berdampingan cukup `figsize=(LEBAR, 2.1)`.
-- Fon gambar sama dengan fon teks (TeX Gyre Pagella); desimal koma di sumbu (`koma_desimal`); tanda minus Unicode.
+- Fon gambar sama dengan fon teks (Libertinus Serif, juga untuk *mathtext*; disematkan Type 3; satu keluarga huruf, lihat `aturan-gaya-dan-tampilan.md` bagian 8); desimal koma di sumbu (`koma_desimal`); tanda minus Unicode.
 - Label sumbu bahasa Indonesia, huruf kecil kecuali nama diri; istilah asing di label miring bila memungkinkan (`$\it{…}$`).
 - Legenda tidak menutupi data; pindahkan ke luar sumbu bila perlu.
 - Warna terang (isian/pita) dibedakan dari warna tua (garis/titik); jangan mengandalkan warna saja untuk membedakan seri (pakai gaya garis atau label langsung).

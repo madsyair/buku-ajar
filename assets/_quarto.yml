@@ -1,4 +1,5 @@
-# Contoh _quarto.yml buku ajar (B5, PDF + Word), diturunkan dari seri statistika Bayesian.
+# Contoh _quarto.yml buku ajar (B5, PDF bertag lewat LuaLaTeX + Word), diturunkan dari
+# seri statistika Bayesian. Tipografi: references/aturan-gaya-dan-tampilan.md.
 # Salin ke <proyek>/<buku>/_quarto.yml; ganti JUDUL, PENULIS, N, dan bab.
 project:
   type: book
@@ -54,21 +55,28 @@ format:
   pdf:
     documentclass: scrbook
     classoption: [oneside, open=any, headings=small]
-    pdf-engine: xelatex
-    geometry:
+    pdf-engine: lualatex              # PDF bertag; XeLaTeX tidak mendukung tagging
+    template-partials:
+      - ../_bersama/doc-class.tex     # \DocumentMetadata sebelum \documentclass
+    geometry:                         # kolom prosa ±118 mm: 40–70 karakter per baris
       - paperwidth=176mm
       - paperheight=250mm
-      - inner=22mm
-      - outer=18mm
+      - inner=29mm
+      - outer=29mm
       - top=22mm
       - bottom=24mm
-    mainfont: TeX Gyre Pagella
-    sansfont: TeX Gyre Heros
-    mathfont: TeX Gyre Pagella Math
-    monofont: DejaVu Sans Mono
-    monofontoptions: [Scale=0.78]
-    fontsize: 10.5pt
-    linestretch: 1.15
+    # Satu keluarga huruf: Libertinus (teks, judul, rumus, kode; juga gambar,
+    # TikZ, sampul, dan reference-b5.docx). sansfont sengaja Libertinus Serif.
+    mainfont: Libertinus Serif
+    sansfont: Libertinus Serif
+    mathfont: Libertinus Math
+    monofont: Libertinus Mono
+    monofontoptions: [Scale=0.8]
+    fontsize: 12pt
+    linestretch: 1.1
+    callout-icon: false               # tanpa ikon FontAwesome: satu keluarga huruf
+    code-block-bg: "#F4F6F5"          # dipakai blok lebar kode (preamble.tex)
+    code-block-border-left: "#0F3D3E"
     indent: true                      # paragraf menjorok, tanpa spasi antarparagraf (lihat preamble)
     toc: true
     toc-depth: 2
@@ -79,7 +87,7 @@ format:
     fig-pos: "H"                      # gambar dan tabel tidak mengambang
     tbl-pos: "H"
     include-in-header:
-      - ../_bersama/preamble.tex      # indentfirst, parindent, draftwatermark, penggalan
+      - ../_bersama/preamble.tex      # huruf, blok lebar, tag judul, indentfirst, draf, penggalan
     keep-tex: true                    # perlu untuk G-TEPI dan G-PENGGALAN
     latex-clean: false
   docx:
