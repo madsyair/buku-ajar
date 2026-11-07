@@ -1,6 +1,7 @@
 # Kerangka Bab N — <Judul Bab> (<tanggal>)
 
 Anggaran: <…> hlm. Label bab `sec-…`; label lain bersufiks `-<kode>-NN`. Chunk setup `setup-<kode>babNN`. Berkas fit `fit/<kode>-NN-*`. Kode tersembunyi: `lampiran-kode/<buku>/babNN.R`.
+Disiplin: <satu disiplin | multidisiplin: `model`, `ml`, …>. Penulis: <04 | 04a per disiplin + 04b pemadu>. Reviewer ahli: <05–08, 16–20 sesuai disiplin>; lintas bagian: 07, 09 (+ 20 untuk multidisiplin).
 Target: ±<…> kata prosa, <…> gambar data (Python) + <…> TikZ, <…> tabel, ±<…> baris kode tampil.
 
 ## Pembuka
@@ -24,10 +25,18 @@ Target: ±<…> kata prosa, <…> gambar data (Python) + <…> TikZ, <…> tabel
    - Klaim bersumber: <isi> [@kunci] (lokasi untuk registri: bag. …).
    - Gambar/tabel: `fig-…-<kode>-NN` "<judul ≤ 12 kata>: (a) …, (b) …"; data parquet `<buku>-babNN-…`; yang harus terlihat: …
    - Miskonsepsi yang disanggah (bila ada): …
+   - **Disiplin dan penugasan** (multidisiplin): disiplin `<kode>`; penulis ahli 04a `<kode>`; berkas `babNN-<kode>.qmd`; reviewer ahli <nomor>; prasyarat dari disiplin lain: …
+
+## Jembatan antardisiplin (multidisiplin; ditulis pemadu 04b)
+
+| Dari subbab (disiplin) | Ke subbab (disiplin) | Yang sudah diketahui pembaca | Mengapa sudut pandang baru diperlukan | Istilah/notasi yang berganti |
+| --- | --- | --- | --- | --- |
 
 ## Contoh utama `sec-contoh-utama-<kode>-NN`: <judul>
 
 Kaitan dengan peta alur kerja/kerangka seri: <…>; yang baru di bab ini: <…>.
+
+Disiplin per langkah (multidisiplin): <mis. Model dan Periksa: `model`; Hitung: `komputasi`; Interpretasikan: `<domain>`>.
 
 1. Pertanyaan dan data (status data; sumber):
 2. Model (formula, prior beserta alasan, DAG):
@@ -49,3 +58,4 @@ Tiga pesan utama; kalimat penutup bagi pembaca terapan.
 | … | Hitungan | | | |
 | … | Pemrograman ("tiru alurnya") | | | |
 | … | Campuran berjarak (bab sebelumnya, metode tidak disebut) | | | |
+| … | Lintas disiplin (multidisiplin: memadukan minimal dua bagian) | | | |

@@ -4,6 +4,10 @@
 
 Memastikan semua kode berjalan, dapat direproduksi pembaca, rapi di halaman cetak, dan bahwa logika kode yang menghasilkan kalimat bersyarat benar.
 
+## Profil keahlian
+
+**Ahli komputasi dan pemrograman** (R, Python, Stan; reproduktibilitas dan numerik). Reviewer ahli untuk bagian berdisiplin `komputasi` dan untuk semua kode di bab. Bukti yang diminta: skrip lampiran salinan dijalankan dari folder bersih; nilai dan ambang setiap kalimat bersyarat dicetak. Pada buku multidisiplin, periksa juga bahwa cache dan parquet bagian tetap dipakai setelah pemaduan (tidak ada model yang dicocokkan ulang tanpa sengaja) dan bahwa setup paduan memuat semua fungsi yang dipakai bagian.
+
 ## Masukan
 
 `babXX.qmd`; `build/babXX.knit.md`; `lampiran-kode/<buku>/babXX.R`, `babXX_gambar.py`, `.tex` TikZ; `fit/`; `stan/`; laporan harness; brief (versi perangkat).

@@ -4,6 +4,10 @@
 
 Menilai dan, pada putaran sunting yang diperintahkan orkestrator, memperbaiki bahasa: EYD V lewat skill **eyd**, kalimat utuh dan efektif, kepaduan paragraf dan antarparagraf, koma konjungsi, istilah, dan bebas pola tulisan mesin (skill **humanizer-id**). Sebagai peninjau ia hanya menulis laporan; sebagai penyunting (mode `sunting`) ia mengubah hanya bahasa, bukan makna, angka inline, sitasi, atau label.
 
+## Profil keahlian
+
+**Ahli bahasa Indonesia** dan penyuntingan naskah ilmiah: EYD V, kalimat efektif, kepaduan, pembentukan istilah. Reviewer lintas bagian yang wajib untuk setiap bagian. Pada buku multidisiplin, perhatikan juga pergantian register antardisiplin (istilah yang berganti tanpa jembatan, gaya kalimat satu bagian yang berbeda dari bagian lain). Bukti yang diminta: keluaran `periksa.py`, kaidah EYD V atau KBBI yang dilanggar untuk setiap temuan.
+
 ## Masukan
 
 `babXX.qmd`; `build/babXX.prosa-eyd.md` dan laporan harness (G-EYD WARNING, G-KONJUNGSI, G-SLOP, G-PARAGRAF); `keputusan-istilah.md`; `KEPUTUSAN-RANCANGAN.md`; skill eyd (`references/kalimat-efektif.md`, `kata-hubung.md`, `inventaris-kesalahan.md`, `istilah-dan-kbbi.md`; rubrik dimensi 7 dan 9); `references/istilah-statistika.md`; `references/aturan-gaya-dan-tampilan.md` bagian 9.

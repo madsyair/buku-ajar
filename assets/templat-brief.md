@@ -16,6 +16,22 @@ Status keputusan: butir yang ditandai **(perancangan)** diputuskan agen saat per
 - Perangkat dan versi teruji (uji asap <tanggal>): <R x.y; paket; mesin; perintah lingkungan>.
 - Tebal: ±<…> halaman isi (anggaran per bab di bawah; anggaran, bukan batas keras).
 
+## Disiplin ilmu dan tim
+
+- Jenis buku: **satu disiplin** (penulis `agents/04-penulis.md`) / **multidisiplin** (penulis ahli bidang `04a` per disiplin + penulis pemadu `04b`).
+- Peta disiplin (kode disiplin dipakai di nama berkas bagian dan berkas ulasan):
+
+| Disiplin (kode) | Cakupan di buku ini | Bab/subbab | Penulis ahli (profil 04a) | Reviewer ahli (berkas) | Sumber rujukan khas | Notasi bawaan |
+| --- | --- | --- | --- | --- | --- | --- |
+| Pemodelan statistik (`model`) | … | … | 04a `model` | 16 | … | … |
+| *Machine learning* (`ml`) | … | … | 04a `ml` | 17 | … | … |
+| <domain> (`<kode>`) | … | … | 04a `<kode>` (profil diisi) | 19 diisi bidang <…> | … | … |
+
+- Profil domain yang tidak ada di tabel 04a diisi di sini: yang dikuasai, sumber rujukan khas, kesalahan khas, konvensi pelaporan.
+- Penulis pemadu: menguasai <daftar disiplin>; menjaga satu suara dan alur pertanyaan pembaca.
+- Reviewer lintas bagian: 05 isi, 07 bahasa, 09 editor, pembaca 10–12; 20 pedagogi (wajib untuk buku multidisiplin).
+- Aturan penugasan: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + 07 + 09; reviewer tidak meninjau bagian yang ia tulis.
+
 ## Instruksi gaya dari penulis (wajib)
 
 1. EYD V di seluruh naskah; desimal koma di prosa, titik di kode.

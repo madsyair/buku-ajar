@@ -1,6 +1,7 @@
 # Ulasan <peran> — Bab N "<judul bab>" (<tanggal>)
 
-Peran: <reviewer isi | rumus | bahasa | kode | pembaca pemula | menengah | mahir | editor>, konteks bersih, hanya membaca.
+Peran: <reviewer isi | rumus (ahli matematika) | bahasa | kode | ahli pemodelan statistik | ahli *machine learning* | ahli statistika resmi | ahli domain <bidang> | ahli pedagogi | pembaca pemula | menengah | mahir | editor>, konteks bersih, hanya membaca.
+Bagian yang ditinjau (buku multidisiplin, dari peta pemaduan): <subbab dan disiplinnya>; peninjau bukan penulis bagian itu.
 Profil (khusus pembaca): <…>.
 Yang dibaca: `babNN.qmd` (<n> baris), `build/babNN.knit.md`, <parquet/fit/sumber>, PDF `_book/<…>.pdf` hlm. cetak <a–b> (<n> halaman; anggaran <m>).
 Yang tidak dijalankan: harness dan render (peninjau tidak menjalankannya); hitung ulang di `<scratchpad>/periksa-<buku>-NN/`.
@@ -22,6 +23,7 @@ Temuan: **<n> MAYOR**, **<m> MINOR**.
 Kutipan: "<teks qmd>".
 Masalah: <mengapa salah/menyesatkan, dengan angka hitung ulang atau bukti>.
 Usulan: "<kalimat pengganti>" (atau tindakan).
+Sasaran perbaikan (multidisiplin): <ahli `<kode>` (substansi bidang) | pemadu (jembatan, notasi lintas bagian, alur, bahasa)>.
 
 ## MINOR
 
@@ -39,9 +41,9 @@ Usulan: "<kalimat pengganti>" (atau tindakan).
 
 - …
 
-## Tindak lanjut (<tanggal>)  <!-- diisi penulis bab, bukan peninjau -->
+## Tindak lanjut (<tanggal>)  <!-- diisi penulis bab (multidisiplin: ahli atau pemadu yang memperbaiki), bukan peninjau -->
 
-- M1 — diperbaiki: <apa yang diubah, baris>.
+- M1 — diperbaiki (<penulis | ahli `<kode>` | pemadu>): <apa yang diubah, baris>.
 - MINOR 3 — tidak diterapkan: <alasan>.
 - MINOR 5 — diajukan ke penulis buku: <butir keputusan>.
 

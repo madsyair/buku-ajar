@@ -2,7 +2,7 @@
 
 Aturan di berkas ini disarikan dari keputusan penulis yang berlaku umum pada seri buku statistika Bayesian (Choir, 2026) dan menjadi **bawaan** skill. Setiap proyek baru menyalinnya ke `KEPUTUSAN-RANCANGAN.md` proyek (lihat `assets/templat-KEPUTUSAN-RANCANGAN.md`); bila penulis memutuskan lain, berkas proyek yang berlaku. Kolom "Gerbang" menyebut pemeriksa otomatis di `scripts/harness.py`; aturan tanpa gerbang diperiksa reviewer.
 
-Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 Rumus dan notasi · 5 Sitasi · 6 Angka dan kode · 7 Kotak dan struktur bab · 8 Tata letak cetak · 9 Bahasa (ringkas; rinci di skill eyd)
+Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 Rumus dan notasi · 5 Sitasi · 6 Angka dan kode · 7 Kotak dan struktur bab · 8 Tata letak cetak (termasuk halaman judul dan anatomi buku) · 9 Bahasa (ringkas; rinci di skill eyd)
 
 ## 1. Prosa dan alur
 
@@ -129,10 +129,20 @@ Struktur bawaan setiap bab (sesuaikan di brief):
 | Nama penulis di halaman judul dan sampul **tanpa gelar akademis** (Permendikbudristek 22/2022, Lampiran II hlm. 55). Anatomi buku (halaman hak cipta dengan fon yang dipakai, prakata berisi tujuan dan pembaca sasaran, petunjuk penggunaan, daftar pustaka, glosarium/indeks, riwayat penulis) diperiksa sekali per buku (kajian butir 33–34). | editor |
 | **Paragraf menjorok** di baris pertama, **tanpa spasi antarparagraf**, termasuk paragraf pertama setelah judul. PDF: `indent: true` di format pdf `_quarto.yml`; preamble `\usepackage{indentfirst}`, `\setlength{\parindent}{1.5em}`, `\setlength{\parskip}{0pt plus 1pt}`. Word: gaya *Body Text* dan *First Paragraph* di `reference-doc` diberi indentasi baris pertama 0,75 cm dan spasi sebelum/sesudah 0. | editor (periksa PDF dan Word) |
 
+### Anatomi buku dan tipografi (keputusan penulis seri, dicatat 2026-11-07)
+
+| Aturan | Gerbang |
+|---|---|
+| Setiap buku (induk dan kunci) punya **halaman hak cipta**: judul, penulis, penerbit, tahun, ISBN, edisi/revisi, fon yang dipakai, lisensi. Data yang belum ada ditulis **"belum ditetapkan"**, tidak dikarang (mis. "ISBN: belum ditetapkan"). | editor |
+| Setiap buku punya **glosarium** (istilah dari `keputusan-istilah.md`, istilah asing miring dengan padanan atau penjelasan singkat) dan **indeks** di keluaran PDF (entri dari istilah glosarium dan nama metode; Word tidak wajib berindeks). | editor |
+| **Riwayat hidup penulis** hanya berisi fakta dari sumber resmi (laman profil lembaga, SK, publikasi resmi) yang **salinannya disimpan** di proyek (mis. `naskah/sumber-riwayat/`, dengan tanggal unduh); fakta tanpa salinan sumber tidak ditulis. | editor |
+| Tipografi: **satu jenis huruf**, panjang baris **40–70 karakter**, dan **PDF bertag** (aksesibel) sedang diterapkan; rincian (fon, ukuran, setelan LaTeX, cara uji) ditulis di sini setelah uji. Sampai saat itu templat bawaan tetap berlaku dan editor mencatat penyimpangannya (kajian butir 34–35). | editor (menunggu gerbang) |
+
 ## 9. Bahasa (ringkas)
 
 Rinci di skill **eyd** (`references/kalimat-efektif.md`, `kata-hubung.md`, `inventaris-kesalahan.md`) dan `istilah-statistika.md`.
 
 - Setiap kalimat **utuh**: subjek dan predikat jelas; tanpa subjek berkata depan ("Dalam bab ini membahas …"); tanpa anak kalimat berdiri sendiri (kalimat diawali "Sehingga", "Karena", "Yang"); tanpa konjungsi ganda ("Meskipun … tetapi").
 - **Koma konjungsi** (EYD V B.2–B.5, B.13): **tanpa** koma sebelum penghubung subordinatif bila induk mendahului anak kalimat (*sehingga, karena, sebab, agar, supaya, bahwa, jika, bila, apabila, kalau, meskipun, walaupun, ketika, setelah, sebelum, sejak, selama*), termasuk bila kalimat diawali anak kalimat lain. **Dengan** koma sebelum *tetapi, melainkan, sedangkan, padahal*; sesudah anak kalimat yang mendahului induk; sesudah penghubung antarkalimat (*Akibatnya,* *Oleh karena itu,* *Namun,*); sebagai penutup aposisi/sisipan. ", karena itu" di tengah kalimat → pecah kalimat. *Sehingga* tidak mengawali kalimat. Kalimat > 30 kata dipecah. Gerbang: G-KONJUNGSI; pengecualian sah per kalimat di `pengecualian.json` (`konjungsi-abaikan`), dinilai satu per satu, tidak dihapus massal.
+- Istilah asing yang **diputuskan tetap dalam bahasa Inggris** (contoh: *odds*) selalu dicetak miring di prosa, judul, keterangan, dan latihan. Bila kalimat yang memuat istilah itu menjadi `penanda` klaim di `harness/klaim.json`, penanda ikut diperbarui agar tetap sama persis dengan teks `.qmd` (mis. `*odds*`); kutipan bukti tidak diubah (keputusan penulis seri, dicatat 2026-11-07).
 - Istilah asing tanpa padanan lazim dicetak miring dan dijelaskan pada kemunculan pertama **di setiap bab**; verba tidak dibuat hibrida ("di-*fit*" → "dicocokkan"); akhiran pada istilah asing memakai tanda hubung (*shrinkage*-nya).

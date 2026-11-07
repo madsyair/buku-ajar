@@ -67,7 +67,7 @@ Satu daftar JSON untuk seluruh proyek; setiap entri satu klaim pada satu kalimat
 ```
 
 - `bab`: id bab (`<folder-buku>/<bab>`; lihat `id_bab` di harness).
-- `penanda`: potongan teks **unik** dari baris bersitasi, persis seperti di `.qmd`, tanpa kode inline. Bila kalimat diubah, penanda diperbarui; kutipan bukti tidak diubah.
+- `penanda`: potongan teks **unik** dari baris bersitasi, persis seperti di `.qmd`, tanpa kode inline. Bila kalimat diubah, penanda diperbarui; kutipan bukti tidak diubah. Ini termasuk perubahan tanda miring istilah asing (mis. odds → `*odds*`) dan pemindahan kunci bab saat pemaduan buku multidisiplin (`<buku>/babXX-<kode>` → `<buku>/babXX`).
 - `bukti[].jenis` dan medan wajib:
 
 | Jenis | Medan | Diperiksa ulang harness |

@@ -153,4 +153,10 @@ Kolom "Agen" menunjuk pemeriksa utama: K = perancang kerangka, I = reviewer isi,
 
 Editor merangkum penilaian internal per bab dan per buku dengan **empat standar mutu Permendikbudristek 22/2022: materi, penyajian, desain, grafika** (kebahasaan bagian dari penyajian, diacu ke EYD V). Butir 33–35 diperiksa sekali per buku menjelang kemasan akhir.
 
+Keputusan seri terbaru (dicatat 2026-11-07; rinci di `aturan-gaya-dan-tampilan.md` bagian 8–9) yang menegaskan butir 33–35:
+
+- Setiap buku punya halaman hak cipta (data yang belum ada ditulis "belum ditetapkan", tidak dikarang), glosarium, indeks (PDF), dan riwayat hidup penulis yang hanya berisi fakta dari sumber resmi yang disimpan salinannya.
+- Istilah asing yang diputuskan tetap dalam bahasa Inggris dicetak miring (contoh: *odds*); bila penanda klaim di registri memuat istilah itu, penanda ikut diperbarui.
+- Keputusan tipografi (satu jenis huruf, 40–70 karakter per baris, PDF bertag) sedang diterapkan dan akan dirinci setelah uji; catatan di bawah berlaku sampai saat itu.
+
 Catatan tipografi seri: templat bawaan memakai TeX Gyre Pagella (teks), TeX Gyre Heros (judul), dan DejaVu Sans Mono (kode). Bila kode dihitung sebagai *typeface* ketiga, editor mencatatnya sebagai pengecualian yang disengaja atau penulis memilih fon kode dari keluarga yang sama; panjang baris blok teks B5 dengan fon 10,5 pt perlu diukur dari PDF terhadap batas 40–70 karakter.
