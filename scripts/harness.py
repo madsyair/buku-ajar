@@ -30,6 +30,8 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-LARANGAN   kata terlarang di naskah (bawaan: nama teknik pengajaran)
   G-ISTILAH    istilah yang sudah diputuskan diganti (konfig.json "istilah_terlarang")
   G-TEPI       tidak ada isi melewati tepi halaman > 3 pt (setelah --render)
+  G-TAG        PDF bertag: Tagged yes, pohon struktur Document/H1/P/Figure, /Lang id-ID
+               (setelah --render; TAG=0 mematikan untuk proyek tanpa DocumentMetadata)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
 
 Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
@@ -42,6 +44,7 @@ Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
 Pemakaian:
   python3 harness/harness.py --buku buku1 --bab bab02
   python3 harness/harness.py --buku buku1 --bab bab02 --render
+  python3 harness/harness.py --tag-pdf buku1/_book/buku.pdf     # G-TAG saja
 """
 import argparse
 import json
@@ -728,8 +731,50 @@ def gerbang_render(buku):
     if peringatan:
         pesan.append("render memberi peringatan rujukan:\n" + "\n".join(peringatan[:20]))
     catat("G-RENDER", not pesan, "\n".join(pesan))
+    if os.environ.get("TAG", "1") == "1":
+        gerbang_tag(buku)
     if os.environ.get("TEPI", "1") == "1":
         gerbang_tepi(buku)
+
+
+def gerbang_tag(buku, pdf=None):
+    """PDF bertag (LuaLaTeX + \\DocumentMetadata di _bersama/doc-class.tex):
+    pdfinfo melaporkan Tagged: yes, pohon struktur berakar Document dengan
+    H1, P, dan Figure, serta /Lang id-ID (bila pikepdf terpasang)."""
+    if pdf is None:
+        daftar = list((buku / "_book").glob("*.pdf"))
+        if not daftar:
+            catat("G-TAG", False, "PDF tidak ditemukan di _book/")
+            return
+        pdf = daftar[0]
+    if not shutil.which("pdfinfo"):
+        catat("G-TAG", False, "pdfinfo (poppler-utils) tidak terpasang")
+        return
+    info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True,
+                          errors="replace").stdout
+    pesan = []
+    if not re.search(r"^Tagged:\s+yes", info, re.M):
+        pesan.append("pdfinfo: PDF tidak bertag (Tagged: no); periksa pdf-engine: lualatex "
+                     "dan template-partials doc-class.tex di _quarto.yml")
+    # Tagged: yes dari poppler berarti /MarkInfo /Marked true; pohon struktur
+    # (/StructTreeRoot) dibaca dengan pdfinfo -struct.
+    struktur = subprocess.run(["pdfinfo", "-struct", str(pdf)], capture_output=True,
+                              text=True, errors="replace").stdout
+    if not struktur.lstrip().startswith("Document"):
+        pesan.append("pohon struktur (/StructTreeRoot) kosong atau tidak berakar Document")
+    for tag in ("H1", "P", "Figure"):
+        if not re.search(rf"^\s*{tag} ", struktur, re.M):
+            pesan.append(f"tag {tag} tidak ditemukan di pohon struktur")
+    try:
+        import pikepdf
+        with pikepdf.open(pdf) as dok:
+            if str(dok.Root.get("/Lang", "")) != "id-ID":
+                pesan.append("bahasa dokumen /Lang bukan id-ID")
+    except ImportError:
+        lang = re.search(r"/Lang\s*\(([^)]*)\)", Path(pdf).read_bytes()[:400000].decode("latin-1"))
+        if lang and lang.group(1) != "id-ID":
+            pesan.append(f"bahasa dokumen /Lang {lang.group(1)}, bukan id-ID")
+    catat("G-TAG", not pesan, "\n".join(pesan))
 
 
 BATAS_TEPI_PT = 3.0
@@ -1092,10 +1137,17 @@ def gerbang_haljudul(buku):
 # ---------------------------------------------------------------- utama
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--buku", required=True)
-    ap.add_argument("--bab", required=True)
+    ap.add_argument("--buku")
+    ap.add_argument("--bab")
     ap.add_argument("--render", action="store_true")
+    ap.add_argument("--tag-pdf", metavar="PDF",
+                    help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
     a = ap.parse_args()
+    if a.tag_pdf:
+        gerbang_tag(None, pdf=Path(a.tag_pdf))
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
+    if not (a.buku and a.bab):
+        ap.error("--buku dan --bab wajib (kecuali dengan --tag-pdf)")
     buku = AKAR / a.buku
     qmd = buku / f"{a.bab}.qmd"
     peng = muat_pengecualian()

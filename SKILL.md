@@ -92,7 +92,7 @@ Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) 
 
 ## Harness engineering
 
-Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 25 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan (G-JUDUL, G-PERSAMAAN, G-HALJUDUL), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN), dan render (G-RENDER, G-TEPI, G-PENGGALAN).
+Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 26 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan (G-JUDUL, G-PERSAMAAN, G-HALJUDUL), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN), dan render (G-RENDER, G-TAG untuk PDF bertag, G-TEPI, G-PENGGALAN).
 
 ```bash
 python3 harness/harness.py --buku <buku> --bab babXX            # agen bab
