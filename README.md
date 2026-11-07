@@ -20,7 +20,7 @@ assets/                      templat brief, rancangan rinci, kerangka bab, bab .
                              laporan ulasan, temuan soal, serah-terima bagian, pemaduan, KEPUTUSAN-RANCANGAN, REVISI, STATUS;
                              _quarto.yml, preamble.tex, tikz-preamble.tex, konfig.json,
                              apa.csl, reference-b5.docx
-scripts/                     harness.py (25 gerbang), referensi.py, penggalan.py,
+scripts/                     harness.py (26 gerbang), referensi.py, penggalan.py,
                              uji_harness.sh + uji-buku/, gaya_gambar.py, catatan.lua,
                              bahasa-asing.lua, kemas_sumber.py, siapkan_proyek.py, README.md
 ```
@@ -36,7 +36,7 @@ scripts/                     harness.py (25 gerbang), referensi.py, penggalan.py
 | Sitasi | dengan lokasi (`[@k, hlm. 212]`); buku besar klaim berupa tabel parafrase berstatus | **penulis–tahun tanpa lokasi**; subjek hanya penulis orang; registri JSON dengan **kutipan verbatim** yang dicocokkan ulang otomatis ke teks sumber, Rd, DESCRIPTION, `citation()`, atau hitung ulang (G-REFERENSI) |
 | Angka di prosa | diisi dari keluaran setelah loop kode (penanda `[[...]]`) | **selalu R inline**; gerbang G-ANGKA menolak angka diketik; klaim "sama/tidak satu pun" dikunci `stopifnot` |
 | Gambar | tidak diatur rinci | R → parquet → Python `gaya_gambar` (Python tidak menghitung, G-PYTHON); TikZ untuk DAG; judul ≤ 12 kata, panel (a)(b), Div catatan; gambar tidak mengambang |
-| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 25 gerbang memeriksa isi bab, hasil rajut, dan hasil render (tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
+| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 26 gerbang memeriksa isi bab, hasil rajut, dan hasil render (PDF bertag, tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
 | Uji harness | tidak ada | fikstur gagal/lulus `uji-buku/` + `uji_harness.sh`; setiap gerbang baru wajib berfikstur |
 | Keputusan penulis | dicatat di STATE | `KEPUTUSAN-RANCANGAN.md` bertanggal → gerbang/konfig baru → **audit semua buku** → putaran sunting → "Draf revisi ke-N" + `REVISI.md` (loop D) |
 | Penulis dan reviewer ahli | satu penulis | buku multidisiplin: penulis ahli per bidang menulis bagiannya, penulis pemadu menggabungkan; reviewer ahli per bidang (matematika, kode, pemodelan, *machine learning*, survei, domain, pedagogi, bahasa) dan penelaah pakar pendidikan yang menilai kelayakan buku ajar |
@@ -63,7 +63,7 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
    cd ~/sumber/seri-baru && bash harness/uji_harness.sh
    ```
 
-4. Perangkat: R (knitr, arrow, paket bab), Quarto ≥ 1.6, TeX Live/XeLaTeX (TeX Gyre, DejaVu Sans Mono, `indentfirst`, `draftwatermark`), Python 3 (pandas, pyarrow, matplotlib, seaborn, Sastrawi), poppler (`pdftotext`). Rincian dan variabel yang perlu disesuaikan: `scripts/README.md`.
+4. Perangkat: R (knitr, arrow, paket bab), Quarto ≥ 1.6, TeX Live dengan LuaLaTeX (paket Debian `texlive-luatex`; huruf Libertinus Serif/Mono/Math, `libertinus-type1` untuk TikZ; `indentfirst`, `draftwatermark`), Python 3 (pandas, pyarrow, matplotlib, seaborn, Sastrawi), poppler (`pdftotext`). Rincian dan variabel yang perlu disesuaikan: `scripts/README.md`.
 
 ## Status draf
 
@@ -82,6 +82,7 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
 
 ## Riwayat perubahan
 
+- **2026-11-07 (d)** — Tipografi dari seri statistika Bayesian (diterapkan dan diuji): satu keluarga huruf **Libertinus** (Serif 12 pt untuk teks dan judul, Mono untuk kode, Math untuk rumus; juga gambar matplotlib bertipe Type 3, TikZ, sampul, dan `reference-b5.docx`; ikon kotak dimatikan); kolom prosa ±118 mm pada B5 agar teks inti 40–70 karakter per baris (diukur median/persentil-95 dari `pdftotext -layout`), blok lebar 140 mm untuk kode, keluaran, gambar, tabel, dan rumus tampilan. Mesin **LuaLaTeX** dengan partial baru `assets/doc-class.tex` (`\DocumentMetadata`) menghasilkan PDF bertag dengan batasan TeX Live 2023 (belum PDF/UA). Berkas `assets/_quarto.yml`, `preamble.tex`, `tikz-preamble.tex`, `reference-b5.docx`, dan `scripts/gaya_gambar.py` diperbarui; `siapkan_proyek.py` menyalin `doc-class.tex`. Gerbang baru **G-TAG** (`pdfinfo`: bertag, pohon struktur Document/H1/P/Figure, `/Lang` id-ID; opsi `--tag-pdf`) dengan fikstur PDF gagal/lulus di `uji_harness.sh`. Aturan final menggantikan catatan "sedang diterapkan" di `aturan-gaya-dan-tampilan.md` dan `prinsip-buku-ajar.md`.
 - **2026-11-07 (c)** — Atas permintaan penulis: peran baru `21` penelaah pakar pendidikan dan penulisan buku ajar, wajib untuk setiap buku pada tiga tahap (telaah rancangan T1, telaah per bab T2, telaah buku utuh T3). Penelaah menilai kelayakan naskah sebagai buku ajar pada aspek materi, penyajian, kebahasaan, serta desain dan grafika (Permendikbudristek 22/2022), memetakan tujuan buku → bab → latihan, menghitung sebaran tingkat kognitif latihan, mengisi daftar periksa 35 butir dengan bukti lokasi, dan memberi rekomendasi kelayakan. Alur di `SKILL.md` dan kriteria berhenti loop A diperbarui.
 - **2026-11-07 (b)** — Buku multidisiplin atas permintaan penulis: peran baru penulis ahli bidang (`04a`) dan penulis pemadu (`04b`) yang menggantikan penulis `04` untuk buku multidisiplin; reviewer ahli bidang baru `16` pemodelan statistik, `17` *machine learning*, `18` statistika resmi/survei, `19` domain terapan (templat), `20` pedagogi; reviewer `05`–`08` diberi profil keahlian. Perencana dan perancang kerangka memetakan disiplin, menandai disiplin setiap bab/subbab, dan menetapkan penulis serta reviewer ahli per bagian. Templat brief, rancangan rinci, kerangka bab, dan laporan ulasan diperbarui; templat baru serah-terima bagian dan laporan pemaduan. Loop A multidisiplin dan aturan penugasan reviewer (ahli disiplin + bahasa + editor, tanpa swatinjau) di `references/loop-kerja.md` dan `SKILL.md`. Keputusan seri terbaru masuk `aturan-gaya-dan-tampilan.md` dan `prinsip-buku-ajar.md`: halaman hak cipta ("belum ditetapkan" untuk data yang belum ada), glosarium, indeks PDF, dan riwayat hidup penulis dari sumber resmi bersalinan. Istilah Inggris yang dipertahankan dicetak miring beserta pembaruan penanda klaim. Keputusan tipografi (satu jenis huruf, 40–70 karakter, PDF bertag) dicatat sebagai sedang diterapkan.
 - **2026-11-07 (a)** — Draf pertama skill: 16 peran, 25 gerbang harness, loop A–E, templat, uji perilaku iterasi 1.

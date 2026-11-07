@@ -8,9 +8,9 @@ Salinan yang digeneralisasi dari harness dan alat seri statistika Bayesian (A. S
 | `harness.py` | `harness/` | Gerbang mutu per bab (daftar di `references/harness-dan-gerbang.md`) |
 | `referensi.py` | `harness/` | G-REFERENSI: registri klaim dan identitas pustaka |
 | `penggalan.py` | `harness/` | Pemenggalan EYD V, daftar nama yang tidak dipenggal, istilah asing (perlu `pip install Sastrawi`) |
-| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS |
+| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS) |
 | `kemas_sumber.py` | `harness/` atau `alat/` | Mengemas kode sumber per buku (+ kunci) ke zip dengan `BANGUN.md` |
-| `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, fon, koma desimal, `label_panel()`, `tampil()` |
+| `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, fon Libertinus Serif (Type 3), koma desimal, `label_panel()`, `tampil()` |
 | `catatan.lua` | `_bersama/` | Filter Div `::: {.catatan}`: "*Catatan:*" kecil di bawah tabel/gambar (PDF dan Word) |
 | `bahasa-asing.lua` | `_bersama/` | Frasa miring di `istilah-asing.txt` diberi `lang=en` (pemenggalan Inggris) |
 
@@ -24,7 +24,7 @@ pip install Sastrawi pandas pyarrow matplotlib seaborn   # bila belum
 bash harness/uji_harness.sh                              # semua baris harus "benar"
 ```
 
-Prasyarat perangkat: R (knitr, arrow; paket bab), Quarto ≥ 1.6, TeX Live dengan XeLaTeX (fon TeX Gyre Pagella/Heros, DejaVu Sans Mono; paket `indentfirst`, `draftwatermark`, `needspace`, `fvextra`, `pdfpages` bila memakai sampul), Python 3, `pdftotext` (poppler) untuk audit PDF, skill **eyd** terpasang (`eyd/scripts/periksa.py`; atau set `SKILL_EYD=<jalur>`).
+Prasyarat perangkat: R (knitr, arrow; paket bab), Quarto ≥ 1.6, TeX Live (diuji 2023) dengan **LuaLaTeX** (Debian: `texlive-luatex` untuk `lualatex-math`, `texlive-latex-extra`, `texlive-fonts-extra` untuk huruf Libertinus Serif/Mono/Math dan `libertinus-type1`/`libertinust1math` bagi TikZ; paket `indentfirst`, `draftwatermark`, `needspace`, `fvextra`, `tcolorbox`, `pdfpages` bila memakai sampul), Python 3 (matplotlib menemukan OTF Libertinus di folder TeX Live atau lewat `kpsewhich`), poppler-utils (`pdftotext` untuk audit PDF, `pdfinfo` untuk G-TAG), `pikepdf` opsional (cek `/Lang` G-TAG), skill **eyd** terpasang (`eyd/scripts/periksa.py`; atau set `SKILL_EYD=<jalur>`).
 
 ## Yang perlu disesuaikan per proyek
 
@@ -44,8 +44,9 @@ Hal lain yang masih tertanam di kode dan mungkin perlu diubah:
 
 - `harness.py`: batas lebar (`BATAS_LEBAR`, `BATAS_LEBAR_KELUARAN`), judul (`MAKS_KATA_JUDUL_*`), daftar `SLOP_ID`, pola atribusi lembaga (`POLA_ATRIBUSI_MANUAL`: BPS, Stan Development Team, R Core Team — tambahkan lembaga bidang lain), daftar penghubung `POLA_KONJ`, singkatan (`SINGKATAN`).
 - `penggalan.py`: daftar eponim yang tidak dipenggal di `nama_diri()` (Bayes, Poisson, Gauss, …).
-- `gaya_gambar.py`: palet per buku (`PALET_BUKU*`), `LEBAR` (B5 = 5,2 inci), jalur fon `_FON`.
-- `_bersama/preamble.tex` (dari `assets/preamble.tex`): warna seri, sampul, tanda air.
+- `gaya_gambar.py`: palet per buku (`PALET_BUKU*`), `LEBAR` (B5 = 5,2 inci), jalur fon `_FON_CALON`.
+- `_bersama/preamble.tex` (dari `assets/preamble.tex`): warna seri, sampul, tanda air; blok lebar (`\tambahlebar`) dihitung dari kertas dan margin.
+- `_bersama/doc-class.tex` (dari `assets/doc-class.tex`): modul `testphase` `\DocumentMetadata`; di TeX Live 2024+ pertimbangkan `tagging=on`.
 - `G-GAYA` memakai skill math-article bila terpasang (`SKILL_GAYA`), selain itu pemeriksa cadangan.
 
 ## Perbedaan dari harness proyek seri
@@ -54,7 +55,10 @@ Hal lain yang masih tertanam di kode dan mungkin perlu diubah:
 - Daftar penulis G-SITASI dibangun otomatis dari `pustaka.bib`.
 - Gerbang baru: **G-LARANGAN** (nama teknik pengajaran dan kata terlarang lain), **G-ISTILAH** (istilah yang sudah diputuskan), **G-HALJUDUL** (tanpa `subtitle`, `date` ISO, "Draf revisi ke-N" di `date-format`).
 - Fikstur baru `uji-buku/bablarangan.qmd`.
+- G-TAG sama dengan seri, ditambah opsi `--tag-pdf`, sakelar `TAG`, dan cek `/Lang` cadangan tanpa pikepdf; fikstur PDF `uji-buku/tag-*.pdf`.
 - Folder laporan dibuat otomatis; `penggalan.py` menghimpun semua folder buku yang punya `_quarto.yml` (bukan hanya `buku*`).
 - `kemas_sumber.py` mengenali buku otomatis (folder dengan `_quarto.yml`; pasangan `kunci-<buku>`).
 
 Diuji 2026-11-07: `uji_harness.sh` (9 fikstur gagal GAGAL, `babbaik` LULUS); `assets/templat-bab.qmd` dan `assets/templat-bab-kunci.qmd` LULUS pada proyek hasil `siapkan_proyek.py` (R 4.6, tanpa `--render`).
+
+Diuji ulang 2026-11-07 (tipografi): `uji_harness.sh` hijau (9 fikstur GAGAL, `babbaik` LULUS, G-TAG pada dua PDF fikstur); `templat-bab.qmd` LULUS tanpa dan dengan `--render` (G-RENDER, G-TAG, G-TEPI, G-PENGGALAN; `pdffonts` hanya Libertinus) pada proyek baru hasil `siapkan_proyek.py` (TeX Live 2023, Quarto 1.10).

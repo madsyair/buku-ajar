@@ -43,7 +43,7 @@ Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 
 | Angka di keterangan memakai `fig-cap: !expr` atau R inline di Div catatan; tidak diketik. | G-ANGKA |
 | Gambar dan tabel **tidak mengambang**: `fig-pos: "H"`, `tbl-pos: "H"` di `_quarto.yml`, agar catatan tidak terpisah dari objeknya. Jangan mengatur `fig-pos` per chunk. | editor |
 | Tabel dibangun dari objek R (`knitr::kable`, flextable), bukan diketik. Tabel lebar dipersempit (singkat judul kolom, kurangi digit, `tbl-colwidths`). | G-TEPI |
-| Lebar gambar ≤ lebar blok teks (B5: 5,2 inci). | G-TEPI |
+| Lebar gambar ≤ lebar blok lebar (B5: 5,2 inci = 132 mm; blok lebar 140 mm, lihat bagian 8, "Tipografi"). | G-TEPI |
 
 Contoh benar:
 
@@ -129,14 +129,28 @@ Struktur bawaan setiap bab (sesuaikan di brief):
 | Nama penulis di halaman judul dan sampul **tanpa gelar akademis** (Permendikbudristek 22/2022, Lampiran II hlm. 55). Anatomi buku (halaman hak cipta dengan fon yang dipakai, prakata berisi tujuan dan pembaca sasaran, petunjuk penggunaan, daftar pustaka, glosarium/indeks, riwayat penulis) diperiksa sekali per buku (kajian butir 33–34). | editor |
 | **Paragraf menjorok** di baris pertama, **tanpa spasi antarparagraf**, termasuk paragraf pertama setelah judul. PDF: `indent: true` di format pdf `_quarto.yml`; preamble `\usepackage{indentfirst}`, `\setlength{\parindent}{1.5em}`, `\setlength{\parskip}{0pt plus 1pt}`. Word: gaya *Body Text* dan *First Paragraph* di `reference-doc` diberi indentasi baris pertama 0,75 cm dan spasi sebelum/sesudah 0. | editor (periksa PDF dan Word) |
 
-### Anatomi buku dan tipografi (keputusan penulis seri, dicatat 2026-11-07)
+### Anatomi buku (keputusan penulis seri, dicatat 2026-11-07)
 
 | Aturan | Gerbang |
 |---|---|
 | Setiap buku (induk dan kunci) punya **halaman hak cipta**: judul, penulis, penerbit, tahun, ISBN, edisi/revisi, fon yang dipakai, lisensi. Data yang belum ada ditulis **"belum ditetapkan"**, tidak dikarang (mis. "ISBN: belum ditetapkan"). | editor |
 | Setiap buku punya **glosarium** (istilah dari `keputusan-istilah.md`, istilah asing miring dengan padanan atau penjelasan singkat) dan **indeks** di keluaran PDF (entri dari istilah glosarium dan nama metode; Word tidak wajib berindeks). | editor |
 | **Riwayat hidup penulis** hanya berisi fakta dari sumber resmi (laman profil lembaga, SK, publikasi resmi) yang **salinannya disimpan** di proyek (mis. `naskah/sumber-riwayat/`, dengan tanggal unduh); fakta tanpa salinan sumber tidak ditulis. | editor |
-| Tipografi: **satu jenis huruf**, panjang baris **40–70 karakter**, dan **PDF bertag** (aksesibel) sedang diterapkan; rincian (fon, ukuran, setelan LaTeX, cara uji) ditulis di sini setelah uji. Sampai saat itu templat bawaan tetap berlaku dan editor mencatat penyimpangannya (kajian butir 34–35). | editor (menunggu gerbang) |
+
+### Tipografi (keputusan penulis seri, diterapkan dan diuji 2026-11-07)
+
+Diterapkan di templat `assets/_quarto.yml`, `assets/preamble.tex`, `assets/doc-class.tex`, `assets/tikz-preamble.tex`, `assets/reference-b5.docx`, dan `scripts/gaya_gambar.py`. Kajian butir 34 (paling banyak dua *typeface*, 40–70 karakter per baris) dan butir 35 (aksesibilitas versi elektronik).
+
+| Aturan | Gerbang |
+|---|---|
+| **Satu keluarga huruf: Libertinus** (SIL OFL, dibawa TeX Live). Teks dan judul Libertinus Serif 12 pt; `sansfont` juga Libertinus Serif sehingga tidak ada keluarga kedua; judul KOMA-Script memakai huruf teks tebal (`\setkomafont{disposition}{\normalfont\bfseries…}`), bukan sans. Rumus memakai Libertinus Math. Kode Libertinus Mono: `Scale=0.8` untuk kode sebaris, 7,8 pt (`\kodekecil`) untuk blok kode dan keluaran. Glif yang tidak ada di Libertinus Mono (mis. huruf Yunani di kode) diambil dari Libertinus Serif/Math lewat `luaotfload.add_fallback` di `doc-class.tex`. | editor (`pdffonts`: hanya Libertinus*) |
+| Keluarga yang sama di luar teks: **gambar** matplotlib (`gaya_gambar.py` mendaftarkan OTF Libertinus Serif, juga untuk *mathtext*; ukuran huruf gambar sumbu 11, angka 9,5; disematkan sebagai **Type 3** karena Libertinus berupa OTF-CFF yang salah disematkan mode Type 42), **TikZ** knitr (pdfLaTeX: `libertinus` dan `libertinust1math` di `tikz-preamble.tex`), **sampul** (`\setmainfont{Libertinus Serif}`, `\setmathfont{Libertinus Math}`, dikompilasi LuaLaTeX), dan **Word** (`reference-b5.docx`: gaya teks, judul, dan tema Libertinus Serif, kode Libertinus Mono, rumus Libertinus Math; pembaca perlu memasang huruf Libertinus, bila tidak, Word memakai pengganti). Halaman hak cipta menyebut ketiga anggota keluarga. | editor |
+| **Ikon kotak (*callout*) dimatikan** di PDF (`callout-icon: false`): ikon FontAwesome adalah huruf kedua. | editor |
+| **Panjang baris teks inti 40–70 karakter** (Permendikbudristek 22/2022, Lampiran III). Pada B5 176 × 250 mm: Libertinus Serif 12 pt, margin dalam/luar 29 mm (**kolom prosa ±118 mm**), atas 22 mm, bawah 24 mm, `linestretch` 1,1. Hasil seri: median 64, persentil-95 72 karakter (sebelumnya Pagella 10,5 pt, kolom 136 mm: 75/83). | editor (ukur dari PDF) |
+| **Blok lebar 140 mm** untuk kode, keluaran R, gambar, tabel, dan rumus tampilan: melebar 11 mm ke kiri dan kanan kolom prosa, tetap 18 mm dari tepi kertas (`\tambahlebar` di `preamble.tex`). Dengan blok ini 72 karakter kode dan 78 karakter keluaran muat utuh. Di dalam kotak atau daftar blok tidak dilebarkan dan baris panjang dipenggal (fvextra `breaklines`). Rumus tampilan memakai `\everydisplay` (nomor persamaan di tepi blok lebar). Kode sebaris boleh patah sesudah `_ / . < > = [ ( ,` tanpa tanda hubung (penalti disisipkan di Lua). | G-TEPI, G-LEBAR-KODE, G-LEBAR-KELUARAN |
+| **Cara ukur panjang baris**: `pdftotext -layout buku.pdf -` pada halaman isi bab, hanya baris prosa (buang baris kode, keluaran, rumus, tabel, judul, dan baris pendek akhir paragraf), lalu hitung **median** dan **persentil-95** jumlah karakter per baris. Median harus di 40–70; persentil-95 boleh sedikit di atas 70 karena baris renggang. Hasil dicatat di `KEPUTUSAN-RANCANGAN.md` proyek. | editor (sekali per buku) |
+| **Mesin LuaLaTeX dan PDF bertag**: `pdf-engine: lualatex` (XeLaTeX tidak mendukung *tagging*); `\DocumentMetadata{testphase={phase-II,sec,toc,minipage,graphic,text}, pdfversion=1.7, lang=id-ID}` dipasang sebelum `\documentclass` lewat partial Quarto `_bersama/doc-class.tex` (`template-partials`). Judul KOMA-Script ditambal di `preamble.tex` agar subbab menjadi H2/H3 tertutup dan paragraf sesudahnya P; judul bab berkoma dibungkus kurung kurawal. Paket Debian **`texlive-luatex`** wajib (`lualatex-math`). | G-TAG |
+| **Batasan TeX Live 2023** (LaTeX 2023-11): modul `float` bentrok dengan `[H]` (gambar tetap ditag Figure, tetapi keterangannya tidak dikaitkan); modul `block`/`bib` (daftar, kutipan, daftar pustaka) bentrok dengan fancyvrb dan tidak dipakai; isi `longtable` tidak ditag (`\tagstop`); isi blok kode tidak ditag; **teks alternatif gambar belum ada**. Hasilnya PDF bertag yang sah (Document–Sect–H1/H2/H3–P–Figure–TOC), **belum PDF/UA**. Kunci Quarto `pdf-standard`/`tagging=on` baru ada di LaTeX 2024; tagging penuh menunggu TeX Live 2024+. | editor (catat di halaman hak cipta atau prakata versi elektronik) |
 
 ## 9. Bahasa (ringkas)
 

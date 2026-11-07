@@ -11,7 +11,9 @@ Menyesuaikan untuk proyek baru:
     Warna terang dipakai untuk isian/pita; untuk garis tipis dan titik pakai
     varian tua (lihat EMAS_TUA, MINT_TUA). Periksa kontras dengan skill dataviz.
   - LEBAR mengikuti lebar blok teks (B5: 5,2 inci). Ubah bila ukuran kertas lain.
-  - _FON menunjuk fon teks buku (TeX Gyre Pagella) agar huruf gambar sama.
+  - Huruf gambar Libertinus Serif, satu keluarga dengan teks, judul, kode, dan
+    rumus buku (references/aturan-gaya-dan-tampilan.md, "Tipografi"). Berkas
+    OTF dicari di _FON_CALON (TeX Live Debian dan TeX Live resmi) lalu kpsewhich.
 
 Pola pakai di chunk Python Quarto (echo: false):
     sys.path[:0] = ["../_bersama", "."]
@@ -58,16 +60,38 @@ PALET_BUKU3 = [HUTAN, EMAS_TUA, MINT_TUA, ABU, MINT, EMAS]
 LEBAR = 5.2
 TINGGI = 3.2
 
-_FON = Path("/usr/share/texmf/fonts/opentype/public/tex-gyre")
+# Satu keluarga huruf: Libertinus Serif, sama dengan teks dan judul buku.
+# Berkas OTF dibawa TeX Live (paket fonts-libertinus/texlive-fonts-extra).
+_FON_CALON = [
+    Path("/usr/share/texlive/texmf-dist/fonts/opentype/public/libertinus-fonts"),
+    Path("/usr/share/fonts/opentype/libertinus"),
+]
+
+
+def _folder_fon():
+    for p in _FON_CALON:
+        if p.exists():
+            return p
+    try:
+        import subprocess
+        jalur = subprocess.run(["kpsewhich", "LibertinusSerif-Regular.otf"],
+                               capture_output=True, text=True).stdout.strip()
+        if jalur:
+            return Path(jalur).parent
+    except OSError:
+        pass
+    return None
 
 
 def _daftarkan_fon():
-    """Daftarkan TeX Gyre Pagella agar huruf gambar sama dengan teks buku."""
+    """Daftarkan Libertinus Serif agar huruf gambar sama dengan teks buku."""
     keluarga = "serif"
-    if _FON.exists():
-        for berkas in _FON.glob("texgyrepagella-*.otf"):
-            font_manager.fontManager.addfont(str(berkas))
-        keluarga = "TeX Gyre Pagella"
+    folder = _folder_fon()
+    berkas = sorted(folder.glob("LibertinusSerif-*.otf")) if folder else []
+    for b in berkas:
+        font_manager.fontManager.addfont(str(b))
+    if berkas:
+        keluarga = "Libertinus Serif"
     return keluarga
 
 
@@ -82,21 +106,31 @@ def gaya(palet=None):
         "figure.dpi": 150,
         "axes.edgecolor": ABU,
         "axes.labelcolor": "#222222",
-        "axes.titlesize": 10.5,
-        "axes.labelsize": 10,
-        "xtick.labelsize": 9,
-        "ytick.labelsize": 9,
-        "legend.fontsize": 9,
+        # Libertinus lebih sempit dan x-height-nya lebih kecil daripada
+        # Pagella; ukuran dinaikkan ±8% agar lebar teks gambar tetap sama.
+        "axes.titlesize": 11.5,
+        "axes.labelsize": 11,
+        "xtick.labelsize": 9.5,
+        "ytick.labelsize": 9.5,
+        "legend.fontsize": 9.5,
         "legend.frameon": False,
         "grid.color": "#E5E7EB",
         "axes.spines.top": False,
         "axes.spines.right": False,
+        "font.serif": [keluarga],
         "font.cursive": [keluarga],
         "font.fantasy": [keluarga],
         "mathtext.fontset": "custom",
         "mathtext.rm": keluarga,
         "mathtext.it": keluarga + ":italic",
-        "pdf.fonttype": 42,
+        "mathtext.bf": keluarga + ":bold",
+        "mathtext.sf": keluarga,
+        "mathtext.tt": keluarga,
+        "mathtext.cal": keluarga + ":italic",
+        "mathtext.fallback": "stix",
+        # Libertinus berupa OTF-CFF; Type 42 (TrueType) menyematkannya dengan tipe
+        # yang salah, jadi huruf gambar disematkan sebagai Type 3.
+        "pdf.fonttype": 3,
     })
 
 
@@ -139,5 +173,5 @@ def label_panel(axes, mulai=0, x=-0.02, y=1.02):
     import numpy as _np
     for i, ax in enumerate(_np.ravel(axes)):
         ax.text(x, y, f"({chr(97 + mulai + i)})", transform=ax.transAxes,
-                ha="right", va="bottom", fontsize=10.5, fontweight="bold",
+                ha="right", va="bottom", fontsize=11.5, fontweight="bold",
                 color="#222222")

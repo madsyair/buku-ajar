@@ -6,7 +6,8 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
   <proyek>/_bersama/      gaya_gambar.py, catatan.lua, bahasa-asing.lua,
-                          tikz-preamble.tex, preamble.tex, apa.csl, reference-b5.docx
+                          tikz-preamble.tex, preamble.tex, doc-class.tex,
+                          apa.csl, reference-b5.docx
   <proyek>/KEPUTUSAN-RANCANGAN.md, REVISI.md, .gitignore
   <proyek>/<buku>/        _quarto.yml, pustaka.bib, index.qmd, references.qmd,
                           naskah/{00-brief.md, 01-rancangan-rinci.md, keputusan-istilah.md,
@@ -80,7 +81,8 @@ def main():
     # folder bersama
     for f in ["gaya_gambar.py", "catatan.lua", "bahasa-asing.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
-    for f in ["tikz-preamble.tex", "preamble.tex", "apa.csl", "reference-b5.docx"]:
+    for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
+              "reference-b5.docx"]:
         salin(ASET / f, P / "_bersama" / f, t)
 
     # dokumen proyek
