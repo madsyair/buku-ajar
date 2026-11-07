@@ -6,13 +6,13 @@ Skill Claude untuk menulis buku ajar berbahasa Indonesia (EYD V) di bidang stati
 
 ```
 SKILL.md                     alur, peran, harness, loop, paralelisasi, kriteria selesai
-agents/00–20, 04a, 04b      orkestrator, perencana, perancang kerangka, peninjau literatur,
+agents/00–21, 04a, 04b      orkestrator, perencana, perancang kerangka, peninjau literatur,
                              penulis (buku satu disiplin), penulis ahli bidang dan penulis
                              pemadu (buku multidisiplin), reviewer isi/rumus/bahasa/kode,
                              editor, pembaca pemula/menengah/mahir, pembuat kunci, penyunting
                              soal, pengaudit ilustrasi, reviewer ahli pemodelan statistik,
                              machine learning, statistika resmi/survei, domain terapan
-                             (templat), pedagogi
+                             (templat), pedagogi, penelaah pakar buku ajar
 references/                  aturan gaya dan tampilan, istilah, data dan sumber, harness dan
                              gerbang, loop kerja, kunci jawaban, ilustrasi, pelajaran proyek,
                              prinsip buku ajar (ringkasan) + kajian lengkap
@@ -39,7 +39,7 @@ scripts/                     harness.py (25 gerbang), referensi.py, penggalan.py
 | Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 25 gerbang memeriksa isi bab, hasil rajut, dan hasil render (tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
 | Uji harness | tidak ada | fikstur gagal/lulus `uji-buku/` + `uji_harness.sh`; setiap gerbang baru wajib berfikstur |
 | Keputusan penulis | dicatat di STATE | `KEPUTUSAN-RANCANGAN.md` bertanggal → gerbang/konfig baru → **audit semua buku** → putaran sunting → "Draf revisi ke-N" + `REVISI.md` (loop D) |
-| Penulis dan reviewer ahli | satu penulis | buku multidisiplin: penulis ahli per bidang menulis bagiannya, penulis pemadu menggabungkan; reviewer ahli per bidang (matematika, kode, pemodelan, *machine learning*, survei, domain, pedagogi, bahasa) |
+| Penulis dan reviewer ahli | satu penulis | buku multidisiplin: penulis ahli per bidang menulis bagiannya, penulis pemadu menggabungkan; reviewer ahli per bidang (matematika, kode, pemodelan, *machine learning*, survei, domain, pedagogi, bahasa) dan penelaah pakar pendidikan yang menilai kelayakan buku ajar |
 | Pembaca uji | satu pembaca simulasi | **tiga tingkat** (pemula, menengah yang menjalankan kode, mahir) + reviewer isi, rumus, bahasa, kode, dan **editor** yang memutuskan temuan |
 | Seri buku | tidak ada | peta "satu topik, satu pemilik", kotak "Ingat dari Buku N, Bab M", jembatan istilah antarbuku |
 | Kunci jawaban | tidak ada | buku terpisah untuk pengajar: pembahasan langkah demi langkah, rubrik 10 poin, temuan soal → perbaikan soal induk oleh agen terpisah (loop C) |
@@ -82,5 +82,6 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
 
 ## Riwayat perubahan
 
+- **2026-11-07 (c)** — Atas permintaan penulis: peran baru `21` penelaah pakar pendidikan dan penulisan buku ajar, wajib untuk setiap buku pada tiga tahap (telaah rancangan T1, telaah per bab T2, telaah buku utuh T3). Penelaah menilai kelayakan naskah sebagai buku ajar pada aspek materi, penyajian, kebahasaan, serta desain dan grafika (Permendikbudristek 22/2022), memetakan tujuan buku → bab → latihan, menghitung sebaran tingkat kognitif latihan, mengisi daftar periksa 35 butir dengan bukti lokasi, dan memberi rekomendasi kelayakan. Alur di `SKILL.md` dan kriteria berhenti loop A diperbarui.
 - **2026-11-07 (b)** — Buku multidisiplin atas permintaan penulis: peran baru penulis ahli bidang (`04a`) dan penulis pemadu (`04b`) yang menggantikan penulis `04` untuk buku multidisiplin; reviewer ahli bidang baru `16` pemodelan statistik, `17` *machine learning*, `18` statistika resmi/survei, `19` domain terapan (templat), `20` pedagogi; reviewer `05`–`08` diberi profil keahlian. Perencana dan perancang kerangka memetakan disiplin, menandai disiplin setiap bab/subbab, dan menetapkan penulis serta reviewer ahli per bagian. Templat brief, rancangan rinci, kerangka bab, dan laporan ulasan diperbarui; templat baru serah-terima bagian dan laporan pemaduan. Loop A multidisiplin dan aturan penugasan reviewer (ahli disiplin + bahasa + editor, tanpa swatinjau) di `references/loop-kerja.md` dan `SKILL.md`. Keputusan seri terbaru masuk `aturan-gaya-dan-tampilan.md` dan `prinsip-buku-ajar.md`: halaman hak cipta ("belum ditetapkan" untuk data yang belum ada), glosarium, indeks PDF, dan riwayat hidup penulis dari sumber resmi bersalinan. Istilah Inggris yang dipertahankan dicetak miring beserta pembaruan penanda klaim. Keputusan tipografi (satu jenis huruf, 40–70 karakter, PDF bertag) dicatat sebagai sedang diterapkan.
 - **2026-11-07 (a)** — Draf pertama skill: 16 peran, 25 gerbang harness, loop A–E, templat, uji perilaku iterasi 1.
