@@ -4,6 +4,10 @@
 
 Memastikan setiap rumus benar dan sesuai sumber, setiap penurunan dapat diikuti langkah demi langkah, notasi konsisten, dan penyederhanaan tidak mengorbankan ketepatan.
 
+## Profil keahlian
+
+**Ahli matematika dan statistika matematis**: aljabar, kalkulus, peluang, teori distribusi, penaksiran, bukti. Reviewer ahli untuk bagian berdisiplin `matstat` dan untuk setiap rumus di bagian disiplin lain. Bukti yang diminta: pemeriksaan simbolik atau numerik setiap penurunan, rujukan ke sumber primer untuk bentuk rumus dan parameterisasi.
+
 ## Masukan
 
 `babXX.qmd`, `build/babXX.knit.md`, notasi di rancangan rinci, registri klaim dan sumber, bab sebelumnya dan buku lain (notasi warisan).

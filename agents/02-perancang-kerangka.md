@@ -2,7 +2,7 @@
 
 ## Peran
 
-Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka bab** (per bab): rantai pertanyaan per subbab, penjelasan sederhana, contoh utama enam langkah, gambar/tabel, sumber per klaim, dan latihan.
+Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka bab** (per bab): disiplin dan penugasan penulis/reviewer per bagian, rantai pertanyaan per subbab, penjelasan sederhana, contoh utama enam langkah, gambar/tabel, sumber per klaim, dan latihan.
 
 ## Masukan
 
@@ -10,7 +10,7 @@ Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka
 
 ## Keluaran
 
-- `<buku>/naskah/01-rancangan-rinci.md` (templat `assets/templat-rancangan-rinci.md`): tabel bab (judul, isi pokok, data, contoh utama, kotak Ingat, sumber utama + lokasi, anggaran halaman), label bab, label tetap lintas bab, peta kepemilikan, data yang sudah diperiksa (dimensi, status Rd), dataset yang ditolak, jembatan istilah.
+- `<buku>/naskah/01-rancangan-rinci.md` (templat `assets/templat-rancangan-rinci.md`): tabel bab (judul, isi pokok, data, contoh utama, kotak Ingat, sumber utama + lokasi, anggaran halaman), label bab, label tetap lintas bab, peta kepemilikan, peta disiplin, penugasan bagian (subbab → disiplin, penulis ahli, berkas bagian, reviewer ahli), tabel notasi dan istilah lintas disiplin, data yang sudah diperiksa (dimensi, status Rd), dataset yang ditolak, jembatan istilah.
 - `<buku>/naskah/03-kerangka/babXX.md` (templat `assets/templat-kerangka-bab.md`).
 
 ## Langkah
@@ -24,6 +24,8 @@ Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka
 7. **Miskonsepsi** 1–2 per bab dan analogi (dengan kalimat batas).
 8. **Latihan** (empat jenis bawaan: Konseptual, Penurunan sederhana, Hitungan, Pemrograman) dengan: tujuan yang diuji, data, parameter, *seed*, kriteria jawaban, bentuk jawaban; satu "tiru alurnya"; minimal satu soal campuran berjarak (bab sebelumnya, metode tidak disebut).
 9. **Target**: kata prosa, gambar, tabel, baris kode tampil, kode tersembunyi ke lampiran.
+10. **Disiplin dan penugasan** (dari peta disiplin brief): tandai disiplin setiap bab di tabel struktur bab dan setiap subbab di kerangka. Untuk buku multidisiplin, isi tabel "Penugasan bagian": satu baris per subbab dengan disiplin, penulis ahli (04a dan kode disiplin), berkas bagian `babXX-<kode>.qmd`, reviewer ahli, dan reviewer lintas bagian; tandai paragraf penghubung sebagai "jembatan pemadu" (04b) beserta reviewer kedua disiplin yang dijembatani. Isi tabel "Notasi dan istilah lintas disiplin" sebelum bagian ditulis: satu simbol dan satu istilah per konsep, padanan disiplin lain disebut sekali. Di kerangka bab, isi tabel jembatan antardisiplin, prasyarat dari disiplin lain per subbab, disiplin per langkah contoh utama, dan minimal satu latihan lintas disiplin.
+11. **Aturan penugasan reviewer**: setiap bagian minimal ditinjau reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi/pemrograman → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19 diisi bidangnya; pedagogi → 20; bahasa → 07. Reviewer isi (05) tetap memeriksa klaim dan angka seluruh bab.
 
 ## Daftar periksa (dari kajian, butir 1–5, 9–10, 14–17, 22, 25–26)
 
@@ -35,6 +37,7 @@ Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka
 - [ ] Ada simulasi untuk intuisi bila relevan; data simulasi dilabeli.
 - [ ] Setiap latihan hitungan dapat dijawab pasti (kriteria, parameter, *seed* lengkap).
 - [ ] Topik milik buku lain hanya dirujuk.
+- [ ] Setiap bab dan subbab bertanda disiplin; buku multidisiplin: setiap subbab punya penulis ahli, berkas bagian, dan reviewer ahli; jembatan antardisiplin dan tabel notasi lintas disiplin terisi.
 
 ## Kriteria lulus
 

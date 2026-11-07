@@ -1,10 +1,10 @@
 # Loop kerja
 
-*Looping engineering*: setiap artefak melewati loop tertutup dengan kriteria berhenti yang terukur, batas iterasi, eskalasi, dan jejak tertulis. Empat loop dijalankan orkestrator (`agents/00-orkestrator.md`).
+*Looping engineering*: setiap artefak melewati loop tertutup dengan kriteria berhenti yang terukur, batas iterasi, eskalasi, dan jejak tertulis. Loop A (dengan varian multidisiplin) sampai E dijalankan orkestrator (`agents/00-orkestrator.md`).
 
 ## Prinsip
 
-1. **Tidak ada yang meninjau tulisannya sendiri.** Peninjau adalah agen baru berkonteks bersih yang hanya membaca berkas (naskah, knit.md, PDF, registri), bukan penalaran penulis. Bila alat subagen tidak tersedia, ulasan dikerjakan berurutan dengan membaca ulang dari berkas, dan berkas ulasan mencatat "tanpa isolasi konteks" (contoh nyata: `bab01-pembaca-uji.md` seri).
+1. **Tidak ada yang meninjau tulisannya sendiri.** Pada buku multidisiplin, penulis ahli bidang tidak menjadi reviewer ahli atas bagiannya dan pemadu tidak meninjau bab paduannya. Peninjau adalah agen baru berkonteks bersih yang hanya membaca berkas (naskah, knit.md, PDF, registri), bukan penalaran penulis. Bila alat subagen tidak tersedia, ulasan dikerjakan berurutan dengan membaca ulang dari berkas, dan berkas ulasan mencatat "tanpa isolasi konteks" (contoh nyata: `bab01-pembaca-uji.md` seri).
 2. **Peninjau hanya membaca.** Peninjau tidak menyunting naskah, tidak menjalankan render, tidak menulis registri; hitung ulang dilakukan di scratchpad.
 3. **Temuan tertulis dan berstatus.** Setiap temuan berlabel MAYOR/MINOR, menyebut baris, kutipan, masalah, usulan. Penulis menanggapi setiap butir di bagian `## Tindak lanjut (tanggal)` berkas ulasan: diperbaiki (bagaimana), tidak diterapkan (alasan), atau diajukan ke penulis buku.
 4. **Harness sebelum dan sesudah ulasan.** Ulasan dimulai hanya dari bab yang LULUS harness; perbaikan ditutup dengan harness LULUS lagi.
@@ -39,6 +39,47 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
 **Batas iterasi**: maks. **3 putaran ulasan** per bab (putaran ke-2 dan ke-3 hanya meninjau ulang temuan sebelumnya dan bagian yang berubah). Loop internal harness maks. **6 percobaan** per kegagalan gerbang yang sama sebelum dilaporkan.
 
 **Eskalasi ke penulis buku** bila: anggaran putaran habis dengan MAYOR terbuka; perbaikan membuka MAYOR baru dua putaran berturut-turut; temuan menyentuh keputusan rancangan (cakupan, data, istilah, notasi lintas buku); peninjau berbeda pendapat tentang kebenaran isi dan editor tidak dapat memutuskan dari sumber; perubahan memerlukan data/sumber yang harus diunggah penulis. Eskalasi berupa daftar singkat: butir, pilihan, rekomendasi, akibat tiap pilihan.
+
+## Loop A multidisiplin — bab yang ditulis beberapa ahli bidang
+
+Dipakai bila brief menyatakan buku multidisiplin. Penulis ahli bidang (`agents/04a-penulis-ahli-bidang.md`) dan penulis pemadu (`agents/04b-penulis-pemadu.md`) menggantikan penulis 04; aturan lain loop A tetap berlaku.
+
+```
+kerangka + penugasan ─▶ 04a tulis per disiplin (paralel, satu berkas bagian per agen) ─▶ harness bagian LULUS + serah-terima
+   ─▶ [semua bagian LULUS] ─▶ arsipkan bagian ─▶ 04b pemaduan ─▶ harness bab LULUS
+   ─▶ [ulasan ahli paralel: ahli disiplin per bagian + 05 isi + 07 bahasa + 20 pedagogi + pembaca 10–12] ─▶ 09 editor memutuskan
+   ─▶ perbaikan: substansi → ahli bidang (bergiliran) | pemaduan/alur/bahasa → pemadu ─▶ pemadu menyelaraskan ─▶ harness bab ─▶ render
+```
+
+1. **Tulis per bidang**: setiap penulis ahli menulis `<buku>/babXX-<kode>.qmd` (hanya subbab yang ditugaskan; dimulai dari `##`, setup sendiri) dan catatan serah-terima `naskah/bagian/babXX-<kode>-serah.md` (`assets/templat-serah-terima-bagian.md`).
+2. **Harness bagian**: `python3 harness/harness.py --buku <buku> --bab babXX-<kode>` (tanpa render) sampai LULUS. Klaim tercatat dengan kunci `<buku>/babXX-<kode>`. Label bagian bersufiks disiplin sehingga gerbang G-RUJUKAN sekaligus menjamin label unik antarbagian.
+3. **Pemaduan** dimulai hanya setelah semua bagian LULUS dan semua serah-terima lengkap. Orkestrator memindahkan berkas bagian ke `<buku>/naskah/bagian/` (arsip, hanya dibaca; tidak lagi terbaca G-RUJUKAN sebagai bab) dan menghapus skrip lampiran bagian. Pemadu menulis `babXX.qmd` dan laporan `naskah/bagian/babXX-pemaduan.md` (`assets/templat-pemaduan.md`), memindahkan klaim ke kunci `<buku>/babXX`, lalu menjalankan harness bab sampai LULUS.
+4. **Ulasan ahli paralel** setelah pemaduan, sesuai peta pemaduan. Aturan penugasan:
+   - setiap bagian ditinjau minimal oleh **reviewer ahli disiplin bagian itu + reviewer bahasa (07) + editor (09)**; jembatan pemadu ditinjau reviewer ahli kedua disiplin yang dijembatani;
+   - reviewer **tidak meninjau bagian yang ia tulis**: reviewer ahli adalah subagen baru yang bukan agen penulis bagian itu, dan pemadu tidak meninjau bab paduannya;
+   - reviewer isi (05) memeriksa klaim dan angka seluruh bab; reviewer pedagogi (20) wajib; pembaca 10–12 seperti loop A.
+   Pemetaan bawaan disiplin → reviewer ahli: statistika matematis → 06; pemodelan statistik → 16; komputasi/pemrograman → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19 (diisi bidangnya); pedagogi → 20; bahasa → 07.
+5. **Editor memutuskan** dan memberi setiap temuan sasaran perbaikan: **ahli `<kode>`** untuk substansi bidang (definisi, rumus, asumsi, metode, tafsiran), **pemadu** untuk jembatan, notasi lintas bagian, alur, prasyarat, dan bahasa.
+6. **Perbaikan**: ahli bidang menyunting `babXX.qmd` hanya di subbab miliknya menurut peta pemaduan, **bergiliran** (satu agen per waktu), dan setiap giliran diakhiri harness bab LULUS; setelah semua giliran ahli, pemadu memperbaiki temuan pemaduan dan menyelaraskan sambungan yang tersentuh. Pemadu tidak mengubah substansi; bila perlu, ia menulis butir "dikembalikan ke ahli" di laporan pemaduan.
+7. **Render** seperti loop A.
+
+**Penyimpanan bagian dan jejak**:
+
+| Berkas | Isi | Pemilik |
+| --- | --- | --- |
+| `<buku>/babXX-<kode>.qmd` | bagian selama ditulis (akar folder buku agar harness, `_bersama/`, `fit/`, `data-gambar/` dipakai tanpa perubahan) | satu penulis ahli |
+| `<buku>/naskah/bagian/babXX-<kode>-serah.md` | catatan serah-terima | penulis ahli |
+| `<buku>/naskah/bagian/babXX-<kode>.qmd` | arsip bagian setelah LULUS (dipindahkan orkestrator sebelum pemaduan) | hanya dibaca |
+| `<buku>/naskah/bagian/babXX-pemaduan.md` | peta pemaduan, keputusan notasi, butir dikembalikan ke ahli | pemadu |
+| `<buku>/babXX.qmd` | bab paduan | pemadu; ahli bergiliran saat perbaikan |
+
+Bagian tidak disimpan sebagai Div ber-atribut di satu berkas bab karena beberapa ahli yang menulis serentak akan menyunting berkas yang sama (melanggar "satu agen per berkas"). Asal setiap subbab paduan dicatat di peta pemaduan, bukan di naskah.
+
+**Kriteria berhenti**: semua kriteria loop A; ditambah setiap bagian sudah ditinjau reviewer ahli disiplinnya, 07, dan 09 tanpa ada yang meninjau tulisannya sendiri; tidak ada butir "dikembalikan ke ahli" yang terbuka; klaim bagian sudah pindah ke kunci bab dan tidak ada sisa entri `babXX-<kode>` di registri.
+
+**Batas iterasi**: harness bagian maks. 6 percobaan per gerbang yang sama; maks. 3 putaran ulasan per bab (sama dengan loop A); maks. 2 putaran bolak-balik pemadu ↔ ahli untuk satu butir sebelum diserahkan ke editor.
+
+**Eskalasi**: dua reviewer ahli (atau ahli dan pemadu) berbeda pendapat tentang substansi → **editor memutuskan** dari sumber primer dan bukti hitung ulang, dan mencatat alasannya di `babXX-editor.md`; bila perbedaan menyangkut **rancangan** (cakupan, pembagian bagian antardisiplin, notasi atau istilah lintas buku, disiplin yang ditugaskan, data) → **penulis buku** memutuskan. Ditambah semua pemicu eskalasi loop A.
 
 ## Loop B — literatur dan klaim
 
@@ -84,8 +125,8 @@ Peninjau, profil, apa yang dibaca (qmd, knit.md, PDF hlm.), apa yang tidak dijal
 ## MINOR
 1. **Baris …** …
 ## Yang sudah baik
-## Tindak lanjut (tanggal)      ← diisi penulis bab
-- M1 — diperbaiki: …
+## Tindak lanjut (tanggal)      ← diisi penulis bab (multidisiplin: ahli atau pemadu yang memperbaiki)
+- M1 — diperbaiki (ahli `ml`): …
 - MINOR 7 — tidak diterapkan: …
 Harness --render LULUS; bab di PDF hlm. …–… (… halaman).
 ```
