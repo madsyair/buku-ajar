@@ -26,11 +26,13 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
    Paket minimum bila sumber daya terbatas: reviewer isi+rumus (satu agen), reviewer kode, satu pembaca pemula; seri statistika memakai pasangan "verifikasi independen" + "pembaca independen".
 3. **Editor memutuskan** atas temuan yang bertentangan (pemula minta penjelasan tambahan vs mahir minta ringkas) dan menyusun daftar kerja berurutan prioritas: MAYOR ketepatan → MAYOR keterbacaan → MINOR.
 4. **Perbaikan** oleh penulis bab (bukan peninjau), lalu harness sampai LULUS, lalu bagian Tindak lanjut di setiap berkas ulasan.
-5. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
+5. **Telaah pakar buku ajar** (`agents/21-penelaah-pakar-buku-ajar.md`, T2): setelah perbaikan putaran ulasan, penelaah menilai kelayakan bab sebagai bab buku ajar (materi, penyajian, kebahasaan, desain) dan memberi rekomendasi; temuannya masuk daftar kerja editor seperti temuan lain. Telaah rancangan (T1) dijalankan sebelum bab pertama ditulis, dan telaah buku utuh (T3) setelah render semua bab.
+6. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
 
 **Kriteria berhenti** (semua harus terpenuhi):
 
 - harness LULUS dengan `--render` (semua gerbang aktif);
+- rekomendasi penelaah pakar buku ajar (21) untuk bab minimal "layak dengan perbaikan kecil";
 - tidak ada temuan MAYOR terbuka di berkas ulasan mana pun (setiap MAYOR punya tindak lanjut "diperbaiki" atau keputusan penulis);
 - setiap MINOR punya tindak lanjut (diperbaiki atau alasan tidak diterapkan);
 - panjang bab dalam anggaran atau kelebihannya dijelaskan (kejelasan didahulukan; pemangkasan hanya untuk kalimat mubazir);

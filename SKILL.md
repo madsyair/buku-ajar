@@ -55,25 +55,26 @@ Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar perik
 | 18 | Reviewer ahli statistika resmi dan data survei | `agents/18-reviewer-statistika-resmi.md` | `ulasan/babXX-survei.md` | tidak |
 | 19 | Reviewer ahli domain terapan (templat diisi bidangnya) | `agents/19-reviewer-domain-terapan.md` | `ulasan/babXX-<domain>.md` | tidak |
 | 20 | Reviewer ahli pedagogi dan keterbacaan | `agents/20-reviewer-pedagogi.md` | `ulasan/babXX-pedagogi.md` | tidak |
+| 21 | Penelaah pakar pendidikan dan penulisan buku ajar | `agents/21-penelaah-pakar-buku-ajar.md` | `ulasan/telaah-rancangan.md`, `ulasan/babXX-telaah.md`, `ulasan/telaah-buku.md` (rekomendasi kelayakan) | tidak |
 
-Peninjau (05–12, 16–20, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas.
+Peninjau (05–12, 16–21, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas.
 
-**Buku multidisiplin.** Bila isi buku memadukan beberapa disiplin (mis. statistika matematis, pemodelan statistik, komputasi, *machine learning*, statistika resmi/survei, ekonomi, kesehatan, spasial), setiap disiplin ditulis penulis ahli bidangnya (04a) hanya pada bagian yang ditugaskan rancangan, lalu penulis pemadu (04b) yang menguasai semua bidang buku menggabungkan dan melengkapinya menjadi satu bab. 04a + 04b menggantikan 04; untuk buku satu disiplin, 04 tetap dipakai. **Aturan penugasan reviewer**: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19; pedagogi → 20 (wajib untuk multidisiplin); bahasa → 07; reviewer isi 05 memeriksa klaim dan angka seluruh bab. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
+**Buku multidisiplin.** Bila isi buku memadukan beberapa disiplin (mis. statistika matematis, pemodelan statistik, komputasi, *machine learning*, statistika resmi/survei, ekonomi, kesehatan, spasial), setiap disiplin ditulis penulis ahli bidangnya (04a) hanya pada bagian yang ditugaskan rancangan, lalu penulis pemadu (04b) yang menguasai semua bidang buku menggabungkan dan melengkapinya menjadi satu bab. 04a + 04b menggantikan 04; untuk buku satu disiplin, 04 tetap dipakai. **Aturan penugasan reviewer**: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19; pedagogi → 20 (wajib untuk multidisiplin); kelayakan sebagai buku ajar → 21 (wajib untuk setiap buku, pada rancangan, setiap bab, dan buku utuh); bahasa → 07; reviewer isi 05 memeriksa klaim dan angka seluruh bab. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
 
 ## Alur tahap demi tahap
 
 ```
 Proyek   : siapkan_proyek.py → uji_harness.sh hijau
-Buku     : 01 brief ─▶ 03 sumber+registri ─▶ 02 rancangan rinci ─▶ [persetujuan penulis]
+Buku     : 01 brief ─▶ 03 sumber+registri ─▶ 02 rancangan rinci ─▶ 21 telaah rancangan (T1) ─▶ [persetujuan penulis]
 Bab (A)  : 02 kerangka ─▶ 04 tulis ─▶ harness LULUS ─▶ 05–12 paralel ─▶ 09 putuskan ─▶ 04 perbaiki
-           ─▶ harness LULUS ─▶ 00 render berurutan + G-RENDER/G-TEPI/G-PENGGALAN ─▶ komit
+           ─▶ harness LULUS ─▶ 21 telaah bab (T2) ─▶ 09 ─▶ perbaikan bila ada ─▶ 00 render berurutan + G-RENDER/G-TEPI/G-PENGGALAN ─▶ komit
 Bab multidisiplin: 02 kerangka+penugasan ─▶ 04a per disiplin (paralel) ─▶ harness bagian LULUS (semua) ─▶ 04b pemaduan
            ─▶ harness bab LULUS ─▶ ahli bidang + 05/07/20 + 10–12 paralel ─▶ 09 putuskan ─▶ perbaikan (ahli bergiliran | pemadu)
            ─▶ harness LULUS ─▶ render ─▶ komit
 Kunci (C): 13 kunci ─▶ temuan-soal ─▶ 14 terapkan ke induk ─▶ 13 sesuaikan ─▶ pemeriksa independen
 Keputusan baru (D): catat ─▶ gerbang/konfig + fikstur ─▶ audit semua buku ─▶ sunting paralel ─▶ render ─▶ REVISI.md
 Ilustrasi (E): 15 audit ─▶ gambar ─▶ harness ─▶ render ─▶ pembaca/editor
-Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) ─▶ kemas_sumber.py
+Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) ─▶ 21 telaah buku utuh (T3) ─▶ kemas_sumber.py
 ```
 
 | Tahap | Gerbang keluar |
@@ -153,7 +154,7 @@ Rinci: `agents/00-orkestrator.md`.
 
 | Berkas | Isi | Dibaca oleh |
 |---|---|---|
-| `references/prinsip-buku-ajar.md` | ringkasan operasional kajian; 5W1H; Permendikbudristek 22/2022; daftar periksa 35 butir | 02, 04, 04a, 04b, 05–12, 16–20 |
+| `references/prinsip-buku-ajar.md` | ringkasan operasional kajian; 5W1H; Permendikbudristek 22/2022; daftar periksa 35 butir | 02, 04, 04a, 04b, 05–12, 16–21 |
 | `references/kajian-prinsip-buku-ajar.md` | kajian lengkap (status sumber [A]/[S]/[A, terverifikasi]) | bila perlu dasar |
 | `references/aturan-gaya-dan-tampilan.md` | semua keputusan gaya bawaan: prosa, judul, tabel/gambar, rumus, sitasi, angka/kode, struktur bab, cetak, halaman judul, anatomi buku, bahasa | semua |
 | `references/istilah-statistika.md` | kebijakan istilah, keputusan bawaan, jembatan istilah | 01, 04, 07, 09 |
