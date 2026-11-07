@@ -1,0 +1,21 @@
+{
+ "bersama": "_bersama",
+ "lampiran": "lampiran-kode",
+ "id_bab_polos": [],
+ "penulis": [],
+ "larangan": [
+  {"pola": "\\bsokrat\\w*|\\bsocrat\\w*|\\bsokrates\\b|\\bsocrates\\b",
+   "saran": "nama teknik pengajaran tidak ditulis di naskah; biarkan pertanyaan bekerja tanpa label"},
+  {"pola": "\\bfeynman\\b",
+   "saran": "nama teknik pengajaran tidak ditulis di naskah; hapus labelnya"}
+ ],
+ "istilah_terlarang": [
+  {"pola": "\\bderau\\b", "saran": "pakai *noise* (keputusan penulis 2026-11-06)"},
+  {"pola": "\\btaksiran\\w*|\\bpenaksir\\w*|\\bditaksir\\b|\\bmenaksir\\b", "saran": "estimasi/estimator/diestimasi (keputusan penulis 2026-11-06)"},
+  {"pola": "\\bkemungkinan maksimum\\b|\\bfungsi kemungkinan\\b", "saran": "*maximum likelihood* / fungsi *likelihood* (keputusan penulis 2026-11-06)"},
+  {"pola": "\\bpendugaan area kecil\\b", "saran": "estimasi area kecil (keputusan penulis 2026-11-06)"},
+  {"pola": "\\btarikan acak\\b|\\bnilai tarikan\\b|\\bditarik dari (?:distribusi|prior|posterior)\\b", "saran": "membangkitkan / nilai bangkitan / *draws* (keputusan 2026-11-06)"},
+  {"pola": "\\bsampel MCMC\\b", "saran": "*draws* untuk keluaran MCMC (keputusan 2026-11-06)"}
+ ],
+ "kemasan": {}
+}

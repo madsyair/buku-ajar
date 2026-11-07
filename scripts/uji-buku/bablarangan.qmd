@@ -1,0 +1,3 @@
+# Bab larangan {#sec-larangan}
+
+Bab ini memakai pendekatan Sokratik agar pembaca bertanya. Uji ala teknik Feynman dipakai untuk memeriksa pemahaman pembaca.

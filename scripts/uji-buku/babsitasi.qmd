@@ -1,0 +1,5 @@
+# Bab sitasi {#sec-sitasi}
+
+Klaim ini mengutip buku yang tidak pernah diverifikasi [@palsu2020]. Harness harus menolaknya.
+
+Klaim kedua mengutip BDA3 dengan kutipan yang tidak ada di sumbernya [@gelman2013]. Harness juga harus menolaknya.

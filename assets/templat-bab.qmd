@@ -1,0 +1,141 @@
+# Judul Bab dalam Frasa Nomina {#sec-label-bab}
+
+```{r}
+#| label: setup-b1bab01
+#| include: false
+invisible(Sys.setlocale("LC_CTYPE", "C.UTF-8"))
+angka <- function(x, d = 2) {
+  sub("^-", "−", formatC(x, format = "f", digits = d,
+                               decimal.mark = ",", big.mark = "."))
+}
+persen <- function(x, d = 1) paste0(angka(100 * x, d), "%")
+# angka di dalam lingkungan matematika: koma desimal tanpa spasi
+ak <- function(x, d = 1) gsub(",", "{,}", angka(x, d))
+dir.create("data-gambar", showWarnings = FALSE)
+dir.create("fit", showWarnings = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+set.seed(2026)
+```
+
+Paragraf pembuka yang menjembatani bab sebelumnya dan menyebut pertanyaan yang dijawab bab ini. Kalimat terakhir menyebut apa yang akan dapat dilakukan pembaca.
+
+::: {.callout-tip title="Ingat dari Buku 1, Bab 7"}
+Satu paragraf berisi konsep dari bab sumber yang diperlukan di bab ini. Isinya konsep, bukan daftar istilah baru.
+:::
+
+::: {.callout-important title="Tujuan belajar"}
+Setelah mempelajari bab ini, pembaca mampu:
+
+1. menghitung …;
+2. menafsirkan …;
+3. memeriksa …
+:::
+
+## Subjudul berupa frasa nama konsep {#sec-konsep-b1-01}
+
+Kalimat pertama adalah pertanyaan wajar pembaca? Jawabannya dimulai dengan penjelasan sederhana dan contoh dari konteks Indonesia, lalu data yang statusnya disebut: data riil dari paket …, data sintetis bawaan paket …, atau data simulasi buku ini dengan parameter sebenarnya diketahui.
+
+```{r}
+#| label: data-contoh-b1-01
+x <- c(12, 15, 9, 20, 14)
+rerata <- mean(x)
+```
+
+Rata-rata kelima pengamatan adalah `r angka(rerata, 1)`. Angka ini dihitung oleh kode di atas dan tidak diketik. Karena itu, angka di prosa selalu sama dengan keluarannya.
+
+Rumus muncul setelah intuisi. Setiap simbolnya dijelaskan, seperti pada @eq-rerata-b1-01.
+
+$$
+\bar{x} = \frac{1}{n} \sum_{i = 1}^{n} x_i
+$$ {#eq-rerata-b1-01}
+
+dengan $n$ banyaknya pengamatan dan $x_i$ pengamatan ke-$i$. Kalimat interpretasi menyebut satuan dan ketidakpastian.
+
+::: {.callout-note title="Penurunan"}
+Penurunan ditulis langkah demi langkah dengan alasan di setiap baris. Penurunan ditutup makna hasilnya dan pemeriksaan angka.
+:::
+
+```{r}
+#| label: gambar-data-b1-01
+#| include: false
+arrow::write_parquet(data.frame(x = x, i = seq_along(x)),
+                     "data-gambar/buku1-bab01-contoh.parquet")
+# klaim dasar kalimat dikunci: rajut gagal bila fakta berubah
+stopifnot(max(x) == 20)
+knitr::opts_chunk$set(fig.cap = paste0(
+  "Pengamatan contoh: (a) nilai, (b) urutan"))
+```
+
+@fig-contoh-b1-01(a) memperlihatkan sebaran kelima nilai. Nilai terbesar `r max(x)` muncul pada pengamatan keempat di @fig-contoh-b1-01(b).
+
+```{python}
+#| label: fig-contoh-b1-01
+#| echo: false
+#| results: hide
+#| dpi: 300
+import sys
+sys.path[:0] = ["../_bersama", "."]
+import pandas as pd
+import matplotlib.pyplot as plt
+from gaya_gambar import gaya, tampil, label_panel, LEBAR, PALET
+
+gaya(PALET)
+d = pd.read_parquet("data-gambar/buku1-bab01-contoh.parquet")
+fig, ax = plt.subplots(1, 2, figsize=(LEBAR, 2.1))
+_ = ax[0].hist(d["x"], bins=5, color=PALET[0])
+_ = ax[1].plot(d["i"], d["x"], marker="o", color=PALET[0])
+ax[0].set_xlabel("nilai")
+ax[1].set_xlabel("urutan pengamatan")
+label_panel(ax)
+tampil(fig, "buku1-bab01-contoh")
+```
+
+::: {.catatan}
+Lima pengamatan contoh; (a) histogram nilai, (b) nilai menurut urutan pengamatan. Data simulasi buku ini.
+:::
+
+```{r}
+#| label: reset-cap-b1-01
+#| include: false
+knitr::opts_chunk$set(fig.cap = NULL)
+```
+
+## Contoh utama: judul kasus {#sec-contoh-utama-b1-01}
+
+Kalimat pengantar menyebut kasus yang dikerjakan. Kalimat kedua menyebut langkah alur kerja yang baru di bab ini.
+
+### Pertanyaan dan data {.unnumbered}
+
+### Model {.unnumbered}
+
+### Hitung {.unnumbered}
+
+### Periksa {.unnumbered}
+
+### Interpretasikan {.unnumbered}
+
+### Uji kepekaan {.unnumbered}
+
+## Ringkasan {#sec-ringkasan-b1-01}
+
+Ringkasan memuat tiga pesan utama dalam prosa. Paragraf terakhir ditutup tafsiran bagi pembaca terapan.
+
+## Latihan {#sec-latihan-b1-01}
+
+### Konseptual {.unnumbered}
+
+1. …
+
+### Penurunan sederhana {.unnumbered}
+
+2. …
+
+### Hitungan {.unnumbered}
+
+3. …
+
+### Pemrograman R {.unnumbered}
+
+4. Tiru alurnya: kerjakan enam langkah contoh utama untuk data … dengan *seed* 2026.
+
+Kode lengkap bab ini ada di `lampiran-kode/buku1/bab01.R`. Skrip itu dijalankan dari foldernya sendiri.

@@ -1,0 +1,21 @@
+# Bab gagal {#sec-gagal}
+
+Dalam bab ini membahas analisa data dimana rata-rata pendapatan adalah 3,75 juta dan proporsinya 45%. Hasilnya sangat signifikan sekali.
+
+Lihat @fig-tidakada untuk ringkasan.
+
+```{r}
+x <- c(1, 2, 3)
+mean(x)  # 2
+stop("galat sengaja")
+```
+
+```{python}
+#| label: fig-satu
+import numpy as np
+y = r.x
+```
+
+```{r}
+sangat_panjang <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+```

@@ -1,0 +1,7 @@
+# Bab bahasa {#sec-bahasa}
+
+Dalam bab ini membahas analisa data dimana sampel diambil acak. Sehingga hasilnya sangat baik sekali.
+
+Model yang mana dipakai terdiri dari tiga bagian. Oleh karena itu kami memakai prior. Berikut adalah hasilnya yang komprehensif.
+
+Satu kalimat saja di sini.

@@ -1,0 +1,39 @@
+# Bab baik {#sec-baik}
+
+```{r}
+#| include: false
+angka <- function(x, d = 2) {
+  formatC(x, format = "f", digits = d,
+          decimal.mark = ",", big.mark = ".")
+}
+```
+
+Rerata tiga pengamatan dihitung langsung dari data. Nilainya adalah `r angka(mean(c(1, 2, 4)), 2)` sehingga angka di teks selalu sama dengan keluaran kode.
+
+```{r}
+#| label: data-gambar
+x <- c(1, 2, 4)
+dir.create("data-gambar", showWarnings = FALSE)
+write.csv(data.frame(x = x), "data-gambar/babbaik.csv",
+          row.names = FALSE)
+mean(x)
+```
+
+Sebaran ketiga nilai itu tampak pada @fig-baik. Gambar dibuat dengan Python dari berkas yang ditulis R.
+
+```{python}
+#| label: fig-baik
+#| fig-cap: "Tiga pengamatan contoh."
+#| echo: false
+#| results: hide
+import sys
+sys.path[:0] = ["../_bersama", "."]
+import pandas as pd
+import matplotlib.pyplot as plt
+from gaya_gambar import gaya, tampil, TOSKA
+gaya()
+d = pd.read_csv("data-gambar/babbaik.csv")
+fig, ax = plt.subplots()
+ax.plot(d["x"], "o", color=TOSKA)
+tampil(fig, "fig-baik")
+```

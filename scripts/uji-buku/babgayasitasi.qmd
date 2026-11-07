@@ -1,0 +1,7 @@
+---
+title: "Uji sitasi gaya"
+---
+
+# Uji gaya sitasi
+
+Gelman dan rekan-rekannya mencatat bahwa ini contoh [@gelman2013]. Sitasi lain memuat lokasi [@gelman2013, bag. 1.2].

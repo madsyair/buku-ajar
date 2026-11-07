@@ -1,0 +1,60 @@
+{
+  "kolmogorov1950": {
+    "identitas": "Terjemahan Inggris 1950 (Chelsea, ed. N. Morrison); asli Springer 1933, doi:10.1007/978-3-642-49888-6",
+    "verifikasi": [
+      {"cara": "membuka PDF terjemahan di archive.org; halaman judul", "sumber": "https://archive.org/details/foundationsofthe00kolm", "tanggal": "2026-10-20", "hasil": "Chelsea Publishing Company, New York, 1950; Aksioma I–V hlm. 2; Aksioma VI dan teorema penjumlahan diperumum hlm. 14–15"},
+      {"cara": "halaman buku di situs Springer", "sumber": "https://www.springer.com/de/book/9783642495960", "tanggal": "2026-10-20", "hasil": "Grundbegriffe der Wahrscheinlichkeitsrechnung, Springer Berlin 1933, DOI 10.1007/978-3-642-49888-6"}
+    ]
+  },
+  "berndt1991": {
+    "identitas": "ISBN 0201823934",
+    "verifikasi": [
+      {"cara": "katalog perpustakaan University of the Aegean", "sumber": "https://vufind2.lib.aegean.gr/Record/113345/Description?lng=en", "tanggal": "2026-10-20", "hasil": "The practice of econometrics: classic and contemporary; Reading, Mass.: Addison-Wesley, c1991; xviii, 702 p.; ISBN 0201823934"},
+      {"cara": "dokumentasi R AER::CPS1985 (lokal, diperiksa ulang harness)", "sumber": "AER 1.2.17", "tanggal": "2026-10-20", "hasil": "References: Berndt, E.R. (1991). The Practice of Econometrics"}
+    ]
+  },
+  "kleiber2008": {
+    "identitas": "ISBN 978-0-387-77316-2; doi:10.1007/978-0-387-77318-6",
+    "verifikasi": [
+      {"cara": "DESCRIPTION paket AER (lokal, diperiksa ulang harness)", "sumber": "AER 1.2.17", "tanggal": "2026-10-20", "hasil": "Applied Econometrics with R, Springer-Verlag, New York, ISBN 978-0-387-77316-2, doi:10.1007/978-0-387-77318-6"}
+    ]
+  },
+  "mcneil1977": {
+    "identitas": "ISBN 978-0471026310",
+    "verifikasi": [
+      {"cara": "dokumentasi R datasets::discoveries (lokal, diperiksa ulang harness)", "sumber": "R 4.6.1", "tanggal": "2026-10-20", "hasil": "McNeil D (1977). Interactive Data Analysis: A Practical Primer. John Wiley & Sons. ISBN 978-0471026310"}
+    ]
+  },
+  "rcore2026": {
+    "identitas": "doi:10.32614/R.manuals",
+    "verifikasi": [
+      {"cara": "citation() di R 4.6.1 (lokal, diperiksa ulang harness)", "sumber": "R 4.6.1", "tanggal": "2026-10-20", "hasil": "R Core Team (2026). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing, Vienna, Austria"}
+    ]
+  },
+  "bls-cps": {
+    "identitas": "https://www.bls.gov/cps/cps_over.htm",
+    "verifikasi": [
+      {"cara": "membuka halaman resmi BLS", "sumber": "https://www.bls.gov/cps/cps_over.htm", "tanggal": "2026-10-20", "hasil": "CPS adalah survei bulanan rumah tangga AS oleh U.S. Census Bureau untuk BLS"}
+    ]
+  },
+  "bps-sakernas": {
+    "identitas": "https://tegalkab.bps.go.id/en/news/2017/03/02/16/survei-angkatan-kerja-nasional--sakernas-.html",
+    "verifikasi": [
+      {"cara": "membuka halaman resmi BPS Kabupaten Tegal", "sumber": "https://tegalkab.bps.go.id/en/news/2017/03/02/16/survei-angkatan-kerja-nasional--sakernas-.html", "tanggal": "2026-10-20", "hasil": "judul Survei Angkatan Kerja Nasional (Sakernas), 2 Maret 2017; memuat tujuan menyediakan data pokok ketenagakerjaan"}
+    ]
+  },
+  "gelman2013": {
+    "identitas": "ISBN 9781439898222",
+    "verifikasi": [
+      {"cara": "katalog O'Reilly", "sumber": "https://www.oreilly.com/library/view/-/9781439898222/", "tanggal": "2026-10-20", "hasil": "Bayesian Data Analysis, Third Edition; CRC Press; Oktober 2013; ISBN 9781439898222"},
+      {"cara": "teks penuh PDF penulis (dokumen Project BDA3.md, errata 20 Feb 2025)", "sumber": "harness/sumber/BDA3.md", "tanggal": "2026-10-20", "hasil": "isi bagian 2.1–2.4 diperiksa ulang otomatis oleh harness"}
+    ]
+  },
+  "gelman2021": {
+    "identitas": "ISBN 978-1-107-02398-7; doi:10.1017/9781139161879",
+    "verifikasi": [
+      {"cara": "halaman hak cipta dari situs Cambridge University Press", "sumber": "https://assets.cambridge.org/97811070/23987/frontmatter/9781107023987_frontmatter.pdf", "tanggal": "2026-10-20", "hasil": "Regression and Other Stories; First published 2021; ISBN 978-1-107-02398-7; DOI 10.1017/9781139161879"},
+      {"cara": "teks penuh PDF penulis (dokumen Project ros.md)", "sumber": "harness/sumber/ros.md", "tanggal": "2026-10-20", "hasil": "isi bagian 1.2, 3.5, dan 15.2 diperiksa ulang otomatis oleh harness"}
+    ]
+  }
+}
