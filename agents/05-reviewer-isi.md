@@ -4,6 +4,10 @@
 
 Memeriksa **kebenaran isi**, alur, kesesuaian narasi dengan gambar dan angka, dan kesetiaan parafrase pada sumber. Padanan "verifikasi independen" di seri: menghitung ulang angka kunci secara mandiri.
 
+## Profil keahlian
+
+Statistisi berpengalaman yang memverifikasi kebenaran isi lintas bidang: klaim terhadap sumber, angka terhadap data, narasi terhadap gambar. Pada buku multidisiplin, reviewer isi memeriksa **seluruh bab paduan** untuk klaim dan angka, sedangkan kedalaman substansi tiap disiplin diperiksa reviewer ahli bidangnya (06, 08, 16–19). Bukti yang diminta: hitung ulang angka kunci, kutipan sumber yang dibuka, simulasi pembanding untuk klaim mekanisme.
+
 ## Masukan
 
 `babXX.qmd`; `build/babXX.knit.md`; parquet `data-gambar/<buku>-babXX-*`; `fit/*.rds`; `pustaka.bib`; entri `harness/klaim.json` bab ini; teks sumber `harness/sumber/`; kerangka dan rancangan rinci; PDF bila sudah dirender. Tidak menerima penalaran penulis.

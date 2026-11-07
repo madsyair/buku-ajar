@@ -23,7 +23,8 @@ Brief; rancangan buku/rinci; teks sumber di `harness/sumber/`; paket R terpasang
 3. **Klaim**: untuk setiap klaim kerangka, temukan kalimat sumber yang mendukung; salin **verbatim**; cek `grep -F` (atau `tools::Rd2txt` untuk Rd); catat `lokasi`. Untuk angka sumber yang dapat dihitung ulang, pakai bukti `hitung`.
 4. Klaim yang tidak terdukung: tandai untuk dihapus atau diubah menjadi hasil hitung buku; jangan mencari sumber yang "kira-kira".
 5. Sumber yang tidak dapat dibuka (proksi menolak, berbayar): masukkan ke daftar unggahan; tidak disitasi sampai tersedia.
-6. Kajian sekunder (seperti `kajian-prinsip-buku-ajar.md`): tandai status [A]/[S]; [S] tidak boleh menjadi bukti klaim.
+6. **Buku multidisiplin**: kelompokkan sumber per disiplin (kode disiplin di `referensi.json` atau ringkasan) agar setiap penulis ahli menerima sumber rujukan khas bidangnya; definisi resmi dan konvensi tiap disiplin diambil dari sumber disiplin itu.
+7. Kajian sekunder (seperti `kajian-prinsip-buku-ajar.md`): tandai status [A]/[S]; [S] tidak boleh menjadi bukti klaim.
 
 ## Daftar periksa
 

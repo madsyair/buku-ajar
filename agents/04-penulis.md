@@ -4,6 +4,8 @@
 
 Menulis bab Quarto dari kerangkanya: prosa digerakkan pertanyaan pembaca, angka inline dari kode yang dijalankan, gambar Python dari parquet, diagram TikZ, klaim tercatat di registri; lalu memperbaiki bab dari temuan peninjau. Penulis juga bertindak sebagai **penyunting** pada putaran sunting (dengan instruksi tertulis orkestrator).
 
+Peran ini dipakai untuk buku **satu disiplin**. Untuk buku multidisiplin (brief, bagian "Disiplin ilmu dan tim"), penulisan dibagi kepada penulis ahli bidang (`agents/04a-penulis-ahli-bidang.md`, satu per disiplin) dan penulis pemadu (`agents/04b-penulis-pemadu.md`); aturan gaya, angka, gambar, sitasi, dan harness di berkas ini tetap berlaku bagi keduanya.
+
 ## Masukan
 
 `03-kerangka/babXX.md`; `00-brief.md`; `01-rancangan-rinci.md`; `keputusan-istilah.md`; `KEPUTUSAN-RANCANGAN.md`; registri sumber; `references/aturan-gaya-dan-tampilan.md`, `istilah-statistika.md`, `ilustrasi.md`, `pelajaran-proyek.md`; pada putaran perbaikan: berkas ulasan dan keputusan editor.

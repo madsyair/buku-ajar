@@ -1,6 +1,6 @@
 ---
 name: buku-ajar
-description: Alur multi-agen untuk menulis, menyunting, mengulas, dan menerbitkan buku ajar berbahasa Indonesia (EYD V) bidang statistika, sains data, dan komputasi dengan Quarto, R/Python, Stan/brms; termasuk seri buku, buku kunci jawaban untuk pengajar (rubrik 10 poin), audit ilustrasi, dan revisi setelah keputusan penulis. Menegakkan gerbang mutu yang dapat dieksekusi (angka dari kode, klaim berkutipan verbatim, judul singkat, sitasi penulis–tahun, koma konjungsi, tanpa luapan tepi) dan loop tulis → harness → ulasan paralel (isi, rumus, bahasa, kode, editor, pembaca pemula/menengah/mahir) → perbaikan → render. Gunakan setiap kali pengguna ingin membuat, melanjutkan, merevisi, atau mengaudit buku ajar, diktat, modul, bab buku, seri buku, atau kunci jawaban berbasis data dan kode, atau menyebut "bab berikutnya", "kerangka bab", "ulasan pembaca", "kunci jawaban", "draf revisi", meskipun tidak menyebut skill ini.
+description: Alur multi-agen untuk menulis, menyunting, mengulas, dan menerbitkan buku ajar berbahasa Indonesia (EYD V) bidang statistika, sains data, dan komputasi dengan Quarto, R/Python, Stan/brms; termasuk seri buku, buku multidisiplin (penulis ahli bidang + penulis pemadu, reviewer ahli per bidang), buku kunci jawaban untuk pengajar (rubrik 10 poin), audit ilustrasi, dan revisi setelah keputusan penulis. Menegakkan gerbang mutu yang dapat dieksekusi (angka dari kode, klaim berkutipan verbatim, judul singkat, sitasi penulis–tahun, koma konjungsi, tanpa luapan tepi) dan loop tulis → harness → ulasan paralel (isi, rumus, bahasa, kode, ahli bidang, editor, pembaca berlapis) → perbaikan → render. Gunakan setiap kali pengguna ingin membuat, melanjutkan, merevisi, atau mengaudit buku ajar, diktat, modul, bab buku, seri buku, atau kunci jawaban berbasis data dan kode, atau menyebut "bab berikutnya", "kerangka bab", "ulasan pembaca", "kunci jawaban", "draf revisi", meskipun tidak menyebut skill ini.
 ---
 
 # Buku ajar (multi-agen, harness, loop)
@@ -38,18 +38,27 @@ Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar perik
 | 01 | Perencana naskah | `agents/01-perencana-naskah.md` | `00-brief.md`, `KEPUTUSAN-RANCANGAN.md`, peta antarbuku | — |
 | 02 | Perancang kerangka | `agents/02-perancang-kerangka.md` | `01-rancangan-rinci.md`, `03-kerangka/babXX.md` | — |
 | 03 | Peninjau literatur | `agents/03-peninjau-literatur.md` | `pustaka.bib`, `referensi.json`, klaim, daftar unggahan | — |
-| 04 | Penulis (dan penyunting) | `agents/04-penulis.md` | `babXX.qmd`, klaim, tindak lanjut ulasan | **ya** |
-| 05 | Reviewer isi | `agents/05-reviewer-isi.md` | `ulasan/babXX-isi.md` | tidak |
-| 06 | Reviewer rumus | `agents/06-reviewer-rumus.md` | `ulasan/babXX-rumus.md` | tidak |
-| 07 | Reviewer bahasa | `agents/07-reviewer-bahasa.md` | `ulasan/babXX-bahasa.md` (mode sunting: bahasa saja) | hanya mode sunting |
-| 08 | Reviewer kode | `agents/08-reviewer-kode.md` | `ulasan/babXX-kode.md` | tidak |
+| 04 | Penulis (dan penyunting), buku satu disiplin | `agents/04-penulis.md` | `babXX.qmd`, klaim, tindak lanjut ulasan | **ya** |
+| 04a | Penulis ahli bidang (satu per disiplin), buku multidisiplin | `agents/04a-penulis-ahli-bidang.md` | `babXX-<kode>.qmd`, serah-terima | bagiannya saja |
+| 04b | Penulis pemadu, buku multidisiplin | `agents/04b-penulis-pemadu.md` | `babXX.qmd` paduan, `babXX-pemaduan.md` | **ya** (tanpa mengubah substansi bidang) |
+| 05 | Reviewer isi (klaim dan angka, lintas bidang) | `agents/05-reviewer-isi.md` | `ulasan/babXX-isi.md` | tidak |
+| 06 | Reviewer rumus (ahli matematika, statistika matematis) | `agents/06-reviewer-rumus.md` | `ulasan/babXX-rumus.md` | tidak |
+| 07 | Reviewer bahasa (ahli bahasa) | `agents/07-reviewer-bahasa.md` | `ulasan/babXX-bahasa.md` (mode sunting: bahasa saja) | hanya mode sunting |
+| 08 | Reviewer kode (ahli komputasi dan pemrograman) | `agents/08-reviewer-kode.md` | `ulasan/babXX-kode.md` | tidak |
 | 09 | Editor | `agents/09-editor.md` | `ulasan/babXX-editor.md`: keputusan atas temuan, daftar kerja | tidak |
 | 10–12 | Pembaca pemula, menengah, mahir | `agents/10-…`, `11-…`, `12-…` | `ulasan/babXX-pembaca-*.md` (MAYOR/MINOR) | tidak |
 | 13 | Pembuat kunci jawaban | `agents/13-pembuat-kunci-jawaban.md` | `kunci-<buku>/kunci-babXX.qmd`, `temuan-soal.md` | bab kunci saja |
 | 14 | Penyunting soal | `agents/14-penyunting-soal.md` | soal induk diperbaiki, status "Diterapkan" | soal induk saja |
 | 15 | Pengaudit ilustrasi | `agents/15-pengaudit-ilustrasi.md` | `audit-ilustrasi.md`, gambar baru | rujukan gambar saja |
+| 16 | Reviewer ahli pemodelan statistik | `agents/16-reviewer-pemodelan-statistik.md` | `ulasan/babXX-model.md` | tidak |
+| 17 | Reviewer ahli *machine learning* | `agents/17-reviewer-machine-learning.md` | `ulasan/babXX-ml.md` | tidak |
+| 18 | Reviewer ahli statistika resmi dan data survei | `agents/18-reviewer-statistika-resmi.md` | `ulasan/babXX-survei.md` | tidak |
+| 19 | Reviewer ahli domain terapan (templat diisi bidangnya) | `agents/19-reviewer-domain-terapan.md` | `ulasan/babXX-<domain>.md` | tidak |
+| 20 | Reviewer ahli pedagogi dan keterbacaan | `agents/20-reviewer-pedagogi.md` | `ulasan/babXX-pedagogi.md` | tidak |
 
-Peninjau (05–12, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
+Peninjau (05–12, 16–20, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas.
+
+**Buku multidisiplin.** Bila isi buku memadukan beberapa disiplin (mis. statistika matematis, pemodelan statistik, komputasi, *machine learning*, statistika resmi/survei, ekonomi, kesehatan, spasial), setiap disiplin ditulis penulis ahli bidangnya (04a) hanya pada bagian yang ditugaskan rancangan, lalu penulis pemadu (04b) yang menguasai semua bidang buku menggabungkan dan melengkapinya menjadi satu bab. 04a + 04b menggantikan 04; untuk buku satu disiplin, 04 tetap dipakai. **Aturan penugasan reviewer**: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19; pedagogi → 20 (wajib untuk multidisiplin); bahasa → 07; reviewer isi 05 memeriksa klaim dan angka seluruh bab. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
 
 ## Alur tahap demi tahap
 
@@ -58,6 +67,9 @@ Proyek   : siapkan_proyek.py → uji_harness.sh hijau
 Buku     : 01 brief ─▶ 03 sumber+registri ─▶ 02 rancangan rinci ─▶ [persetujuan penulis]
 Bab (A)  : 02 kerangka ─▶ 04 tulis ─▶ harness LULUS ─▶ 05–12 paralel ─▶ 09 putuskan ─▶ 04 perbaiki
            ─▶ harness LULUS ─▶ 00 render berurutan + G-RENDER/G-TEPI/G-PENGGALAN ─▶ komit
+Bab multidisiplin: 02 kerangka+penugasan ─▶ 04a per disiplin (paralel) ─▶ harness bagian LULUS (semua) ─▶ 04b pemaduan
+           ─▶ harness bab LULUS ─▶ ahli bidang + 05/07/20 + 10–12 paralel ─▶ 09 putuskan ─▶ perbaikan (ahli bergiliran | pemadu)
+           ─▶ harness LULUS ─▶ render ─▶ komit
 Kunci (C): 13 kunci ─▶ temuan-soal ─▶ 14 terapkan ke induk ─▶ 13 sesuaikan ─▶ pemeriksa independen
 Keputusan baru (D): catat ─▶ gerbang/konfig + fikstur ─▶ audit semua buku ─▶ sunting paralel ─▶ render ─▶ REVISI.md
 Ilustrasi (E): 15 audit ─▶ gambar ─▶ harness ─▶ render ─▶ pembaca/editor
@@ -69,8 +81,11 @@ Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) 
 | Brief | butir wajib templat terisi; pembaca dan tiga profil uji; peta "satu topik, satu pemilik"; G-HALJUDUL pada `_quarto.yml` |
 | Sumber | setiap kunci yang akan disitasi terverifikasi di `referensi.json`; kutipan klaim ada verbatim |
 | Rancangan/kerangka | setiap subbab punya pertanyaan, penjelasan sederhana, sumber; enam pertanyaan perencanaan per metode; data per bab terperiksa (status Rd); latihan dapat dijawab pasti; persetujuan penulis untuk bab pertama |
+| Brief/rancangan (multidisiplin) | peta disiplin; setiap subbab bertanda disiplin dengan penulis ahli, berkas bagian, reviewer ahli; tabel notasi dan istilah lintas disiplin |
+| Bagian (multidisiplin) | setiap `babXX-<kode>.qmd` LULUS harness tanpa render; serah-terima lengkap |
+| Pemaduan (multidisiplin) | semua bagian LULUS sebelum mulai; `babXX.qmd` LULUS; peta pemaduan lengkap; klaim pindah ke kunci bab; tidak ada butir "dikembalikan ke ahli" terbuka |
 | Draf bab | `harness.py` LULUS tanpa render (semua gerbang aktif) |
-| Ulasan | tidak ada MAYOR terbuka; setiap temuan punya tindak lanjut tertulis |
+| Ulasan | tidak ada MAYOR terbuka; setiap temuan punya tindak lanjut tertulis; (multidisiplin) setiap bagian ditinjau ahli disiplinnya + 07 + 09, tanpa swatinjau |
 | Render | `harness.py --render` LULUS: G-RENDER, G-TEPI, G-PENGGALAN; tampilan PDF/Word diperiksa editor |
 | Kunci | setiap latihan: pembahasan, Jawaban akhir, rubrik = 10; temuan soal Diterapkan/Diputuskan |
 
@@ -97,6 +112,7 @@ Loop tertutup dengan kriteria berhenti, batas iterasi, eskalasi, dan jejak tertu
 | Loop | Isi | Berhenti bila | Batas | Eskalasi ke penulis |
 |---|---|---|---|---|
 | A bab | tulis → harness → ulasan independen paralel → editor → perbaikan → harness → render | `--render` LULUS, 0 MAYOR terbuka, semua temuan bertindak lanjut | 3 putaran ulasan; 6 percobaan per gerbang | MAYOR bertahan; perbaikan membuka MAYOR baru 2×; temuan menyentuh rancangan |
+| A multidisiplin | tulis per bidang → harness bagian → pemaduan → harness bab → ulasan ahli paralel → editor → perbaikan ke ahli (substansi) atau pemadu (pemaduan) | kriteria A + semua bagian ditinjau ahlinya, 07, 09; butir "dikembalikan ke ahli" tertutup | seperti A; 2 bolak-balik pemadu ↔ ahli per butir | dua ahli berbeda pendapat → editor; menyangkut rancangan → penulis |
 | B literatur | usul klaim → registri → G-REFERENSI → cek parafrase | semua sitasi terbukti | 3 putaran | sumber harus diunggah |
 | C kunci → soal induk | temuan soal → penyunting soal → harness induk → kunci disesuaikan → pemeriksa | semua temuan Diterapkan/Diputuskan | 2 putaran | rumusan mengubah tujuan latihan |
 | D keputusan → gerbang → audit | keputusan → gerbang + fikstur → audit semua buku → sunting → render → `REVISI.md` | semua buku LULUS gerbang baru | per kelompok bab | pola gerbang ambigu |
@@ -107,6 +123,7 @@ Tindak lanjut ditulis penulis di bagian `## Tindak lanjut (tanggal)` setiap berk
 ## Paralelisasi aman
 
 - **Satu agen per berkas**; kelompok bab tanpa irisan; pembuat kunci dan penyunting soal tidak pernah menyunting berkas yang sama.
+- **Buku multidisiplin**: satu penulis ahli per berkas bagian `babXX-<kode>.qmd` (paralel); pemaduan dimulai setelah **semua** bagian LULUS harness; ulasan ahli paralel setelah pemaduan; perbaikan substansi oleh ahli bergiliran pada `babXX.qmd`, lalu pemadu menyelaraskan. Bagian diarsipkan di `naskah/bagian/` bersama serah-terima dan laporan pemaduan.
 - Berkas bersama (`harness/klaim.json`, `pengecualian.json`) hanya lewat `flock <scratchpad>/klaim.lock`, mengganti entri bab sendiri.
 - Agen bab **tidak** menjalankan `--render` dan tidak mengubah `_quarto.yml`, `harness/`, `_bersama/`, bab/buku lain.
 - **Render berurutan** oleh orkestrator, satu buku sekali jalan, PDF + Word dalam satu `quarto render`.
@@ -119,7 +136,7 @@ Rinci: `agents/00-orkestrator.md`.
 ## Kriteria selesai
 
 - **Bab**: kriteria berhenti loop A terpenuhi; bab ada di `chapters` dan `lampiran-kode/README.md`; halaman sebenarnya tercatat; komit.
-- **Buku**: semua bab selesai; prakata (tujuan, pembaca, cara pakai, "Data yang digunakan dan batasannya"); lampiran Sumber Data; daftar pustaka; anatomi dan tipografi (butir 33–35); tanpa subjudul buku; "Draf revisi ke-N" dan `REVISI.md` mutakhir; render bersih PDF dan Word.
+- **Buku**: semua bab selesai; prakata (tujuan, pembaca, cara pakai, "Data yang digunakan dan batasannya"); lampiran Sumber Data; daftar pustaka; halaman hak cipta (data yang belum ada ditulis "belum ditetapkan"), glosarium, indeks (PDF), riwayat hidup penulis dari sumber resmi; anatomi dan tipografi (butir 33–35); tanpa subjudul buku; "Draf revisi ke-N" dan `REVISI.md` mutakhir; render bersih PDF dan Word.
 - **Kunci**: setiap latihan induk berpembahasan dan berubrik 10; pemeriksa independen tanpa MAYOR; temuan soal tertutup.
 - Laporan ke penulis menyebut yang belum terverifikasi; jangan menyatakan selesai sebelum gerbang lulus.
 
@@ -136,18 +153,18 @@ Rinci: `agents/00-orkestrator.md`.
 
 | Berkas | Isi | Dibaca oleh |
 |---|---|---|
-| `references/prinsip-buku-ajar.md` | ringkasan operasional kajian; 5W1H; Permendikbudristek 22/2022; daftar periksa 35 butir | 02, 04, 05–12 |
+| `references/prinsip-buku-ajar.md` | ringkasan operasional kajian; 5W1H; Permendikbudristek 22/2022; daftar periksa 35 butir | 02, 04, 04a, 04b, 05–12, 16–20 |
 | `references/kajian-prinsip-buku-ajar.md` | kajian lengkap (status sumber [A]/[S]/[A, terverifikasi]) | bila perlu dasar |
-| `references/aturan-gaya-dan-tampilan.md` | semua keputusan gaya bawaan: prosa, judul, tabel/gambar, rumus, sitasi, angka/kode, struktur bab, cetak, halaman judul, bahasa | semua |
+| `references/aturan-gaya-dan-tampilan.md` | semua keputusan gaya bawaan: prosa, judul, tabel/gambar, rumus, sitasi, angka/kode, struktur bab, cetak, halaman judul, anatomi buku, bahasa | semua |
 | `references/istilah-statistika.md` | kebijakan istilah, keputusan bawaan, jembatan istilah | 01, 04, 07, 09 |
 | `references/data-dan-sumber.md` | urutan data, status data, peta, prakata; registri klaim dan identitas | 01–05, 13 |
 | `references/harness-dan-gerbang.md` | setiap gerbang, konfig, menambah gerbang, registri aman, render | 00, 04, 08 |
-| `references/loop-kerja.md` | loop A–E, kriteria berhenti, batas, eskalasi, format ulasan | 00, 09, peninjau |
+| `references/loop-kerja.md` | loop A–E (dan A multidisiplin), kriteria berhenti, batas, eskalasi, penyimpanan bagian, format ulasan | 00, 04a, 04b, 09, peninjau |
 | `references/kunci-jawaban.md` | bentuk kunci, rubrik, temuan soal, pemeriksaan kunci | 13, 14 |
 | `references/ilustrasi.md` | jalur Python/TikZ, keterangan, audit | 04, 15 |
 | `references/pelajaran-proyek.md` | kesalahan berulang dan pencegahannya | 04, 05, 08, 09 |
 
-Templat di `assets/`: brief, rancangan rinci, kerangka bab, bab `.qmd` dan bab kunci `.qmd` (keduanya lulus harness), laporan ulasan, temuan soal, `KEPUTUSAN-RANCANGAN`, `REVISI`, `STATUS`, `_quarto.yml`, `preamble.tex`, `tikz-preamble.tex`, `konfig.json`, `apa.csl`, `reference-b5.docx`.
+Templat di `assets/`: brief, rancangan rinci, kerangka bab, serah-terima bagian, laporan pemaduan, bab `.qmd` dan bab kunci `.qmd` (keduanya lulus harness), laporan ulasan, temuan soal, `KEPUTUSAN-RANCANGAN`, `REVISI`, `STATUS`, `_quarto.yml`, `preamble.tex`, `tikz-preamble.tex`, `konfig.json`, `apa.csl`, `reference-b5.docx`.
 
 ## Kemasan akhir
 
