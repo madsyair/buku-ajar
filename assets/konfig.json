@@ -1,4 +1,11 @@
 {
+ "huruf": "libertinus",
+ "profil": "seri",
+ "docx_huruf": "",
+ "ukuran": "b5",
+ "batas_kode": 72,
+ "batas_kode_python": 79,
+ "batas_keluaran": 78,
  "bersama": "_bersama",
  "lampiran": "lampiran-kode",
  "id_bab_polos": [],

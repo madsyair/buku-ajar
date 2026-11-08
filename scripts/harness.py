@@ -10,7 +10,7 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-LAMPIRAN   kode lampiran (R hasil purl + Python gambar) berjalan mandiri
   G-ANGKA      angka hasil hitung di prosa wajib berasal dari kode R inline
   G-KELUARAN   tidak ada keluaran yang diketik tangan di komentar kode
-  G-LEBAR-KODE baris R maksimal 72 karakter, Python 79 (tidak terpotong di B5)
+  G-LEBAR-KODE baris R maksimal 72 karakter, Python 79 (konfig batas_kode, batas_kode_python)
   G-BOCOR      tidak ada peringatan, galat, atau repr objek yang tercetak di buku
   G-PYTHON     potongan Python tidak mengambil objek R (r.) dan tidak menghitung model
   G-RUJUKAN    setiap rujukan @fig/@tbl/@eq/@sec dan [@kunci] punya sasaran
@@ -21,7 +21,7 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-PARAGRAF   paragraf isi 2–6 kalimat (aturan longgar untuk buku)
   G-RENDER     buku dirender ke PDF dan Word tanpa galat (opsi --render)
   G-PENGGALAN  pemenggalan kata EYD V (kamus Sastrawi + uji contoh resmi; audit PDF)
-  G-LEBAR-KELUARAN keluaran kode tercetak <= 78 karakter (TEPI=1)
+  G-LEBAR-KELUARAN keluaran kode tercetak <= 78 karakter (konfig batas_keluaran; TEPI=1)
   G-JUDUL      judul tabel/gambar singkat, panel (a)(b), subjudul bukan kalimat tanya
   G-KONJUNGSI  tanpa koma sebelum penghubung subordinatif (KONJUNGSI=1)
   G-PERSAMAAN  "persamaan" huruf kecil di tengah kalimat; @Eq- di awal kalimat
@@ -37,6 +37,12 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-LN         logaritma natural ditulis ln di rumus naskah; log hanya dengan
                subskrip basis (log_{10}); kode tetap log() (LN=0 mematikan)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
+  G-DOCX-RUMUS rumus Word asli (OMML) di DOCX: jumlah m:oMath >= rumus sumber - toleransi,
+               tanpa TeX mentah di teks biasa, tanpa gambar rumus (setelah --render; DOCX_RUMUS=0)
+  G-DOCX       Word: ukuran halaman = ukuran buku, gambar di dalam bidang teks, tanpa ikon
+               kotak, tanpa "??"/@rujukan mentah, judul Heading1 bernomor (setelah --render; DOCX=0)
+  G-HURUF      semua huruf tersemat di PDF buku dan PDF gambar termasuk keluarga opsi
+               "huruf" di konfig.json (_bersama/huruf.py; setelah --render; HURUF=0 mematikan)
 
 Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
   <proyek>/harness/{harness.py, referensi.py, penggalan.py, klaim.json,
@@ -49,6 +55,9 @@ Pemakaian:
   python3 harness/harness.py --buku buku1 --bab bab02
   python3 harness/harness.py --buku buku1 --bab bab02 --render
   python3 harness/harness.py --tag-pdf buku1/_book/buku.pdf     # G-TAG saja
+  python3 harness/harness.py --docx-rumus buku.docx --sumber bab01.qmd ...   # G-DOCX-RUMUS saja
+  python3 harness/harness.py --docx-cek buku.docx [--ukuran unesco]          # G-DOCX saja
+  python3 harness/harness.py --huruf-pdf gambar/x.pdf [--huruf springer]   # G-HURUF saja
 """
 import argparse
 import json
@@ -94,6 +103,17 @@ KONFIG_BAWAAN = {
     ],
     # Istilah yang sudah diputuskan penulis: pola regex -> saran (dan tanggal keputusan)
     "istilah_terlarang": [],
+    # Opsi huruf (libertinus, springer, crc, stix), profil ukuran (seri, springer,
+    # crc, wiley), dan gaya Word ("windows": Times New Roman/Courier New/Cambria Math);
+    # diterapkan oleh _bersama/huruf.py, diperiksa G-HURUF.
+    "huruf": "libertinus",
+    "profil": "seri",
+    "docx_huruf": "",
+    # Ukuran buku (b5, unesco, a5, a4, 6x9, 7x10) dan batas baris kode/keluaran
+    "ukuran": "b5",
+    "batas_kode": 72,
+    "batas_kode_python": 79,
+    "batas_keluaran": 78,
 }
 
 
@@ -262,8 +282,11 @@ def gerbang_keluaran_python(qmd):
 
 
 # ---------------------------------------------------------------- G-LEBAR-KODE
-# Baris R yang panjang terpotong di halaman B5; Python mengikuti PEP 8.
-BATAS_LEBAR = {"r": 72, "python": 79}
+# Baris R yang panjang terpotong di kolom; Python mengikuti PEP 8. Batas dibaca
+# dari konfig.json ("batas_kode", "batas_kode_python") karena ukuran buku kecil
+# (unesco, a5) memerlukan batas lebih kecil atau huruf mono lebih kecil
+# (_bersama/huruf.py menghitung ukuran mono dari batas ini).
+BATAS_LEBAR = {"r": int(KONFIG.get("batas_kode", 72)), "python": int(KONFIG.get("batas_kode_python", 79))}
 
 
 def gerbang_lebar_kode(qmd):
@@ -281,7 +304,7 @@ def gerbang_lebar_kode(qmd):
     catat("G-LEBAR-KODE", not salah, "\n".join(salah))
 
 
-BATAS_LEBAR_KELUARAN = 78
+BATAS_LEBAR_KELUARAN = int(KONFIG.get("batas_keluaran", 78))
 
 
 def gerbang_lebar_keluaran(md):
@@ -740,6 +763,205 @@ def gerbang_render(buku):
         gerbang_tag(buku)
     if os.environ.get("TEPI", "1") == "1":
         gerbang_tepi(buku)
+    if os.environ.get("HURUF", "1") == "1":
+        gerbang_huruf(buku)
+    if os.environ.get("DOCX_RUMUS", "1") == "1":
+        gerbang_docx_rumus(buku)
+    if os.environ.get("DOCX", "1") == "1":
+        gerbang_docx(buku)
+
+
+# ---------------------------------------------------------------- G-DOCX-RUMUS
+# Rumus di Word harus persamaan Word asli (OMML) agar dapat disunting dan
+# dikonversi (mis. ke MathType), bukan gambar atau teks TeX mentah.
+TEX_MENTAH = re.compile(r"\\(?:frac|sum|prod|int|sqrt|alpha|beta|gamma|delta|theta|lambda|mu|sigma|"
+                        r"pi|hat|bar|mathbf|mathrm|operatorname|left|right|begin|end)\b|\^\{|_\{")
+GAMBAR_RUMUS = re.compile(r"(?:^|[-_ ])(?:eq|rumus|persamaan|equation)(?:[-_ ]|$)|\\(?:frac|sum|alpha)", re.I)
+TOLERANSI_RUMUS = (0.02, 2)   # boleh kurang 2% atau 2 rumus (yang lebih besar)
+
+
+def hitung_rumus(teks):
+    r"""Jumlah rumus Pandoc di prosa .qmd: blok $$...$$ dan $...$ sebaris
+    (aturan Pandoc tex_math_dollars: $ pembuka tidak diikuti spasi, $ penutup
+    tidak didahului spasi dan tidak diikuti angka), di luar chunk, kode
+    sebaris, R inline, komentar HTML, dan \$."""
+    prosa, _ = pilah_qmd(teks)
+    isi = "\n".join(b for _, b in prosa)
+    isi = re.sub(r"<!--.*?-->", " ", isi, flags=re.S)
+    isi = re.sub(r"`[^`\n]*`", " ", isi)
+    isi = isi.replace(r"\$", " ")
+    blok = len(re.findall(r"\$\$.+?\$\$", isi, flags=re.S))
+    isi = re.sub(r"\$\$.+?\$\$", " ", isi, flags=re.S)
+    sebaris = len(re.findall(r"\$(?=\S)[^$\n]*?(?<=\S)\$(?!\d)", isi))
+    return blok + sebaris
+
+
+def masalah_docx_rumus(docx, harap=None):
+    """Daftar masalah rumus di DOCX; harap = jumlah rumus di sumber."""
+    import zipfile
+    with zipfile.ZipFile(docx) as z:
+        xml = z.read("word/document.xml").decode("utf-8", errors="replace")
+    masalah = []
+    n_omath = len(re.findall(r"<m:oMath[ >]", xml))
+    if harap is not None:
+        batas = harap - max(TOLERANSI_RUMUS[1], int(TOLERANSI_RUMUS[0] * harap))
+        if n_omath < batas:
+            masalah.append(f"(a) {n_omath} m:oMath di DOCX, sumber memuat {harap} rumus (minimal {batas})")
+    tanpa_math = re.sub(r"<m:oMath(?:Para)?[ >].*?</m:oMath(?:Para)?>", " ", xml, flags=re.S)
+    for par in re.findall(r"<w:p[ >].*?</w:p>", tanpa_math, flags=re.S):
+        if re.search(r'<w:pStyle w:val="SourceCode"', par):
+            continue
+        for run in re.findall(r"<w:r[ >].*?</w:r>", par, flags=re.S):
+            if re.search(r'<w:rStyle w:val="(?:VerbatimChar|[A-Za-z]*Tok)"', run):
+                continue
+            teks = "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", run))
+            m = TEX_MENTAH.search(teks)
+            if m:
+                masalah.append(f"(b) TeX mentah di teks biasa: '{teks.strip()[:60]}'")
+    for tag in re.findall(r"<wp:docPr [^>]*>", xml):
+        nama = (re.search(r'name="([^"]*)"', tag) or [None, ""])[1]
+        alt = (re.search(r'descr="([^"]*)"', tag) or [None, ""])[1]
+        if GAMBAR_RUMUS.search(nama) or GAMBAR_RUMUS.search(alt or ""):
+            masalah.append(f"(c) gambar tampak seperti rumus: name='{nama[:40]}', alt='{(alt or '')[:40]}'")
+    return masalah, n_omath
+
+
+def gerbang_docx_rumus(buku, docx=None, sumber=None):
+    if docx is None:
+        daftar = list((buku / "_book").glob("*.docx"))
+        if not daftar:
+            catat("G-DOCX-RUMUS", False, "DOCX tidak ditemukan di _book/")
+            return
+        docx = daftar[0]
+        yml = (buku / "_quarto.yml").read_text(encoding="utf-8")
+        sumber = [buku / f for f in re.findall(r"^\s*-\s*(\S+\.qmd)", yml, flags=re.M) if (buku / f).exists()]
+    harap = sum(hitung_rumus(Path(s).read_text(encoding="utf-8")) for s in sumber) if sumber else None
+    masalah, n = masalah_docx_rumus(docx, harap)
+    # (d) fon rumus Word: m:mathFont di settings.xml sama dengan fon rumus opsi
+    # (gaya Word Windows: Cambria Math); dipasang huruf.py --pasca-render.
+    modul = _modul_huruf()
+    if modul is not None and buku is not None:
+        import zipfile
+        harap_fon = modul.fon_rumus_docx(KONFIG.get("huruf", "libertinus"), KONFIG.get("docx_huruf", ""))
+        with zipfile.ZipFile(docx) as z:
+            s = z.read("word/settings.xml").decode("utf-8", errors="replace")
+        m = re.search(r'<m:mathFont m:val="([^"]+)"', s)
+        if not m or m.group(1) != harap_fon:
+            masalah.append(f"(d) m:mathFont {m.group(1) if m else 'tidak ada'}, seharusnya {harap_fon} "
+                           "(post-render _bersama/huruf.py --pasca-render di _quarto.yml)")
+    print(f"    G-DOCX-RUMUS: {n} m:oMath di {Path(docx).name}; sumber {harap} rumus")
+    catat("G-DOCX-RUMUS", not masalah, "\n".join(masalah[:40]))
+
+
+# ---------------------------------------------------------------- G-DOCX
+def _attr(tag, nama):
+    m = re.search(rf'{nama}="(\d+)"', tag)
+    return int(m.group(1)) if m else 0
+
+
+def masalah_docx(docx, ukuran_mm=None, bernomor=False):
+    """Pemeriksaan otomatis keluaran Word (daftar periksa
+    assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, gambar
+    tidak melebihi bidang teks, tanpa ikon kotak (gambar <= 0,2 inci), tanpa
+    "??" atau rujukan @fig-/@sec-/@tbl-/@eq- mentah, ada Heading1, dan judul
+    bernomor bila number-sections."""
+    import zipfile
+    with zipfile.ZipFile(docx) as z:
+        xml = z.read("word/document.xml").decode("utf-8", errors="replace")
+    masalah = []
+    sect = re.findall(r"<w:sectPr[ >].*?</w:sectPr>", xml, flags=re.S)
+    pgsz = re.search(r"<w:pgSz [^>]*>", sect[-1]).group(0) if sect else ""
+    pgmar = re.search(r"<w:pgMar [^>]*>", sect[-1]).group(0) if sect else ""
+    w, h = _attr(pgsz, "w:w"), _attr(pgsz, "w:h")
+    if ukuran_mm:
+        mm = 25.4 / 1440
+        if abs(w * mm - ukuran_mm[0]) > 2 or abs(h * mm - ukuran_mm[1]) > 2:
+            masalah.append(f"halaman {w * mm:.0f} × {h * mm:.0f} mm, seharusnya {ukuran_mm[0]} × {ukuran_mm[1]} mm "
+                           "(reference-doc ukuran buku dari huruf.py)")
+    bidang = (w - _attr(pgmar, "w:left") - _attr(pgmar, "w:right")) * 635  # EMU
+    for tag in re.findall(r"<wp:extent [^>]*>", xml):
+        cx = _attr(tag, "cx")
+        if bidang and cx > bidang * 1.01:
+            masalah.append(f"gambar {cx / 914400:.2f} in melebihi bidang teks {bidang / 914400:.2f} in")
+        if cx <= 0.2 * 914400:
+            masalah.append(f"gambar kecil {cx / 914400:.2f} in (ikon kotak? set callout-icon: false di format docx)")
+    teks = " ".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", xml))
+    if "??" in teks:
+        masalah.append("'??' di teks: rujukan silang atau sitasi tidak terselesaikan")
+    for r in sorted(set(re.findall(r"@(?:fig|sec|tbl|eq|lst|thm)-[\w-]+", teks)))[:10]:
+        masalah.append(f"rujukan mentah '{r}' di teks")
+    judul = []
+    for par in re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S):
+        st = re.search(r'<w:pStyle w:val="(Heading\d)"', par)
+        if st:
+            judul.append((st.group(1), "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par)).strip()))
+    if not any(g == "Heading1" for g, _ in judul):
+        masalah.append("tidak ada judul bergaya Heading1")
+    if bernomor and not any(g == "Heading1" and re.match(r"\d+\.?\s", s) for g, s in judul):
+        masalah.append("judul bab tidak bernomor di Word (number-sections)")
+    return masalah
+
+
+def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False):
+    if docx is None:
+        daftar = list((buku / "_book").glob("*.docx"))
+        if not daftar:
+            catat("G-DOCX", False, "DOCX tidak ditemukan di _book/")
+            return
+        docx = daftar[0]
+        modul = _modul_huruf()
+        if modul is not None:
+            ukuran_mm = modul.ukuran(KONFIG.get("ukuran", "b5"))["kertas"]
+        yml = (buku / "_quarto.yml").read_text(encoding="utf-8")
+        bernomor = bool(re.search(r"^number-sections:\s*true", yml, flags=re.M))
+    masalah = masalah_docx(docx, ukuran_mm, bernomor)
+    catat("G-DOCX", not masalah, "\n".join(sorted(set(masalah))[:40]))
+
+
+# ---------------------------------------------------------------- G-HURUF
+def _modul_huruf():
+    import importlib.util
+    for calon in (BERSAMA / "huruf.py", Path(__file__).resolve().parent / "huruf.py"):
+        if calon.exists():
+            spek = importlib.util.spec_from_file_location("huruf", calon)
+            modul = importlib.util.module_from_spec(spek)
+            spek.loader.exec_module(modul)
+            return modul
+    return None
+
+
+def gerbang_huruf(buku, pdfs=None, nama=None):
+    """Semua huruf tersemat (pdffonts) di PDF buku dan PDF gambar (matplotlib,
+    TikZ) termasuk keluarga opsi "huruf" (teks, matematika, mono, dan pasangan
+    TikZ-nya). Huruf asing (DejaVu, STIXGeneral, CMR pada opsi Times, dst.)
+    berarti ada glif yang jatuh ke huruf cadangan lain."""
+    modul = _modul_huruf()
+    nama = nama or KONFIG.get("huruf", "libertinus")
+    if modul is None or not shutil.which("pdffonts"):
+        catat("G-HURUF", False, "_bersama/huruf.py atau pdffonts (poppler-utils) tidak ada")
+        return
+    if pdfs is None:
+        pdfs = sorted((buku / "_book").glob("*.pdf"))
+        for pola in ("*_files/figure-pdf/*.pdf", "gambar/*.pdf", "_book/*_files/figure-pdf/*.pdf"):
+            pdfs += sorted(buku.glob(pola))
+    if not pdfs:
+        catat("G-HURUF", False, "PDF buku/gambar tidak ditemukan")
+        return
+    masalah = []
+    if buku is not None:  # glif hilang: \tracinglostchars=2 di preamble.tex
+        logs = sorted(buku.glob("*.log"), key=lambda p: p.stat().st_mtime)
+        logs = [p for p in logs if not p.name.startswith("tikz")]
+        if logs:
+            hilang = sorted(set(re.findall(r"Missing character: There is no (.+?) in font ([^!\n]+)",
+                                           logs[-1].read_text(encoding="utf-8", errors="replace"))))
+            masalah += [f"{logs[-1].name}: glif {g} tidak ada di huruf {f.strip()}" for g, f in hilang[:20]]
+    for pdf in pdfs:
+        asing = modul.huruf_asing(pdf, nama)
+        if asing:
+            masalah.append(f"{pdf.name}: {', '.join(asing)} (opsi '{nama}' mengizinkan "
+                           f"{', '.join(modul.opsi(nama)['izin'][:6])}...)")
+    print(f"    G-HURUF: {len(pdfs)} PDF diperiksa (opsi {nama})")
+    catat("G-HURUF", not masalah, "\n".join(masalah[:40]))
 
 
 # ---------------------------------------------------------------- G-LOG
@@ -1220,12 +1442,37 @@ def main():
     ap.add_argument("--render", action="store_true")
     ap.add_argument("--tag-pdf", metavar="PDF",
                     help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
+    ap.add_argument("--huruf-pdf", metavar="PDF", nargs="+",
+                    help="hanya jalankan G-HURUF pada PDF ini (uji fikstur, PDF gambar)")
+    ap.add_argument("--huruf", help="opsi huruf untuk --huruf-pdf (bawaan: konfig.json)")
+    ap.add_argument("--docx-rumus", metavar="DOCX",
+                    help="hanya jalankan G-DOCX-RUMUS pada DOCX ini (uji fikstur)")
+    ap.add_argument("--sumber", nargs="*", default=[], help="berkas .qmd sumber untuk --docx-rumus")
+    ap.add_argument("--docx-cek", metavar="DOCX", help="hanya jalankan G-DOCX pada DOCX ini (uji fikstur)")
+    ap.add_argument("--ukuran", default="b5", help="ukuran buku untuk --docx-cek")
     a = ap.parse_args()
     if a.tag_pdf:
         gerbang_tag(None, pdf=Path(a.tag_pdf))
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
+    if a.docx_cek:
+        modul = _modul_huruf()
+        gerbang_docx(None, docx=Path(a.docx_cek),
+                     ukuran_mm=modul.ukuran(a.ukuran)["kertas"] if modul else None)
+        for g, ok, r in hasil:
+            print(f"{g}: {'LULUS' if ok else 'GAGAL'}" + (f"\n{r}" if r else ""))
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
+    if a.docx_rumus:
+        gerbang_docx_rumus(None, docx=Path(a.docx_rumus), sumber=[Path(s) for s in a.sumber])
+        for g, ok, r in hasil:
+            print(f"{g}: {'LULUS' if ok else 'GAGAL'}" + (f"\n{r}" if r else ""))
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
+    if a.huruf_pdf:
+        gerbang_huruf(None, pdfs=[Path(p) for p in a.huruf_pdf], nama=a.huruf)
+        for g, ok, r in hasil:
+            print(f"{g}: {'LULUS' if ok else 'GAGAL'}" + (f"\n{r}" if r else ""))
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
     if not (a.buku and a.bab):
-        ap.error("--buku dan --bab wajib (kecuali dengan --tag-pdf)")
+        ap.error("--buku dan --bab wajib (kecuali dengan --tag-pdf, --huruf-pdf, --docx-rumus, atau --docx-cek)")
     buku = AKAR / a.buku
     qmd = buku / f"{a.bab}.qmd"
     peng = muat_pengecualian()
