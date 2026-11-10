@@ -131,6 +131,14 @@ Keputusan yang tidak dapat diperiksa mesin (mis. "setiap kalimat utuh", "kepadua
 
 Pengaudit ilustrasi per kelompok bab: audit → `audit-ilustrasi.md` → buat ≤ 2 gambar per bab → harness LULUS → render berurutan → pembaca/editor memeriksa narasi cocok dengan gambar → perbaikan. Batas 2 putaran.
 
+## Loop F — gaya bab (sesudah loop A dan telaah 21)
+
+Penyunting gaya buku ajar (22, konteks bersih) menelaah bab dari lima sisi (komunikatif–interaktif, semi-formal, istilah, rujukan, struktur bab) dan menulis ulang ke `naskah/gaya/babXX.qmd` beserta tabel keputusan sitasi (`references/gaya-buku-ajar.md`). Penerap revisi gaya (23, **agen lain**) membandingkan kedua versi paragraf demi paragraf, mengembalikan perubahan yang menggeser makna atau menghapus sitasi wajib, memperbarui registri (`"tampil": "bacaan-lanjut"`) dan glosarium, menerapkan ke `babXX.qmd`, lalu menjalankan `harness.py` dan `harness.py --tahap akhir` sampai keduanya LULUS. Batas 2 putaran; eskalasi bila penulisan ulang menggeser makna dua kali atau sapaan buku belum diputuskan.
+
+## Loop G — penerbitan (buku utuh)
+
+Editor penerbitan (24) membaca PDF/Word utuh dan memutuskan *siap terbit*, *siap terbit dengan perbaikan mekanis*, atau *perlu putaran revisi*. Perbaikan mekanis dikerjakan 23; temuan substansi dikembalikan ke loop A bab terkait; keputusan produksi (ISBN, penerbit, tanda air) ke penulis. Render ulang, lalu 24 memeriksa ulang. Batas 2 putaran.
+
 ## Format berkas ulasan
 
 Lihat `assets/templat-laporan-ulasan.md`. Inti:

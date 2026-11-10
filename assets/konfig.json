@@ -20,7 +20,7 @@
   {"pola": "\\bderau\\b", "saran": "pakai *noise* (keputusan penulis 2026-11-06)"},
   {"pola": "\\btaksiran\\w*|\\bpenaksir\\w*|\\bditaksir\\b|\\bmenaksir\\b", "saran": "estimasi/estimator/diestimasi (keputusan penulis 2026-11-06)"},
   {"pola": "\\bkemungkinan maksimum\\b|\\bfungsi kemungkinan\\b", "saran": "*maximum likelihood* / fungsi *likelihood* (keputusan penulis 2026-11-06)"},
-  {"pola": "\\bpendugaan area kecil\\b", "saran": "estimasi area kecil (keputusan penulis 2026-11-06)"},
+  {"pola": "\\bestimasi area kecil\\b", "saran": "pendugaan area kecil (*small area estimation*, SAE): istilah tetap paling umum di literatur Indonesia (keputusan penulis 2026-11-10)"},
   {"pola": "\\btarikan acak\\b|\\bnilai tarikan\\b|\\bditarik dari (?:distribusi|prior|posterior)\\b", "saran": "membangkitkan / nilai bangkitan / *draws* (keputusan 2026-11-06)"},
   {"pola": "\\bsampel MCMC\\b", "saran": "*draws* untuk keluaran MCMC (keputusan 2026-11-06)"}
  ],

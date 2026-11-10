@@ -1,0 +1,7 @@
+# Bab gaya artikel {#sec-gaya-artikel}
+
+Rerata sampel merupakan penaksir tak bias bagi rerata populasi apabila pengamatan diambil secara acak dari populasi yang sama dan masing-masing pengamatan memiliki ragam yang terhingga sebagaimana telah ditunjukkan dalam berbagai literatur statistika matematis klasik [@a2001; @b2002; @c2003]. Pembaca dapat melihat bahwa sifat ini berlaku umum [@d2004]. Pembaca perlu memahami syaratnya [@e2005]. Pembaca harus memeriksa asumsinya [@f2006]. Pembaca diharapkan mengulang pembuktiannya [@g2007].
+
+## Rangkuman {#sec-rangkuman-gaya-artikel}
+
+Rerata sampel tidak bias bagi rerata populasi bila pengamatannya acak dan ragamnya terhingga.

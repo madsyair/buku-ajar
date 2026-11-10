@@ -15,9 +15,11 @@ Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 
 | Contoh diambil dari **pengetahuan umum dan konteks Indonesia** (pengangguran, kemiskinan kabupaten, upah, harga beras, klaim asuransi, nilai ujian), dengan data yang statusnya disebut (lihat `data-dan-sumber.md`). | reviewer isi |
 | Satu istilah baru, satu penjelasan utuh: arti dengan kata sehari-hari, alasan dibutuhkan, contoh angka atau analogi. Jangan menumpuk beberapa istilah baru dalam satu kalimat atau satu kotak. | pembaca, reviewer bahasa |
 | Paragraf isi 2–6 kalimat; satu gagasan pokok; kalimat pertama terhubung ke paragraf sebelumnya. | G-PARAGRAF |
-| Tanpa basa-basi dan kosakata khas tulisan mesin ("berikut ini", "perlu dicatat bahwa", "sangat", "krusial", "menyoroti", "mari kita", "pada dasarnya", "ternyata"). | G-SLOP, G-GAYA |
+| **Komunikatif dan interaktif, semi-formal** (keputusan penulis 2026-11-10): prosa menyapa pembaca dengan *kita* seolah berdialog (tanpa *Anda*; perintah latihan tanpa kata ganti), kalimat aktif lebih dulu, kosakata baku EYD V, kalimat pendek dan mengalir (rata-rata ≤ 20 kata, tidak ada yang > 35 kata). Kata *pembaca* sebagai pelaku diganti sapaan. Rinci: `gaya-buku-ajar.md`. | G-GAYA-AJAR (`--tahap akhir`), peran 22–23 |
+| Tanpa basa-basi dan kosakata khas tulisan mesin ("berikut ini", "perlu dicatat bahwa", "sangat", "krusial", "menyoroti", "pada dasarnya", "ternyata"). Sapaan *kita* dianjurkan; yang ditolak hanya pengumuman meta ("mari kita lihat/bahas/pelajari …") (keputusan penulis 2026-11-10). | G-SLOP, G-GAYA |
 | Tanpa "di mana"/"dimana"/"yang mana" sebagai penghubung; pakai "yang", "tempat", atau pecah kalimat. | G-GAYA |
 | Komentar meta tentang buku ("Pada bab ini kita akan…") diganti pernyataan isi. | G-SLOP |
+| **Istilah teknis atau asing dijelaskan langsung** pada kemunculan pertama di setiap bab (arti sehari-hari, lalu contoh) dan dimasukkan ke glosarium dengan arti yang sama. | peran 22–23, editor penerbitan |
 | Klaim perbandingan ("sama", "lebih lebar", "kokoh", "tidak memuat nol") ditulis bersyarat pada angka atau dikunci dengan `stopifnot()` (lihat `pelajaran-proyek.md`). | reviewer kode |
 
 ## 2. Judul dan subjudul
@@ -60,6 +62,7 @@ dari posterior ...
 
 | Aturan | Gerbang |
 |---|---|
+| **Rumus dan simbol** mengikuti `rumus-dan-simbol.md`: rumus bagian kalimat; kalimat tidak diawali lambang; dua rumus dipisah kata; operator, fungsi baku, dan label subskrip tegak; satu bentuk per operator; rumus tampilan dipenggal **sebelum** relasi/operator di tingkat terluar, terjajar pada =, satu nomor per rumus, tanpa `\left`/`\right` terbelah; **teks lanjutan sesudah rumus tampilan tidak diindentasi** (tanpa baris kosong di sekitar rumus); setiap simbol diterangkan pada kemunculan pertama; satu simbol satu arti; narasi, tabel, gambar, dan kode memakai nama yang sama. | G-RUMUS (ERROR), reviewer rumus (WARNING R5/R10) |
 | Kata **"persamaan" huruf kecil** di tengah kalimat ("… seperti pada persamaan 3.2"); kapital hanya di awal kalimat. Di Quarto: `crossref-eq-prefix: "persamaan"`; rujukan di awal kalimat ditulis `@Eq-…`. | G-PERSAMAAN |
 | **Pemisah parameter distribusi**: bila salah satu parameter memuat koma desimal, pakai titik koma: Beta(18,85; 281,15), $\mathrm{N}(0;\ 0{,}5)$. Parameter bilangan bulat boleh koma: Beta(1, 1). Seragam dalam satu bab. | reviewer rumus |
 | Desimal koma di prosa dan rumus (`0{,}5` dalam mode matematika agar tanpa spasi); kode tetap titik. | reviewer |
@@ -75,6 +78,7 @@ dari posterior ...
 
 | Aturan | Gerbang |
 |---|---|
+| **Dua tahap sitasi.** Selama loop A, naskah padat sitasi agar setiap pernyataan punya dasar (G-REFERENSI). Pada **tahap gaya akhir** (peran 22–23), sitasi di prosa dikurangi menjadi gaya buku ajar: hanya untuk kutipan, angka/data sumber lain, gambar/tabel adaptasi, hasil khas atau diperdebatkan, dan atribusi nama metode. Sisanya pindah ke subbab *Bacaan lanjut*; registri klaim tetap lengkap (`"tampil": "bacaan-lanjut"`). Rinci: `gaya-buku-ajar.md` §4. | G-GAYA-AJAR (≤ 4 sitasi per 1.000 kata prosa isi) |
 | **Penulis–tahun tanpa lokasi**: `[@gelman2026]`, `[@a; @b]`, bukan `[@gelman2021, bag. 13.2]`. Lokasi (bab, halaman) hanya disimpan di registri klaim (`lokasi`). | G-SITASI |
 | Bila penulis menjadi subjek kalimat, pakai **sitasi naratif** `@kunci` ("@gelman2026 menyebut …" → "Gelman dkk. (2026) menyebut …"). Jangan menulis nama manual plus sitasi kurung kunci yang sama. | G-SITASI |
 | **Subjek pernyataan bersitasi hanya penulis orang.** Lembaga (BPS, Stan Development Team, R Core Team), manual, panduan, dokumentasi, halaman bantuan, *vignette*, situs, rilis, dan publikasi tidak dijadikan subjek ("Menurut Panduan X …", "BPS menyatakan …"): tulis faktanya langsung dengan sitasi kurung. Entri bib berpenulis lembaga tidak boleh disitasi naratif. | G-ATRIBUSI |
@@ -101,12 +105,13 @@ dari posterior ...
 Struktur bawaan setiap bab (sesuaikan di brief):
 
 1. Judul `# Judul Bab {#sec-…}` dan chunk setup tersembunyi (`assets/templat-bab.qmd`).
-2. Paragraf pembuka yang menjembatani bab sebelumnya dan menyebut pertanyaan bab.
+2. **Pengantar bab yang menarik** (120–300 kata): studi kasus nyata (data atau peristiwa Indonesia yang statusnya disebut) atau cerita pendek, berakhir pada pertanyaan yang dijawab bab, dirujuk lagi di contoh utama atau rangkuman; menjembatani bab sebelumnya bila perlu. Jangan membuka dengan "Bab ini membahas …". (G-STRUKTUR)
 3. Kotak **"Ingat dari Buku N, Bab M"** (`.callout-tip`): maks. satu paragraf, paling banyak dua per bab, nomor dan judul bab sumber benar. Isinya konsep yang diperlukan, **bukan** daftar istilah baru; istilah yang belum dikenal pembaca dijelaskan di prosa, bukan dipadatkan di kotak.
 4. Kotak **Tujuan belajar** (`.callout-important`): 3–5 butir berawalan kata kerja terukur.
-5. Isi per subbab; kotak **Penurunan** (`.callout-note`) untuk penurunan pendek.
+5. Isi dalam **subbab ringkas**: satu konsep per subbab, paling banyak 800 kata prosa per bagian (G-STRUKTUR); kotak **Penurunan** (`.callout-note`) untuk penurunan pendek.
 6. **Contoh utama enam langkah** (`### … {.unnumbered}`): Pertanyaan dan data, Model, Hitung, Periksa, Interpretasikan, Uji kepekaan. Maks. ±40% bab.
-7. **Ringkasan** (≤ 1 halaman), ditutup interpretasi bagi pembaca terapan (mis. ekonomi dan sosial).
+7. **Rangkuman** di akhir setiap bab (bab lama yang memakai *Ringkasan* tetap diterima; 40–450 kata, 3–7 butir atau 1–2 paragraf, tanpa sitasi), menjawab pertanyaan pengantar dan ditutup interpretasi bagi pembaca terapan (mis. ekonomi dan sosial). (G-STRUKTUR)
+7a. **Bacaan lanjut** (sesudah tahap gaya akhir): sumber yang sitasinya dipindah dari prosa, dikelompokkan per topik, satu kalimat alasan per sumber.
 8. **Latihan** empat jenis: Konseptual, Penurunan sederhana, Hitungan, Pemrograman; satu latihan "tiru alurnya" (enam langkah untuk data lain).
 9. Kalimat penutup yang menunjuk skrip lampiran kode bab.
 

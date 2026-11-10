@@ -7,6 +7,7 @@
 ```bash
 python3 harness/harness.py --buku <buku> --bab bab02            # tanpa render (agen bab)
 python3 harness/harness.py --buku <buku> --bab bab02 --render   # dengan render (orkestrator, berurutan)
+python3 harness/harness.py --buku <buku> --bab bab02 --tahap akhir  # sesudah tahap gaya (peran 22–23)
 bash harness/uji_harness.sh                                     # uji regresi harness
 python3 harness/harness.py --tag-pdf <buku>/_book/<buku>.pdf    # G-TAG saja pada PDF jadi
 python3 harness/harness.py --huruf-pdf <pdf>... [--huruf springer]  # G-HURUF saja
@@ -38,6 +39,9 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-LARANGAN | statis | kata terlarang di prosa dan keterangan (bawaan: Sokratik/Socrates/Feynman); konfig `larangan` | nama teknik tidak ditulis |
 | G-ISTILAH | statis | istilah yang sudah diganti keputusan penulis (konfig `istilah_terlarang`); pengecualian `istilah-abaikan` | keputusan istilah |
 | G-LN | statis (`LN=1`) | `\log` tanpa subskrip basis di rumus prosa dan `fig/tbl-cap` (logaritma natural ditulis `\ln`); `\log_{10}`, `\log_2` lulus; blok kode, R inline, kode sebaris, dan berkas kode dilewati; pengecualian `ln-abaikan`. Fikstur: `uji-buku/babln.qmd` (GAGAL), `babbaik.qmd` memuat `\ln`, `\log_{10}`, `log()` (LULUS); fungsi `masalah_ln()` juga diuji langsung | ln di naskah, kode `log` |
+| G-RUMUS | statis | `cek_rumus.py` R1–R12 (`references/rumus-dan-simbol.md`): kalimat diawali lambang dan `\left…\right` terbelah = ERROR; simbol tanpa keterangan (R5), arti ganda (R10), pemenggalan sesudah operator (R7a), huruf berderet miring (R6), lambang di luar mode matematika (R9), baris kosong di sekitar rumus (R7d) = WARNING di laporan. Pengecualian `rumus-abaikan` (`{"simbol": "\\theta", "alasan": …}`). Fikstur `babrumus.qmd` | rumus dan simbol |
+| G-STRUKTUR | statis | pengantar sebelum `##` pertama ≥ `pengantar_min_kata` (di luar kotak) dan tidak dibuka "Bab ini …"; setiap bagian ≤ `subbab_maks_kata` kata prosa; `## Rangkuman`/`## Ringkasan` ada, sesudah semua subbab materi, `rangkuman_min_kata`–`rangkuman_maks_kata` kata, tanpa sitasi. Buku berawalan `struktur_abaikan_buku` (bawaan `kunci`) dilewati. Fikstur `babstruktur.qmd` | struktur bab buku ajar |
+| G-GAYA-AJAR | `--tahap akhir` | sapaan (`sapaan`, bawaan *kita*) ≥ `sapaan_per_1000_kata_min`; *Anda* di prosa ≤ `anda_maks` bila sapaan *kita*; *pembaca* sebagai pelaku ≤ `pembaca_pelaku_maks`; rata-rata kalimat ≤ `rerata_kata_kalimat_maks`; kalimat > `kalimat_maks_kata` dilaporkan; sitasi per 1.000 kata prosa isi (di luar Bacaan lanjut, Latihan, kotak) ≤ `sitasi_per_1000_kata_maks`. Fikstur `babgayaajar.qmd` | `gaya-buku-ajar.md` |
 | G-HALJUDUL | statis | `subtitle:` di `_quarto.yml`; `date` bukan ISO; `date-format` tanpa "[Draf revisi ke-N · ]" (`DRAF=1`) | halaman judul |
 | G-EYD | rajut | `periksa.py` skill eyd pada prosa hasil rajut: 0 ERROR (WARNING ditinjau manual); pengecualian `eyd-abaikan` | EYD V |
 | G-GAYA | rajut | pemeriksa gaya skill math-article bila ada, atau cadangan ("di mana", koma *tetapi/sedangkan/melainkan*, koma setelah penghubung antarkalimat) | gaya |
@@ -82,12 +86,18 @@ Semua yang khusus proyek ada di sini, bukan di kode harness:
   {"pola": "\\bderau\\b", "saran": "pakai *noise* (keputusan penulis 2026-11-06)"},
   {"pola": "\\btaksiran\\b|\\bpenaksir\\b|\\bditaksir\\b|\\bmenaksir\\b", "saran": "estimasi/estimator (keputusan penulis 2026-11-06)"},
   {"pola": "\\bkemungkinan maksimum\\b", "saran": "*maximum likelihood* (keputusan penulis 2026-11-06)"},
-  {"pola": "\\bpendugaan area kecil\\b", "saran": "estimasi area kecil (keputusan penulis 2026-11-06)"},
+  {"pola": "\\bestimasi area kecil\\b", "saran": "pendugaan area kecil (*small area estimation*, SAE): istilah tetap paling umum di literatur Indonesia (keputusan penulis 2026-11-10)"},
   {"pola": "\\btarikan acak\\b|\\bditarik dari (?:distribusi|prior|posterior)\\b", "saran": "membangkitkan / nilai bangkitan (keputusan 2026-11-06)"}
  ],
- "kemasan": {"buku1": "R 4.6, R dasar saja"}
+ "kemasan": {"buku1": "R 4.6, R dasar saja"},
+ "pengantar_min_kata": 120, "subbab_maks_kata": 800,
+ "rangkuman_min_kata": 40, "rangkuman_maks_kata": 450, "struktur_abaikan_buku": ["kunci"],
+ "sapaan": "kita", "anda_maks": 0, "sapaan_per_1000_kata_min": 3, "pembaca_pelaku_maks": 3,
+ "rerata_kata_kalimat_maks": 20, "kalimat_maks_kata": 35, "sitasi_per_1000_kata_maks": 4
 }
 ```
+
+Ambang struktur dan gaya (`pengantar_…` sampai `sitasi_…`) adalah pegangan kerja yang dapat diubah penulis per buku; nilai di atas adalah bawaan harness bila kunci tidak ditulis.
 
 Kunci `larangan` menggantikan daftar bawaan; tulis ulang kedua pola bawaan bila menambah larangan. Pola `istilah_terlarang` harus cukup sempit agar arti umum tidak tertangkap ("kemungkinan besar" tetap sah, jadi jangan melarang "kemungkinan").
 

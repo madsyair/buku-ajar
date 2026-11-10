@@ -112,7 +112,7 @@ Kesalahan yang **berulang** ditemukan peninjau independen pada Buku 1–3 dan ku
 
 ## 18. Konflik kepentingan penulis paket
 
-*Gejala*: buku memakai paket yang dibuat atau dipelihara penulis buku sendiri (seri asal: hbsaems untuk estimasi area kecil) dan rancangan awal memakai paket itu di sepanjang satu bab; penelaah pakar meminta pengungkapan dan jalur yang tetap lengkap tanpa paket itu.
+*Gejala*: buku memakai paket yang dibuat atau dipelihara penulis buku sendiri (seri asal: hbsaems untuk pendugaan area kecil) dan rancangan awal memakai paket itu di sepanjang satu bab; penelaah pakar meminta pengungkapan dan jalur yang tetap lengkap tanpa paket itu.
 
 *Pencegahan*: periksa `Author`/`Maintainer` di DESCRIPTION setiap paket yang dipakai terhadap nama penulis di `_quarto.yml`. Bila cocok, tulis **satu kalimat pengungkapan** di tempat paket pertama dipakai (atau di prakata), dengan bukti DESCRIPTION di registri klaim, dan pastikan **jalur alternatif tetap lengkap** (seri asal: brms penuh; paket penulis hanya satu subbab "perangkat siap pakai").
 
