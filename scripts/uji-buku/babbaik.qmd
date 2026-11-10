@@ -12,7 +12,7 @@ Bu Rina mengelola warung kelontong di pinggir Kota Bogor. Setiap malam ia mencat
 
 Anaknya tidak langsung menjawab dengan satu angka. Ia mengajak ibunya menjumlahkan ketiga catatan, lalu membaginya dengan banyaknya hari. Hasil hitungan sederhana itu disebut rerata. Kita akan memakai cara yang sama dengan bantuan kode sehingga angka di teks selalu cocok dengan hasil hitungan.
 
-Anda mungkin bertanya: apakah tiga hari cukup untuk menggambarkan penjualan sebulan? Pertanyaan itu kita simpan dulu. Bab ini menjawab bagian pertamanya, yaitu cara menghitung dan membaca rerata dari data kecil.
+Mungkin kita bertanya: apakah tiga hari cukup untuk menggambarkan penjualan sebulan? Pertanyaan itu kita simpan dulu. Bab ini menjawab bagian pertamanya, yaitu cara menghitung dan membaca rerata dari data kecil.
 
 ## Rerata tiga pengamatan {#sec-rerata-baik}
 
@@ -54,4 +54,4 @@ tampil(fig, "fig-baik")
 - Rerata adalah jumlah semua pengamatan dibagi banyaknya pengamatan.
 - Kita menghitungnya dengan kode sehingga angka di teks sama dengan keluarannya.
 - Logaritma natural ditulis ln di naskah, sedangkan kode tetap memakai `log()`.
-- Tiga catatan Bu Rina memberi gambaran awal, tetapi Anda masih perlu data lebih banyak untuk menilai penjualan sebulan.
+- Tiga catatan Bu Rina memberi gambaran awal, tetapi kita masih perlu data lebih banyak untuk menilai penjualan sebulan.

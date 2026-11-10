@@ -2,7 +2,7 @@
 
 ## Peran
 
-Mengubah bab yang **sudah lolos loop A** (ditulis, ditinjau, diperbaiki, harness LULUS) dari gaya laporan atau artikel menjadi gaya **buku ajar**: komunikatif dan interaktif, semi-formal, istilah terjelaskan, rujukan seperlunya, dan berstruktur bab buku ajar (pengantar menarik, subbab ringkas, rangkuman). Peran ini menelaah **lalu menulis ulang** ke berkas terpisah. Peran ini tidak menyunting `babXX.qmd` dan tidak menambah atau mengubah substansi.
+Mengubah bab yang **sudah lolos loop A** (ditulis, ditinjau, diperbaiki, harness LULUS) dari gaya laporan atau artikel menjadi gaya **buku ajar**: komunikatif dan interaktif dengan sapaan *kita*, semi-formal, istilah terjelaskan, rujukan seperlunya, dan berstruktur bab buku ajar (pengantar menarik, subbab ringkas, rangkuman). Peran ini menelaah **lalu menulis ulang** ke berkas terpisah. Peran ini tidak menyunting `babXX.qmd` dan tidak menambah atau mengubah substansi.
 
 ## Profil keahlian
 
@@ -26,7 +26,7 @@ Penulis dan penyunting buku ajar perguruan tinggi berpengalaman, terbiasa menjel
 
 1. Baca bab utuh sebagai mahasiswa tingkat awal, lalu tandai tempat yang terasa seperti artikel: pasif bertumpuk, kalimat panjang, sitasi beruntun, istilah tanpa penjelasan, subbab terlalu panjang.
 2. **Pengantar**: tulis atau perbaiki pengantar 120–300 kata berupa studi kasus nyata atau cerita pendek. Data nyata harus sudah ada di bab atau registri, karena peran ini tidak mengarang fakta. Cerita rekaan diberi tanda rekaan bila menyebut orang atau lembaga. Akhiri dengan pertanyaan bab.
-3. **Sapaan dan kalimat**: ubah ke *Anda/kita* sesuai keputusan buku; aktifkan kalimat; pecah kalimat lebih dari 35 kata; hapus komentar meta.
+3. **Sapaan dan kalimat**: ubah ke sapaan *kita* (atau sapaan lain yang tercatat di `KEPUTUSAN-RANCANGAN.md`), tanpa *Anda*; aktifkan kalimat; pecah kalimat lebih dari 35 kata; hapus komentar meta.
 4. **Istilah**: jelaskan setiap istilah teknis atau asing pada kemunculan pertama di bab (arti sehari-hari, lalu contoh); catat untuk glosarium.
 5. **Rujukan**: terapkan tabel `gaya-buku-ajar.md` §4; susun subbab *Bacaan lanjut*; jangan hapus sitasi kutipan langsung, angka atau data sumber lain, gambar/tabel adaptasi, hasil khas, atau atribusi nama metode.
 6. **Struktur**: pecah subbab lebih dari 800 kata menurut konsep; pastikan *Rangkuman* ada di akhir bab (3–7 butir atau 1–2 paragraf, tanpa sitasi) dan menjawab pertanyaan pengantar.

@@ -40,7 +40,7 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                (simbol tanpa keterangan, arti ganda, pemenggalan) untuk reviewer rumus
   G-STRUKTUR   pengantar bab 120+ kata (studi kasus/cerita), subbab ringkas
                (≤ subbab_maks_kata), Rangkuman/Ringkasan di akhir bab (bukan buku kunci)
-  G-GAYA-AJAR  (hanya --tahap akhir) sapaan Anda/kita, kata "pembaca" sebagai pelaku,
+  G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
                panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
 
@@ -105,6 +105,8 @@ KONFIG_BAWAAN = {
     "rangkuman_min_kata": 40,
     "rangkuman_maks_kata": 450,
     "struktur_abaikan_buku": ["kunci"],   # awalan nama folder buku yang tidak diperiksa G-STRUKTUR
+    "sapaan": "kita",                    # "kita", "Anda", atau "kita+Anda"
+    "anda_maks": 0,
     "sapaan_per_1000_kata_min": 3,
     "pembaca_pelaku_maks": 3,
     "rerata_kata_kalimat_maks": 20,
@@ -718,9 +720,9 @@ SLOP_ID = [
     (r"\bdi era\b|\bdi zaman sekarang\b", "frasa pengisi"),
     (r"\b(?:tak|tidak) dapat (?:dipungkiri|disangkal)\b", "frasa pengisi"),
     (r"\bseperti yang (?:kita ketahui|akan kita lihat)\b", "komentar meta"),
-    # Sapaan "kita/Anda" dianjurkan (gaya-buku-ajar.md §1); yang ditolak hanya pengumuman meta.
+    # Sapaan "kita" dianjurkan (gaya-buku-ajar.md §1, keputusan 2026-11-10); yang ditolak hanya pengumuman meta.
     (r"\bmari (?:kita|saya) (?:lihat|bahas|pelajari|simak|telusuri|selami|mulai|ulas|eksplorasi|kupas)\b|\bmari saya\b",
-     "komentar meta; langsung kerjakan (sapaan kita/Anda tetap boleh)"),
+     "komentar meta; langsung kerjakan (sapaan kita tetap boleh)"),
     (r"\bpada (?:bagian|bab) ini,? (?:kita|kami) akan\b", "komentar meta"),
     (r"\bfaktanya,|\bkenyataannya adalah\b|\bternyata\b", "frasa pengisi"),
     (r"\bkesimpulannya,|\bsebagai penutup,|\bakhir kata,|\bsemoga bermanfaat\b", "penutup otomatis"),
@@ -1273,13 +1275,19 @@ def gerbang_gaya_ajar(qmd):
     masalah = []
     per1000 = lambda x: 1000 * x / max(kata_total, 1)
     plain = bersihkan_baris_prosa("\n".join(isi))
-    sapaan = len(re.findall(r"\b(?:Anda|kita|Kita)\b", plain))
+    mode = KONFIG.get("sapaan", "kita")
+    pola_sapaan = {"kita": r"\b[Kk]ita\b", "Anda": r"\bAnda\b"}.get(mode, r"\bAnda\b|\b[Kk]ita\b")
+    sapaan = len(re.findall(pola_sapaan, plain))
     if per1000(sapaan) < KONFIG["sapaan_per_1000_kata_min"]:
-        masalah.append(f"sapaan Anda/kita {per1000(sapaan):.1f} per 1.000 kata (< {KONFIG['sapaan_per_1000_kata_min']}); "
+        masalah.append(f"sapaan {mode} {per1000(sapaan):.1f} per 1.000 kata (< {KONFIG['sapaan_per_1000_kata_min']}); "
                        "tulis seolah berdialog dengan pembaca")
+    if mode == "kita":
+        anda = [k for _, k in kal_semua if re.search(r"\bAnda\b", k)]
+        if len(anda) > KONFIG.get("anda_maks", 0):
+            masalah += [f"'Anda' di prosa (sapaan buku: kita): '{k[:70]}…'" for k in anda[:8]]
     pelaku = re.findall(r"\b[Pp]embaca (?:dapat|bisa|perlu|harus|diharapkan|akan|sudah|telah|mungkin|cukup)\b", plain)
     if len(pelaku) > KONFIG["pembaca_pelaku_maks"]:
-        masalah.append(f"'pembaca' sebagai pelaku {len(pelaku)}× (> {KONFIG['pembaca_pelaku_maks']}); ganti dengan Anda/kita")
+        masalah.append(f"'pembaca' sebagai pelaku {len(pelaku)}× (> {KONFIG['pembaca_pelaku_maks']}); ganti dengan sapaan kita")
     if kal_semua:
         rerata = sum(n for n, _ in kal_semua) / len(kal_semua)
         if rerata > KONFIG["rerata_kata_kalimat_maks"]:

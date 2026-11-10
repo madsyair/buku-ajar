@@ -6,12 +6,12 @@ Peran yang menjalankan tahap ini: **22 Penyunting gaya buku ajar** menelaah dan 
 
 ## 1. Komunikatif dan interaktif
 
-- **Menyapa pembaca.** Kalimat ditulis seolah-olah penulis sedang berdialog dengan pembaca. Pakai *Anda* untuk pembaca dan *kita* untuk penulis bersama pembaca. Pilih satu sapaan utama per buku dan catat di `KEPUTUSAN-RANCANGAN.md` (bawaan: *Anda* untuk tugas dan pertanyaan, *kita* untuk langkah yang dikerjakan bersama).
+- **Menyapa pembaca dengan *kita*** (keputusan penulis 2026-11-10). Kalimat ditulis seolah-olah penulis sedang berdialog dengan pembaca dan mengerjakan langkahnya bersama: *kita hitung*, *kita lihat hasilnya*, *kita perlu bertanya*. Kata *Anda* tidak dipakai di prosa bab; perintah di latihan ditulis sebagai kalimat perintah tanpa kata ganti (*Hitunglah …*, *Bandingkan …*). Buku lain boleh memilih sapaan lain dengan mengubah `sapaan` di `konfig.json` dan mencatatnya di `KEPUTUSAN-RANCANGAN.md`.
   - ✗ *Rata-rata sampel dihitung dengan menjumlahkan semua pengamatan.* → ✓ *Untuk mendapatkan rata-rata, kita jumlahkan semua pengamatan, lalu bagi dengan banyaknya.*
-  - ✗ *Pembaca diharapkan memeriksa asumsi kenormalan.* → ✓ *Sebelum memakai uji ini, periksa dulu apakah data Anda kira-kira normal.*
+  - ✗ *Pembaca diharapkan memeriksa asumsi kenormalan.* → ✓ *Sebelum memakai uji ini, kita periksa dulu apakah datanya kira-kira normal.*
 - **Pertanyaan yang mengajak berpikir** di tempat pembaca biasanya ragu: *Apa yang terjadi bila sampelnya dua kali lebih besar?* Pertanyaan itu langsung dijawab atau dijadikan aktivitas singkat. Subjudul tetap berupa frasa, bukan kalimat tanya (G-JUDUL).
 - **Kalimat aktif** lebih dulu. Kalimat pasif dipakai bila pelakunya tidak penting (*Data dikumpulkan BPS setiap Maret.*). Hindari menulis tumpukan pasif berpelaku tersembunyi seperti di artikel.
-- **Kata *pembaca* sebagai pelaku diganti sapaan.** *Pembaca dapat melihat …* → *Anda dapat melihat …*. Kata *pembaca* tetap boleh di prakata dan petunjuk penggunaan.
+- **Kata *pembaca* sebagai pelaku diganti sapaan.** *Pembaca dapat melihat …* → *Kita dapat melihat …*. Kata *pembaca* tetap boleh di prakata dan petunjuk penggunaan.
 - **Batas dialog.** Sapaan bukan komentar meta. Hindari pengumuman kosong (*Mari kita lihat …*, *Pada bab ini kita akan …*, *Seperti yang akan kita lihat …*), karena G-SLOP tetap menolaknya. Langsung kerjakan: *Kita hitung rata-ratanya.* Hindari juga basa-basi pujian (*Selamat, Anda telah …*) dan kalimat perintah beruntun tanpa penjelasan.
 
 ## 2. Semi-formal
@@ -24,7 +24,7 @@ Peran yang menjalankan tahap ini: **22 Penyunting gaya buku ajar** menelaah dan 
 ## 3. Penjelasan istilah
 
 - **Setiap istilah teknis atau asing dijelaskan langsung pada kemunculan pertama di setiap bab**: arti dalam kata sehari-hari, lalu contoh singkat. Istilah asing dicetak miring (`istilah-statistika.md`).
-  - ✓ *Galat baku (*standard error*) mengukur seberapa jauh rata-rata sampel biasanya meleset dari rata-rata populasi. Bayangkan Anda mengambil banyak sampel …*
+  - ✓ *Galat baku (*standard error*) mengukur seberapa jauh rata-rata sampel biasanya meleset dari rata-rata populasi. Bayangkan kita mengambil banyak sampel …*
 - **Satu istilah baru per kalimat.** Istilah yang belum dijelaskan tidak dipakai untuk menjelaskan istilah lain.
 - **Glosarium**: setiap istilah yang dijelaskan masuk `keputusan-istilah.md` dan glosarium buku dengan arti singkat yang sama dengan penjelasan di bab. Istilah yang dijelaskan di bab lain cukup diingatkan singkat dengan jembatan istilah.
 - Rumus dan simbol mengikuti `rumus-dan-simbol.md`: setiap simbol diterangkan pada kemunculan pertama.
@@ -56,7 +56,8 @@ Tujuannya adalah **menghapus sitasi dari prosa, bukan menghapus dasar**. Setiap 
 
 | Ukuran | Bawaan (`konfig.json`) | Gagal bila |
 |---|---|---|
-| Sapaan *Anda/kita* per 1.000 kata prosa | `sapaan_per_1000_kata_min`: 3 | di bawah ambang |
+| Sapaan *kita* per 1.000 kata prosa (`sapaan`: "kita") | `sapaan_per_1000_kata_min`: 3 | di bawah ambang |
+| Kata *Anda* di prosa bab bila `sapaan` = "kita" | `anda_maks`: 0 | di atas ambang (dilaporkan per kalimat) |
 | Kata *pembaca* sebagai pelaku di prosa bab | `pembaca_pelaku_maks`: 3 | di atas ambang |
 | Rata-rata panjang kalimat | `rerata_kata_kalimat_maks`: 20 | di atas ambang |
 | Kalimat terpanjang | `kalimat_maks_kata`: 35 | ada kalimat lebih panjang (dilaporkan) |
@@ -65,7 +66,7 @@ Tujuannya adalah **menghapus sitasi dari prosa, bukan menghapus dasar**. Setiap 
 
 ## 7. Daftar periksa peran 22 dan 23
 - [ ] Pengantar bab berupa studi kasus nyata atau cerita pendek, 120–300 kata, berakhir pada pertanyaan bab, dan dirujuk lagi kemudian.
-- [ ] Prosa menyapa pembaca (*Anda/kita*) tanpa komentar meta; kalimat aktif lebih dulu.
+- [ ] Prosa menyapa pembaca dengan *kita* (tanpa *Anda*) dan tanpa komentar meta; kalimat aktif lebih dulu.
 - [ ] Kosakata baku; kalimat pendek dan mengalir; paragraf 2–6 kalimat.
 - [ ] Setiap istilah teknis/asing dijelaskan pada kemunculan pertama di bab dan ada di glosarium.
 - [ ] Sitasi tersisa hanya untuk kutipan, angka/data sumber lain, hasil khas/diperdebatkan, dan atribusi nama metode; sisanya di *Bacaan lanjut*; registri klaim mencatat `"tampil": "bacaan-lanjut"`.

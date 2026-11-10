@@ -2,7 +2,7 @@
 
 ## Profil keahlian
 
-Statistisi resmi atau peneliti metodologi survei: desain sampel (stratifikasi, klaster, peluang tak sama), penimbang dan kalibrasi, galat sampling dan nonsampling, konsep dan definisi resmi, estimasi area kecil, serta diseminasi dan kerahasiaan data. Membaca bagian berdisiplin `survei` dan setiap bagian yang memakai data lembaga.
+Statistisi resmi atau peneliti metodologi survei: desain sampel (stratifikasi, klaster, peluang tak sama), penimbang dan kalibrasi, galat sampling dan nonsampling, konsep dan definisi resmi, pendugaan area kecil, serta diseminasi dan kerahasiaan data. Membaca bagian berdisiplin `survei` dan setiap bagian yang memakai data lembaga.
 
 ## Masukan
 
@@ -19,7 +19,7 @@ Statistisi resmi atau peneliti metodologi survei: desain sampel (stratifikasi, k
 - [ ] Angka lembaga tidak dikarang; tahun, cakupan wilayah, dan satuan data sesuai sumber.
 - [ ] Status data disebut (riil, sintetis paket, simulasi); data mikro yang tidak boleh dibagikan tidak ditampilkan.
 - [ ] Galat nonsampling (nonrespons, cakupan) dibahas bila relevan dengan kesimpulan.
-- [ ] Estimasi area kecil atau model berbasis survei menyebut asumsi model dan ukuran ketelitiannya (RSE, MSE).
+- [ ] Pendugaan area kecil atau model berbasis survei menyebut asumsi model dan ukuran ketelitiannya (RSE, MSE).
 - [ ] Peta dan batas wilayah sesuai tahun data dan berlisensi.
 
 ## Bukti yang diminta

@@ -17,11 +17,11 @@ knitr::opts_chunk$set(message = FALSE)
 set.seed(2026)
 ```
 
-Pengantar bab (120–300 kata) berupa studi kasus nyata atau cerita pendek. Contohnya: data BPS tentang harga beras di kabupaten Anda (status data disebut), atau cerita seorang pemilik warung yang mencatat penjualan. Tulis seolah Anda bercerita kepada mahasiswa: kalimat pendek, sapaan *Anda* atau *kita*, dan tanpa sitasi bila tidak perlu.
+Pengantar bab (120–300 kata) berupa studi kasus nyata atau cerita pendek. Contohnya: data BPS tentang harga beras di sebuah kabupaten (status data disebut), atau cerita seorang pemilik warung yang mencatat penjualan. Tulis seolah kita bercerita kepada mahasiswa: kalimat pendek, sapaan *kita*, dan tanpa sitasi bila tidak perlu.
 
-Paragraf kedua menjembatani bab sebelumnya bila perlu. Paragraf terakhir pengantar berakhir pada pertanyaan yang akan kita jawab di bab ini, lalu menyebut apa yang akan dapat Anda lakukan sesudahnya. Jangan membuka dengan "Bab ini membahas …".
+Paragraf kedua menjembatani bab sebelumnya bila perlu. Paragraf terakhir pengantar berakhir pada pertanyaan yang akan kita jawab di bab ini, lalu menyebut apa yang akan dapat kita lakukan sesudahnya. Jangan membuka dengan "Bab ini membahas …".
 
-Cerita atau kasus di pengantar tidak berhenti di sini. Kita kembali kepadanya di contoh utama, ketika data yang sama dihitung dengan kode, dan sekali lagi di rangkuman, ketika pertanyaan pengantar dijawab dengan satu kalimat. Dengan begitu, Anda melihat alasan setiap rumus sebelum menghafalnya. Fakta di dalam kasus berasal dari data atau sumber yang tercatat di registri; tokoh cerita rekaan tidak memakai nama orang atau lembaga nyata.
+Cerita atau kasus di pengantar tidak berhenti di sini. Kita kembali kepadanya di contoh utama, ketika data yang sama dihitung dengan kode, dan sekali lagi di rangkuman, ketika pertanyaan pengantar dijawab dengan satu kalimat. Dengan begitu, kita melihat alasan setiap rumus sebelum menghafalnya. Fakta di dalam kasus berasal dari data atau sumber yang tercatat di registri; tokoh cerita rekaan tidak memakai nama orang atau lembaga nyata.
 
 ::: {.callout-tip title="Ingat dari Buku 1, Bab 7"}
 Satu paragraf berisi konsep dari bab sumber yang diperlukan di bab ini. Isinya konsep, bukan daftar istilah baru.
