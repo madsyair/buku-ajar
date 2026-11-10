@@ -8,6 +8,14 @@ angka <- function(x, d = 2) {
 }
 ```
 
+Bu Rina mengelola warung kelontong di pinggir Kota Bogor. Setiap malam ia mencatat berapa bungkus beras yang terjual hari itu. Pada suatu minggu ia hanya sempat mencatat tiga hari, dan angkanya kecil sekali. Catatan itu ia tulis di buku tulis bergaris. Ia bertanya kepada anaknya yang kuliah statistika: berapa sebenarnya penjualan sehari yang biasa?
+
+Anaknya tidak langsung menjawab dengan satu angka. Ia mengajak ibunya menjumlahkan ketiga catatan, lalu membaginya dengan banyaknya hari. Hasil hitungan sederhana itu disebut rerata. Kita akan memakai cara yang sama dengan bantuan kode sehingga angka di teks selalu cocok dengan hasil hitungan.
+
+Mungkin kita bertanya: apakah tiga hari cukup untuk menggambarkan penjualan sebulan? Pertanyaan itu kita simpan dulu. Bab ini menjawab bagian pertamanya, yaitu cara menghitung dan membaca rerata dari data kecil.
+
+## Rerata tiga pengamatan {#sec-rerata-baik}
+
 Rerata tiga pengamatan dihitung langsung dari data. Nilainya adalah `r angka(mean(c(1, 2, 4)), 2)` sehingga angka di teks selalu sama dengan keluaran kode.
 
 ```{r}
@@ -19,7 +27,7 @@ write.csv(data.frame(x = x), "data-gambar/babbaik.csv",
 mean(x)
 ```
 
-Logaritma natural rerata itu ditulis $\ln \bar x$ di naskah dan `log(mean(x))` di kode, sedangkan logaritma basis sepuluh ditulis $\log_{10} \bar x$. Hasil hitungnya adalah `r angka(log(mean(c(1, 2, 4))), 2)`.
+Logaritma natural rerata $\bar x$ itu ditulis $\ln \bar x$ di naskah dan `log(mean(x))` di kode, sedangkan logaritma basis sepuluh ditulis $\log_{10} \bar x$. Hasil hitungnya adalah `r angka(log(mean(c(1, 2, 4))), 2)`.
 
 Sebaran ketiga nilai itu tampak pada @fig-baik. Gambar dibuat dengan Python dari berkas yang ditulis R.
 
@@ -39,3 +47,11 @@ fig, ax = plt.subplots()
 ax.plot(d["x"], "o", color=TOSKA)
 tampil(fig, "fig-baik")
 ```
+
+
+## Rangkuman {#sec-rangkuman-baik}
+
+- Rerata adalah jumlah semua pengamatan dibagi banyaknya pengamatan.
+- Kita menghitungnya dengan kode sehingga angka di teks sama dengan keluarannya.
+- Logaritma natural ditulis ln di naskah, sedangkan kode tetap memakai `log()`.
+- Tiga catatan Bu Rina memberi gambaran awal, tetapi kita masih perlu data lebih banyak untuk menilai penjualan sebulan.

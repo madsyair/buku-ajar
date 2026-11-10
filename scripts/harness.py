@@ -36,6 +36,12 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                changed", "Rerun to get", atau label "multiply defined" (setelah --render)
   G-LN         logaritma natural ditulis ln di rumus naskah; log hanya dengan
                subskrip basis (log_{10}); kode tetap log() (LN=0 mematikan)
+  G-RUMUS      rumus dan simbol (cek_rumus.py R1–R12): ERROR menggagalkan; WARNING
+               (simbol tanpa keterangan, arti ganda, pemenggalan) untuk reviewer rumus
+  G-STRUKTUR   pengantar bab 120+ kata (studi kasus/cerita), subbab ringkas
+               (≤ subbab_maks_kata), Rangkuman/Ringkasan di akhir bab (bukan buku kunci)
+  G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
+               panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
 
 Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
@@ -48,6 +54,7 @@ Tata letak proyek yang diharapkan (jalur dapat diubah di harness/konfig.json):
 Pemakaian:
   python3 harness/harness.py --buku buku1 --bab bab02
   python3 harness/harness.py --buku buku1 --bab bab02 --render
+  python3 harness/harness.py --buku buku1 --bab bab02 --tahap akhir   # sesudah tahap gaya (22–23)
   python3 harness/harness.py --tag-pdf buku1/_book/buku.pdf     # G-TAG saja
 """
 import argparse
@@ -92,6 +99,19 @@ KONFIG_BAWAAN = {
         {"pola": r"\bfeynman\b",
          "saran": "nama teknik pengajaran tidak ditulis di naskah; hapus labelnya"},
     ],
+    # Struktur bab dan gaya buku ajar (references/gaya-buku-ajar.md)
+    "pengantar_min_kata": 120,
+    "subbab_maks_kata": 800,
+    "rangkuman_min_kata": 40,
+    "rangkuman_maks_kata": 450,
+    "struktur_abaikan_buku": ["kunci"],   # awalan nama folder buku yang tidak diperiksa G-STRUKTUR
+    "sapaan": "kita",                    # "kita", "Anda", atau "kita+Anda"
+    "anda_maks": 0,
+    "sapaan_per_1000_kata_min": 3,
+    "pembaca_pelaku_maks": 3,
+    "rerata_kata_kalimat_maks": 20,
+    "kalimat_maks_kata": 35,
+    "sitasi_per_1000_kata_maks": 4,
     # Istilah yang sudah diputuskan penulis: pola regex -> saran (dan tanggal keputusan)
     "istilah_terlarang": [],
 }
@@ -127,8 +147,15 @@ def jalankan(perintah, cwd, env=None, batas=3600):
     lingk.setdefault("RETICULATE_PYTHON", shutil.which("python3") or "/usr/bin/python3")
     if env:
         lingk.update(env)
-    p = subprocess.run(perintah, cwd=cwd, env=lingk, capture_output=True,
-                       text=True, timeout=batas)
+    try:
+        p = subprocess.run(perintah, cwd=cwd, env=lingk, capture_output=True,
+                           text=True, timeout=batas)
+    except FileNotFoundError:
+        # Interpreter tidak terpasang: gerbang dicatat GAGAL dengan pesan jelas,
+        # bukan menghentikan harness (gerbang lain tetap dijalankan dan dilaporkan).
+        return 127, f"perintah tidak ditemukan: {perintah[0]} (pasang dulu, mis. R + knitr)"
+    except subprocess.TimeoutExpired:
+        return 124, f"melewati batas waktu {batas} detik: {' '.join(perintah[:3])}"
     return p.returncode, p.stdout + p.stderr
 
 
@@ -693,7 +720,9 @@ SLOP_ID = [
     (r"\bdi era\b|\bdi zaman sekarang\b", "frasa pengisi"),
     (r"\b(?:tak|tidak) dapat (?:dipungkiri|disangkal)\b", "frasa pengisi"),
     (r"\bseperti yang (?:kita ketahui|akan kita lihat)\b", "komentar meta"),
-    (r"\bmari kita\b|\bmari saya\b", "komentar meta; langsung kerjakan"),
+    # Sapaan "kita" dianjurkan (gaya-buku-ajar.md §1, keputusan 2026-11-10); yang ditolak hanya pengumuman meta.
+    (r"\bmari (?:kita|saya) (?:lihat|bahas|pelajari|simak|telusuri|selami|mulai|ulas|eksplorasi|kupas)\b|\bmari saya\b",
+     "komentar meta; langsung kerjakan (sapaan kita tetap boleh)"),
     (r"\bpada (?:bagian|bab) ini,? (?:kita|kami) akan\b", "komentar meta"),
     (r"\bfaktanya,|\bkenyataannya adalah\b|\bternyata\b", "frasa pengisi"),
     (r"\bkesimpulannya,|\bsebagai penutup,|\bakhir kata,|\bsemoga bermanfaat\b", "penutup otomatis"),
@@ -877,7 +906,11 @@ def gerbang_penggalan(buku, sesudah_render):
     uji contoh resmi EYD V, dan (setelah render) setiap kata yang terpenggal di
     akhir baris PDF dipenggal pada titik yang sah menurut EYD V."""
     sys.path.insert(0, str(AKAR / "harness"))
-    import penggalan
+    try:
+        import penggalan
+    except ImportError as e:
+        catat("G-PENGGALAN", False, f"pemenggal tidak dapat dimuat ({e}); pasang: pip install Sastrawi")
+        return
     pesan = []
     if "harness" not in buku.relative_to(AKAR).parts:  # fikstur uji tidak menimpa daftar buku
         penggalan.tulis(buku)
@@ -1114,6 +1147,161 @@ def gerbang_judul(qmd, md):
     catat("G-JUDUL", not masalah, "\n".join(masalah[:40]))
 
 
+# ---------------------------------------------------------------- G-RUMUS
+def gerbang_rumus(qmd, peng):
+    """Rumus dan simbol (references/rumus-dan-simbol.md). ERROR menggagalkan;
+    WARNING ditulis di laporan untuk reviewer rumus (06) dan penyunting gaya (22)."""
+    sys.path.insert(0, str(AKAR / "harness"))
+    try:
+        import cek_rumus
+    except ImportError as e:
+        catat("G-RUMUS", False, f"cek_rumus.py tidak dapat dimuat ({e}); salin dari skill ke harness/")
+        return
+    abaikan = [a["simbol"] for a in peng.get("rumus-abaikan", []) if "simbol" in a]
+    temuan, _ = cek_rumus.periksa([qmd], "id", abaikan)
+    err = [x for x in temuan if x["tingkat"] == "ERROR"]
+    war = [x for x in temuan if x["tingkat"] != "ERROR"]
+    fmt = lambda x: f"baris {x['baris']} {x['kode']} {x['tingkat']}: {x['temuan']} → {x['saran']}"
+    catat("G-RUMUS", not err, "\n".join([fmt(x) for x in err] + [fmt(x) for x in war][:40]))
+
+
+# ---------------------------------------------------------------- G-STRUKTUR dan G-GAYA-AJAR
+def _bagian_bab(teks):
+    """Pecah bab menjadi bagian (tingkat_judul, judul, baris_awal, daftar_baris_prosa_bersih)."""
+    prosa, _ = pilah_qmd(teks)
+    bagian = [(1, "(pembuka)", 1, [])]
+    dalam_math = False
+    for nomor, b in prosa:
+        m = re.match(r"^(#{1,6})\s+(.*?)\s*(\{[^}]*\})?\s*$", b)
+        if m and not dalam_math:
+            bagian.append((len(m.group(1)), m.group(2).strip(), nomor, []))
+            continue
+        if b.strip().startswith("$$"):
+            dalam_math = not (b.strip().count("$$") == 2) and not dalam_math
+            continue
+        if dalam_math:
+            continue
+        bagian[-1][3].append(bersihkan_baris_prosa(b))
+    return bagian
+
+
+def _kata(baris):
+    teks = " ".join(baris)
+    teks = re.sub(r"^:::.*$", " ", teks, flags=re.M)
+    teks = re.sub(r":::\s*\{[^}]*\}|:::", " ", teks)
+    return re.findall(r"[A-Za-zÀ-ÿ][\w'-]*", teks)
+
+
+def gerbang_struktur(qmd, buku):
+    """Pengantar menarik, subbab ringkas, rangkuman di akhir bab (keputusan penulis 2026-11-10)."""
+    if any(Path(buku).name.startswith(a) for a in KONFIG["struktur_abaikan_buku"]):
+        return
+    teks = qmd.read_text(encoding="utf-8")
+    bagian = _bagian_bab(teks)
+    masalah = []
+    # pengantar: prosa antara judul bab (#) dan judul ## pertama, di luar kotak
+    pengantar, i = [], 0
+    while i < len(bagian) and bagian[i][0] <= 1:
+        isi = "\n".join(bagian[i][3])
+        isi = re.sub(r":::\s*\{\.callout[^}]*\}.*?:::", " ", isi, flags=re.S)
+        pengantar += _kata([isi])
+        i += 1
+    if len(pengantar) < KONFIG["pengantar_min_kata"]:
+        masalah.append(f"pengantar bab {len(pengantar)} kata (< {KONFIG['pengantar_min_kata']}); "
+                       "buka dengan studi kasus nyata atau cerita pendek yang berakhir pada pertanyaan bab")
+    awal = " ".join(pengantar[:6]).lower()
+    if re.match(r"^(bab ini|pada bab ini|dalam bab ini|di bab ini)\b", awal):
+        masalah.append("pengantar dibuka komentar meta ('Bab ini …'); mulai dari kasus atau cerita")
+    # subbab ringkas
+    for tingkat, judul, nomor, isi in bagian[i:]:
+        n = len(_kata(isi))
+        if n > KONFIG["subbab_maks_kata"] and not re.match(r"(?i)(latihan|bacaan lanjut|lampiran)", judul):
+            masalah.append(f"baris {nomor}: bagian '{judul[:40]}' {n} kata (> {KONFIG['subbab_maks_kata']}); "
+                           "pecah menjadi subbab per konsep")
+    # rangkuman
+    h2 = [(j, k, n, isi) for j, k, n, isi in bagian if j == 2]
+    rang = [b for b in h2 if re.match(r"(?i)^(rangkuman|ringkasan)\b", b[1])]
+    if not rang:
+        masalah.append("tidak ada subbab 'Rangkuman' (atau 'Ringkasan') di akhir bab")
+    else:
+        posisi = h2.index(rang[-1])
+        sesudah = [b[1] for b in h2[posisi + 1:]]
+        if any(not re.match(r"(?i)(latihan|bacaan lanjut|catatan|soal|lampiran|daftar)", s) for s in sesudah):
+            masalah.append("Rangkuman bukan bagian isi terakhir; letakkan sesudah semua subbab materi "
+                           "(sebelum Bacaan lanjut dan Latihan)")
+        n = len(_kata(rang[-1][3]))
+        if not KONFIG["rangkuman_min_kata"] <= n <= KONFIG["rangkuman_maks_kata"]:
+            masalah.append(f"Rangkuman {n} kata (harus {KONFIG['rangkuman_min_kata']}–{KONFIG['rangkuman_maks_kata']})")
+        if re.search(r"\[@|(?<![\w`])@(?!fig-|tbl-|eq-|sec-|Fig-|Tbl-|Eq-|Sec-)\w", "\n".join(rang[-1][3])):
+            masalah.append("Rangkuman memuat sitasi; tulis tanpa sitasi")
+    catat("G-STRUKTUR", not masalah, "\n".join(masalah))
+
+
+def gerbang_gaya_ajar(qmd):
+    """Tahap gaya akhir (references/gaya-buku-ajar.md §6): sapaan, kalimat, kepadatan sitasi."""
+    teks = qmd.read_text(encoding="utf-8")
+    prosa, _ = pilah_qmd(teks)
+    isi, sitasi, dalam_bacaan, dalam_kotak, dalam_math = [], 0, False, 0, False
+    for _, b in prosa:
+        m = re.match(r"^#{1,6}\s+(.*)$", b)
+        if m:
+            dalam_bacaan = bool(re.match(r"(?i)(bacaan lanjut|catatan bab|daftar pustaka|latihan)", m.group(1)))
+            continue
+        if b.strip().startswith("$$"):
+            dalam_math = not (b.strip().count("$$") == 2) and not dalam_math
+            continue
+        if dalam_math:
+            continue
+        if b.lstrip().startswith(":::"):
+            dalam_kotak += 1 if re.match(r"\s*:::\s*\{", b) else -1
+            dalam_kotak = max(dalam_kotak, 0)
+            continue
+        if dalam_bacaan or dalam_kotak or re.match(r"\s*#\|", b):
+            continue
+        sitasi += len(re.findall(r"\[@[^\]]*\]", b)) + len(re.findall(r"(?<![\[\w`])@(?!fig-|tbl-|eq-|sec-|Fig-|Tbl-|Eq-|Sec-)\w[\w:-]*", b))
+        isi.append(b)
+    paragraf = re.split(r"\n\s*\n", "\n".join(isi))
+    kata_total, kal_semua = 0, []
+    for par in paragraf:
+        bersih = bersihkan_baris_prosa(par)
+        if not bersih.strip() or bersih.lstrip().startswith(("|", "-", "*", "1.")):
+            kata_total += len(re.findall(r"\w+", bersih))
+            continue
+        for k in kalimat(" ".join(bersih.split())):
+            n = len(re.findall(r"[A-Za-zÀ-ÿ0-9][\w'-]*", k))
+            if n >= 3:
+                kal_semua.append((n, k))
+        kata_total += len(re.findall(r"\w+", bersih))
+    masalah = []
+    per1000 = lambda x: 1000 * x / max(kata_total, 1)
+    plain = bersihkan_baris_prosa("\n".join(isi))
+    mode = KONFIG.get("sapaan", "kita")
+    pola_sapaan = {"kita": r"\b[Kk]ita\b", "Anda": r"\bAnda\b"}.get(mode, r"\bAnda\b|\b[Kk]ita\b")
+    sapaan = len(re.findall(pola_sapaan, plain))
+    if per1000(sapaan) < KONFIG["sapaan_per_1000_kata_min"]:
+        masalah.append(f"sapaan {mode} {per1000(sapaan):.1f} per 1.000 kata (< {KONFIG['sapaan_per_1000_kata_min']}); "
+                       "tulis seolah berdialog dengan pembaca")
+    if mode == "kita":
+        anda = [k for _, k in kal_semua if re.search(r"\bAnda\b", k)]
+        if len(anda) > KONFIG.get("anda_maks", 0):
+            masalah += [f"'Anda' di prosa (sapaan buku: kita): '{k[:70]}…'" for k in anda[:8]]
+    pelaku = re.findall(r"\b[Pp]embaca (?:dapat|bisa|perlu|harus|diharapkan|akan|sudah|telah|mungkin|cukup)\b", plain)
+    if len(pelaku) > KONFIG["pembaca_pelaku_maks"]:
+        masalah.append(f"'pembaca' sebagai pelaku {len(pelaku)}× (> {KONFIG['pembaca_pelaku_maks']}); ganti dengan sapaan kita")
+    if kal_semua:
+        rerata = sum(n for n, _ in kal_semua) / len(kal_semua)
+        if rerata > KONFIG["rerata_kata_kalimat_maks"]:
+            masalah.append(f"rata-rata kalimat {rerata:.1f} kata (> {KONFIG['rerata_kata_kalimat_maks']}); pendekkan")
+        panjang = [k for n, k in kal_semua if n > KONFIG["kalimat_maks_kata"]]
+        for k in panjang[:10]:
+            masalah.append(f"kalimat > {KONFIG['kalimat_maks_kata']} kata: '{k[:80]}…'")
+    if per1000(sitasi) > KONFIG["sitasi_per_1000_kata_maks"]:
+        masalah.append(f"{sitasi} sitasi = {per1000(sitasi):.1f} per 1.000 kata prosa isi "
+                       f"(> {KONFIG['sitasi_per_1000_kata_maks']}); pindahkan sumber pengetahuan baku ke Bacaan lanjut "
+                       "(gaya-buku-ajar.md §4)")
+    catat("G-GAYA-AJAR", not masalah, "\n".join(masalah))
+
+
 # ---------------------------------------------------------------- G-LARANGAN dan G-ISTILAH
 # Keputusan penulis yang dapat diperiksa dengan pola kata ditambahkan sebagai
 # entri konfig.json, bukan dengan menyunting harness (lihat
@@ -1218,6 +1406,8 @@ def main():
     ap.add_argument("--buku")
     ap.add_argument("--bab")
     ap.add_argument("--render", action="store_true")
+    ap.add_argument("--tahap", choices=["draf", "akhir"], default="draf",
+                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR")
     ap.add_argument("--tag-pdf", metavar="PDF",
                     help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
     a = ap.parse_args()
@@ -1251,6 +1441,10 @@ def main():
     gerbang_judul(qmd, md)
     if os.environ.get("KONJUNGSI", "1") == "1":
         gerbang_konjungsi(qmd, peng)
+    gerbang_rumus(qmd, peng)
+    gerbang_struktur(qmd, buku)
+    if a.tahap == "akhir":
+        gerbang_gaya_ajar(qmd)
     m_eq = cek_persamaan(qmd)
     catat("G-PERSAMAAN", not m_eq, "\n".join(m_eq[:30]))
     if os.environ.get("ATRIBUSI_MANUAL", "1") == "1":

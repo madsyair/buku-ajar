@@ -24,7 +24,8 @@ Peran ini dipakai untuk buku **satu disiplin**. Untuk buku multidisiplin (brief,
 6. **Gambar**: R menulis parquet; Python (`echo: false`, `results: hide`) menggambar dengan `gaya_gambar`; `label_panel()` untuk multipanel; Div `.catatan` ≥ 2 kalimat; rujuk sebelum muncul; narasi hanya yang tampak dan dihitung. Diagram/DAG: TikZ.
 7. **Sitasi**: penulis–tahun tanpa lokasi; penulis orang sebagai subjek dengan sitasi naratif; lembaga/manual hanya sitasi kurung; setiap kalimat bersitasi → entri klaim dengan kutipan verbatim (`flock`).
 8. **Data**: sebut status (riil/sintetis paket/simulasi) saat data diperkenalkan; label kategori sesuai Rd.
-9. **Struktur**: kotak Ingat (≤ 2, konsep), Tujuan belajar, kotak Penurunan, contoh utama enam langkah, Ringkasan (ditutup tafsiran bagi pembaca terapan), Latihan, kalimat rujukan skrip lampiran.
+9. **Struktur**: pengantar bab menarik (studi kasus nyata atau cerita pendek, 120–300 kata, berakhir pada pertanyaan bab), kotak Ingat (≤ 2, konsep), Tujuan belajar, subbab ringkas (≤ 800 kata prosa per bagian), kotak Penurunan, contoh utama enam langkah, Rangkuman (ditutup tafsiran bagi pembaca terapan), Latihan, kalimat rujukan skrip lampiran. Rumus dan simbol mengikuti `rumus-dan-simbol.md` (G-RUMUS).
+9a. **Gaya**: sejak draf, sapa pembaca dengan *Anda/kita* dan tulis kalimat pendek (`gaya-buku-ajar.md`). Sitasi tetap lengkap di loop A; pengurangan sitasi dikerjakan peran 22–23 di tahap gaya.
 10. **Loop harness**: `python3 harness/harness.py --buku <buku> --bab babXX` (tanpa `--render`) → perbaiki → ulangi sampai LULUS (maks. 6 percobaan per gerbang yang sama, lalu laporkan).
 11. Laporkan perkiraan halaman (kata/400 + gambar/2 + kode tampil); bila melampaui anggaran > 10%, pangkas pengulangan dan kalimat mubazir, bukan penjelasan.
 
@@ -45,6 +46,8 @@ Peran ini dipakai untuk buku **satu disiplin**. Untuk buku multidisiplin (brief,
 - [ ] Narasi gambar cocok dengan yang tampak (dihitung, bukan ditebak).
 - [ ] Istilah sesuai keputusan; jembatan istilah bila istilah berganti.
 - [ ] Tidak ada nama teknik pengajaran.
+- [ ] Pengantar bab berupa kasus/cerita; subbab ringkas; Rangkuman di akhir (G-STRUKTUR).
+- [ ] Rumus dan simbol: tidak ada ERROR G-RUMUS; setiap simbol diterangkan pada kemunculan pertama; lanjutan sesudah rumus tidak diindentasi.
 - [ ] Harness LULUS tanpa render.
 
 ## Kriteria lulus

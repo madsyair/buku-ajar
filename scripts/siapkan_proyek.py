@@ -2,7 +2,7 @@
 """Siapkan tata letak proyek buku ajar dari skill buku-ajar.
 
 Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
-  <proyek>/harness/       harness.py, referensi.py, penggalan.py, kemas_sumber.py,
+  <proyek>/harness/       harness.py, referensi.py, penggalan.py, cek_rumus.py, kemas_sumber.py,
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
   <proyek>/_bersama/      gaya_gambar.py, catatan.lua, bahasa-asing.lua,
@@ -66,7 +66,7 @@ def main():
     print(f"Proyek {P}, buku {a.buku}")
 
     # harness
-    for f in ["harness.py", "referensi.py", "penggalan.py", "kemas_sumber.py", "uji_harness.sh"]:
+    for f in ["harness.py", "referensi.py", "penggalan.py", "cek_rumus.py", "kemas_sumber.py", "uji_harness.sh"]:
         salin(SKRIP / f, P / "harness" / f, t)
     salin(SKRIP / "uji-buku", P / "harness" / "uji-buku", t)
     tulis(P / "harness" / "klaim.json", "[]\n", False)
