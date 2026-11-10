@@ -17,7 +17,11 @@ knitr::opts_chunk$set(message = FALSE)
 set.seed(2026)
 ```
 
-Paragraf pembuka yang menjembatani bab sebelumnya dan menyebut pertanyaan yang dijawab bab ini. Kalimat terakhir menyebut apa yang akan dapat dilakukan pembaca.
+Pengantar bab (120–300 kata) berupa studi kasus nyata atau cerita pendek. Contohnya: data BPS tentang harga beras di kabupaten Anda (status data disebut), atau cerita seorang pemilik warung yang mencatat penjualan. Tulis seolah Anda bercerita kepada mahasiswa: kalimat pendek, sapaan *Anda* atau *kita*, dan tanpa sitasi bila tidak perlu.
+
+Paragraf kedua menjembatani bab sebelumnya bila perlu. Paragraf terakhir pengantar berakhir pada pertanyaan yang akan kita jawab di bab ini, lalu menyebut apa yang akan dapat Anda lakukan sesudahnya. Jangan membuka dengan "Bab ini membahas …".
+
+Cerita atau kasus di pengantar tidak berhenti di sini. Kita kembali kepadanya di contoh utama, ketika data yang sama dihitung dengan kode, dan sekali lagi di rangkuman, ketika pertanyaan pengantar dijawab dengan satu kalimat. Dengan begitu, Anda melihat alasan setiap rumus sebelum menghafalnya. Fakta di dalam kasus berasal dari data atau sumber yang tercatat di registri; tokoh cerita rekaan tidak memakai nama orang atau lembaga nyata.
 
 ::: {.callout-tip title="Ingat dari Buku 1, Bab 7"}
 Satu paragraf berisi konsep dari bab sumber yang diperlukan di bab ini. Isinya konsep, bukan daftar istilah baru.
@@ -33,7 +37,7 @@ Setelah mempelajari bab ini, pembaca mampu:
 
 ## Subjudul berupa frasa nama konsep {#sec-konsep-b1-01}
 
-Kalimat pertama adalah pertanyaan wajar pembaca? Jawabannya dimulai dengan penjelasan sederhana dan contoh dari konteks Indonesia, lalu data yang statusnya disebut: data riil dari paket …, data sintetis bawaan paket …, atau data simulasi buku ini dengan parameter sebenarnya diketahui.
+Kalimat pertama adalah pertanyaan wajar pembaca? Subbab ini ringkas (paling banyak ±800 kata prosa) dan mengerjakan satu konsep. Jawabannya dimulai dengan penjelasan sederhana dan contoh dari konteks Indonesia, lalu data yang statusnya disebut: data riil dari paket …, data sintetis bawaan paket …, atau data simulasi buku ini dengan parameter sebenarnya diketahui.
 
 ```{r}
 #| label: data-contoh-b1-01
@@ -48,8 +52,7 @@ Rumus muncul setelah intuisi. Setiap simbolnya dijelaskan, seperti pada @eq-rera
 $$
 \bar{x} = \frac{1}{n} \sum_{i = 1}^{n} x_i
 $$ {#eq-rerata-b1-01}
-
-dengan $n$ banyaknya pengamatan dan $x_i$ pengamatan ke-$i$. Kalimat interpretasi menyebut satuan dan ketidakpastian.
+dengan $n$ menyatakan banyaknya pengamatan dan $x_i$ pengamatan ke-$i$. Kalimat interpretasi menyebut satuan dan ketidakpastian.
 
 ::: {.callout-note title="Penurunan"}
 Penurunan ditulis langkah demi langkah dengan alasan di setiap baris. Penurunan ditutup makna hasilnya dan pemeriksaan angka.
@@ -116,9 +119,16 @@ Kalimat pengantar menyebut kasus yang dikerjakan. Kalimat kedua menyebut langkah
 
 ### Uji kepekaan {.unnumbered}
 
-## Ringkasan {#sec-ringkasan-b1-01}
+## Rangkuman {#sec-rangkuman-b1-01}
 
-Ringkasan memuat tiga pesan utama dalam prosa. Paragraf terakhir ditutup tafsiran bagi pembaca terapan.
+- Rangkuman memuat 3–7 pesan utama bab dalam bahasa sederhana, tanpa sitasi.
+- Satu butir menjawab pertanyaan dari pengantar bab.
+- Setiap butir memakai istilah yang sudah dijelaskan di bab, bukan istilah baru.
+- Butir terakhir ditutup tafsiran bagi pembaca terapan, misalnya apa arti hasil bab ini bagi analis kebijakan di dinas daerah.
+
+## Bacaan lanjut {#sec-bacaan-b1-01}
+
+Diisi pada tahap gaya akhir (peran 22–23): sumber yang sitasinya dipindah dari prosa, dikelompokkan per topik, satu kalimat alasan per sumber.
 
 ## Latihan {#sec-latihan-b1-01}
 

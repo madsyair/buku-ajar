@@ -6,14 +6,15 @@ Skill Claude untuk menulis buku ajar berbahasa Indonesia (EYD V) di bidang stati
 
 ```
 SKILL.md                     alur, peran, harness, loop, paralelisasi, kriteria selesai
-agents/00–21, 04a, 04b      orkestrator, perencana, perancang kerangka, peninjau literatur,
+agents/00–24, 04a, 04b      orkestrator, perencana, perancang kerangka, peninjau literatur,
                              penulis (buku satu disiplin), penulis ahli bidang dan penulis
                              pemadu (buku multidisiplin), reviewer isi/rumus/bahasa/kode,
                              editor, pembaca pemula/menengah/mahir, pembuat kunci, penyunting
                              soal, pengaudit ilustrasi, reviewer ahli pemodelan statistik,
                              machine learning, statistika resmi/survei, domain terapan
-                             (templat), pedagogi, penelaah pakar buku ajar
-references/                  aturan gaya dan tampilan, istilah, data dan sumber, harness dan
+                             (templat), pedagogi, penelaah pakar buku ajar, penyunting gaya
+                             buku ajar, penerap revisi gaya, editor penerbitan
+references/                  gaya buku ajar, rumus dan simbol, aturan gaya dan tampilan, istilah, data dan sumber, harness dan
                              gerbang, loop kerja, kunci jawaban, ilustrasi, pelajaran proyek,
                              prinsip buku ajar (ringkasan) + kajian lengkap
 assets/                      templat brief, rancangan rinci, kerangka bab, bab .qmd, bab kunci,
@@ -21,7 +22,7 @@ assets/                      templat brief, rancangan rinci, kerangka bab, bab .
                              instruksi pembaca independen dan instruksi perbaikan;
                              _quarto.yml, preamble.tex, hak-cipta.tex, tikz-preamble.tex, konfig.json,
                              apa.csl, reference-b5.docx
-scripts/                     harness.py (28 gerbang), referensi.py, penggalan.py,
+scripts/                     harness.py (31 gerbang), cek_rumus.py, referensi.py, penggalan.py,
                              uji_harness.sh + uji-buku/, gaya_gambar.py, catatan.lua,
                              bahasa-asing.lua, kemas_sumber.py, siapkan_proyek.py, README.md
 ```
@@ -37,7 +38,7 @@ scripts/                     harness.py (28 gerbang), referensi.py, penggalan.py
 | Sitasi | dengan lokasi (`[@k, hlm. 212]`); buku besar klaim berupa tabel parafrase berstatus | **penulis–tahun tanpa lokasi**; subjek hanya penulis orang; registri JSON dengan **kutipan verbatim** yang dicocokkan ulang otomatis ke teks sumber, Rd, DESCRIPTION, `citation()`, atau hitung ulang (G-REFERENSI) |
 | Angka di prosa | diisi dari keluaran setelah loop kode (penanda `[[...]]`) | **selalu R inline**; gerbang G-ANGKA menolak angka diketik; klaim "sama/tidak satu pun" dikunci `stopifnot` |
 | Gambar | tidak diatur rinci | R → parquet → Python `gaya_gambar` (Python tidak menghitung, G-PYTHON); TikZ untuk DAG; judul ≤ 12 kata, panel (a)(b), Div catatan; gambar tidak mengambang |
-| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 28 gerbang memeriksa isi bab, hasil rajut, dan hasil render (PDF bertag, tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
+| Gerbang | G0–G9 memeriksa keberadaan artefak tahap | 31 gerbang memeriksa isi bab, hasil rajut, dan hasil render (PDF bertag, tepi halaman, pemenggalan EYD V, nama tidak dipenggal, Word) |
 | Uji harness | tidak ada | fikstur gagal/lulus `uji-buku/` + `uji_harness.sh`; setiap gerbang baru wajib berfikstur |
 | Keputusan penulis | dicatat di STATE | `KEPUTUSAN-RANCANGAN.md` bertanggal → gerbang/konfig baru → **audit semua buku** → putaran sunting → "Draf revisi ke-N" + `REVISI.md` (loop D) |
 | Penulis dan reviewer ahli | satu penulis | buku multidisiplin: penulis ahli per bidang menulis bagiannya, penulis pemadu menggabungkan; reviewer ahli per bidang (matematika, kode, pemodelan, *machine learning*, survei, domain, pedagogi, bahasa) dan penelaah pakar pendidikan yang menilai kelayakan buku ajar |
@@ -82,6 +83,8 @@ Yang **tidak** diambil dari buku-praktikum: `cek_gerbang.py` (gerbang artefak), 
 - Deskripsi skill (1.012 karakter setelah perubahan 2026-11-07 e) semula dipendekkan menjadi 912 karakter agar lolos validasi (batas 1.024); pemicuannya belum dioptimalkan dengan evaluasi pemicuan skill-creator.
 
 ## Riwayat perubahan
+
+- **2026-11-10** — Atas permintaan penulis. (1) **Tahap gaya buku ajar** sesudah loop A (loop F): peran baru `22` penyunting gaya buku ajar (telaah + tulis ulang ke berkas terpisah: komunikatif dan interaktif dengan sapaan *Anda/kita*, semi-formal, istilah dijelaskan langsung dan masuk glosarium, sitasi seperlunya dengan sumber lain dipindah ke *Bacaan lanjut* dan registri klaim tetap lengkap) dan `23` penerap revisi gaya (agen lain yang membandingkan, memeriksa, dan menerapkan). Rujukan baru `references/gaya-buku-ajar.md`; gerbang **G-GAYA-AJAR** (`--tahap akhir`). (2) **Editor penerbitan** `24` di tahap akhir buku (loop G): keputusan siap terbit, lembar gaya, daftar periksa produksi. (3) **Struktur bab**: pengantar bab berupa studi kasus nyata atau cerita pendek, subbab ringkas (≤ 800 kata), dan Rangkuman di setiap akhir bab; gerbang **G-STRUKTUR**; templat bab diperbarui. (4) **Rumus dan simbol**: rujukan `references/rumus-dan-simbol.md` (rumus bagian kalimat, ISO 80000-2, pemenggalan rumus tampilan, keterangan dan konsistensi simbol) dan pemeriksa `scripts/cek_rumus.py`; gerbang **G-RUMUS**. (5) **Perbaikan arsitektur**: harness tidak lagi berhenti dengan *traceback* bila Rscript atau Sastrawi tidak terpasang (gerbang dicatat GAGAL dengan pesan pemasangan); `uji_harness.sh` kini memeriksa gerbang yang dimaksud setiap fikstur, bukan sekadar kode keluar (sebelumnya lima fikstur "gagal sesuai harapan" hanya karena harness *crash*), dan menandai uji yang butuh R sebagai dilewati; G-SLOP hanya menolak "mari kita" yang berupa pengumuman meta sehingga sapaan *kita* boleh; templat bab tidak lagi menyisipkan baris kosong sesudah rumus (lanjutan "dengan …" ikut terindentasi); rujukan ke berkas milik skill eyd dan buku-praktikum disebut pemiliknya.
 
 - **2026-11-07 (e)** — Pelajaran putaran telaah seri statistika Bayesian. (1) **Uji pembaca pemula independen wajib per bab** di loop A: audit tanpa isolasi konteks oleh agen penulis-perbaikan melewatkan 35 MAYOR di 34 bab, termasuk kesalahan isi nyata. Satu subagen berkonteks bersih membaca 3–5 bab dan menulis satu laporan per bab; penyunting adalah agen lain yang memeriksa temuan isi dulu (hitung ulang, registri) dan menulis "tidak diterapkan" beserta bukti bila temuan keliru. Templat baru `assets/templat-instruksi-pembaca-independen.md` dan `templat-instruksi-perbaikan-pembaca.md`; pola temuan berulang di `pelajaran-proyek.md` (bagian 14–19). (2) **Telaah pakar → tindak lanjut → "Usulan untuk diputuskan penulis"** dengan nilai bawaan sementara, disajikan bernomor dengan rekomendasi (juga untuk MINOR yang ditunda): `agents/00`, `09`, `21`, `loop-kerja.md`. (3) **Istilah dan notasi**: ln untuk logaritma natural di naskah dan kode tetap `log` (paragraf penjelas per buku, tabel lewat `col.names`); istilah *fit* menjadi mencocokkan/pencocokan; periksa bentrok simbol (ω, $\hat\theta$). Gerbang baru **G-LN** dengan fikstur `babln.qmd`. (4) **Tata letak**: gerbang **G-LOG** (log LaTeX akhir stabil, tanpa label ganda) dengan fikstur `uji-buku/log/*.txt`; `latex-min-runs: 4` di `assets/_quarto.yml`; `\endhead` longtable dan penalti baris yatim/janda di `assets/preamble.tex`; `assets/hak-cipta.tex` baru (fon beserta lisensi SIL OFL 1.1), disalin `siapkan_proyek.py`. (5) **Pemulihan** setelah batas pemakaian: lanjutkan agen yang sama lewat pesan, anggap proses latar mati (`agents/00`, bagian Pemulihan). (6) **Pengungkapan konflik kepentingan** bila penulis membuat atau memelihara paket yang dipakai, dengan jalur alternatif tetap lengkap.
 

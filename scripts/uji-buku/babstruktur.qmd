@@ -1,0 +1,7 @@
+# Bab struktur {#sec-struktur}
+
+Bab ini membahas rerata.
+
+## Rerata {#sec-rerata-struktur}
+
+Rerata adalah jumlah pengamatan dibagi banyaknya. Bab ini sengaja tanpa pengantar yang memadai dan tanpa rangkuman, sehingga harness harus menolaknya.

@@ -8,19 +8,47 @@
 #   bash harness/uji_harness.sh
 cd "$(dirname "$0")/.."
 status=0
-GAGAL="babgagal babbahasa babbocor babsitasi babcap babgayasitasi babinf babjudul bablarangan babln"
-for bab in $GAGAL; do
-  if python3 harness/harness.py --buku harness/uji-buku --bab "$bab" > /dev/null 2>&1; then
-    echo "SALAH: $bab seharusnya GAGAL"; status=1
+# Setiap fikstur gagal dipasangkan dengan gerbang yang HARUS gagal. Uji lulus hanya
+# bila gerbang itu tercatat [GAGAL] dan harness tidak berhenti karena galat Python;
+# kode keluar saja tidak cukup (dulu fikstur "gagal" ikut lulus ketika harness
+# crash karena Rscript atau Sastrawi tidak terpasang).
+# Format: fikstur:gerbang[:R]  (:R = gerbang butuh R + knitr)
+GAGAL="babgagal:G-ANGKA babbahasa:G-EYD:R babbocor:G-BOCOR:R babsitasi:G-REFERENSI
+babcap:G-BOCOR:R babgayasitasi:G-SITASI babinf:G-BOCOR:R babjudul:G-JUDUL
+bablarangan:G-LARANGAN babln:G-LN babrumus:G-RUMUS babstruktur:G-STRUKTUR"
+ADA_R=0; command -v Rscript > /dev/null && Rscript -e 'library(knitr)' > /dev/null 2>&1 && ADA_R=1
+for butir in $GAGAL; do
+  bab=${butir%%:*}; sisa=${butir#*:}; gerbang=${sisa%%:*}
+  if [ "$sisa" != "${sisa%:R}" ] && [ $ADA_R = 0 ]; then
+    echo "dilewati: $bab ($gerbang butuh R + knitr)"; continue
+  fi
+  keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab "$bab" 2>&1)
+  if ! echo "$keluaran" | grep -q "^Status:"; then
+    echo "SALAH: $bab membuat harness crash"; echo "$keluaran" | tail -3; status=1
+  elif echo "$keluaran" | grep -q "\[GAGAL\] $gerbang\b"; then
+    echo "benar: $bab GAGAL di $gerbang"
   else
-    echo "benar: $bab GAGAL"
+    echo "SALAH: $bab seharusnya GAGAL di $gerbang"; status=1
   fi
 done
-if python3 harness/harness.py --buku harness/uji-buku --bab babbaik > /dev/null 2>&1; then
-  echo "benar: babbaik LULUS"
+if [ $ADA_R = 1 ]; then
+  if python3 harness/harness.py --buku harness/uji-buku --bab babbaik > /dev/null 2>&1; then
+    echo "benar: babbaik LULUS"
+  else
+    echo "SALAH: babbaik seharusnya LULUS"; status=1
+  fi
 else
-  echo "SALAH: babbaik seharusnya LULUS"; status=1
+  echo "dilewati: babbaik LULUS (butuh R + knitr) — uji TIDAK LENGKAP"
 fi
+# G-GAYA-AJAR hanya aktif pada --tahap akhir (sesudah peran 22–23): babgayaajar
+# (gaya artikel: tanpa sapaan, "pembaca" sebagai pelaku, kalimat panjang, sitasi padat) GAGAL.
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babgayaajar --tahap akhir 2>&1)
+if echo "$keluaran" | grep -q "\[GAGAL\] G-GAYA-AJAR"; then echo "benar: babgayaajar GAGAL di G-GAYA-AJAR (--tahap akhir)"
+else echo "SALAH: babgayaajar seharusnya GAGAL di G-GAYA-AJAR (--tahap akhir)"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babbaik --tahap akhir 2>&1)
+if echo "$keluaran" | grep -q "\[GAGAL\] G-\(GAYA-AJAR\|STRUKTUR\|RUMUS\)"; then
+  echo "SALAH: babbaik seharusnya lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; status=1
+else echo "benar: babbaik lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; fi
 # G-TAG (PDF bertag) diuji pada PDF fikstur tanpa render: tag-tanpa.pdf
 # (pdfLaTeX/LuaLaTeX tanpa DocumentMetadata) GAGAL, tag-baik.pdf LULUS.
 if command -v pdfinfo > /dev/null; then

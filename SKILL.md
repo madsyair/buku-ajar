@@ -1,6 +1,6 @@
 ---
 name: buku-ajar
-description: Alur multi-agen untuk menulis, menyunting, mengulas, dan menerbitkan buku ajar berbahasa Indonesia (EYD V) bidang statistika, sains data, dan komputasi dengan Quarto, R/Python, Stan/brms; termasuk seri buku, buku multidisiplin (penulis ahli bidang + penulis pemadu, reviewer ahli per bidang), buku kunci jawaban untuk pengajar (rubrik 10 poin), audit ilustrasi, dan revisi setelah keputusan penulis. Menegakkan gerbang mutu yang dapat dieksekusi (angka dari kode, klaim berkutipan verbatim, judul singkat, sitasi penulis–tahun, koma konjungsi, tanpa luapan tepi) dan loop tulis → harness → ulasan paralel (isi, rumus, bahasa, kode, ahli bidang, editor, pembaca berlapis dan independen) → perbaikan → render. Gunakan setiap kali pengguna ingin membuat, melanjutkan, merevisi, atau mengaudit buku ajar, diktat, modul, bab buku, seri buku, atau kunci jawaban berbasis data dan kode, atau menyebut "bab berikutnya", "kerangka bab", "ulasan pembaca", "kunci jawaban", "draf revisi", meskipun tidak menyebut skill ini.
+description: Alur multi-agen untuk menulis, menyunting, mengulas, dan menerbitkan buku ajar berbahasa Indonesia (EYD V) bidang statistika, sains data, dan komputasi dengan Quarto, R/Python, Stan/brms: seri buku, buku multidisiplin, kunci jawaban berubrik, audit ilustrasi, tahap gaya buku ajar (komunikatif, semi-formal, istilah terjelaskan, rujukan seperlunya), dan editor penerbitan. Menegakkan gerbang mutu yang dapat dieksekusi (angka dari kode, klaim berkutipan verbatim, rumus dan simbol, struktur bab, sitasi, tanpa luapan tepi) dan loop tulis → harness → ulasan paralel → perbaikan → gaya → render. Gunakan setiap kali pengguna ingin membuat, melanjutkan, merevisi, atau mengaudit buku ajar, diktat, modul, bab buku, seri buku, atau kunci jawaban berbasis data dan kode, atau menyebut "bab berikutnya", "kerangka bab", "ulasan pembaca", "kunci jawaban", "draf revisi", "siap terbit", meskipun tidak menyebut skill ini.
 ---
 
 # Buku ajar (multi-agen, harness, loop)
@@ -20,11 +20,12 @@ Label internal skill: gaya **bertanya** ("Sokratik") dan gaya **menjelaskan-ulan
 
 1. Alur prosa digerakkan **pertanyaan wajar pembaca** di kalimat pertama subbab; subjudul **bukan** kalimat tanya.
 2. Setiap subbab harus dapat **dijelaskan ulang** pembaca sasaran dalam beberapa kalimat sederhana; penulis menulis penjelasan tanpa notasi sebelum rumus; pembaca uji mengujinya.
-3. **Intuisi → rumus → interpretasi angka** dari kode buku sendiri, dengan satuan dan ketidakpastian.
+3. **Intuisi → rumus → interpretasi angka** dari kode buku sendiri, dengan satuan dan ketidakpastian. Rumus dan simbol mengikuti `references/rumus-dan-simbol.md`.
 4. Contoh dari **pengetahuan umum dan konteks Indonesia**; analogi dipetakan dan diberi batas.
 5. Istilah asing tanpa padanan lazim **dicetak miring dan dijelaskan** pada kemunculan pertama di setiap bab; satu istilah baru per kalimat; **jembatan istilah** antarbab/antarbuku.
 6. Data **riil → sintetis paket → simulasi sendiri**; status data selalu disebut; batasan data di prakata.
-7. 5W1H dipakai sebagai **daftar periksa perencanaan** (versi statistika: apa, mengapa, kapan dipakai, bagaimana menghitung, bagaimana menafsirkan, kapan gagal), bukan subjudul.
+7. **Gaya buku ajar** (`references/gaya-buku-ajar.md`): menyapa pembaca (*Anda/kita*), semi-formal (kosakata baku, kalimat pendek), istilah dijelaskan langsung dan masuk glosarium, sitasi seperlunya di versi akhir. Setiap bab punya **pengantar menarik** (studi kasus nyata atau cerita pendek), **subbab ringkas**, dan **rangkuman** di akhir.
+8. 5W1H dipakai sebagai **daftar periksa perencanaan** (versi statistika: apa, mengapa, kapan dipakai, bagaimana menghitung, bagaimana menafsirkan, kapan gagal), bukan subjudul.
 
 Rinci: `references/prinsip-buku-ajar.md` (ringkasan operasional kajian; daftar periksa butir 1–35), `references/aturan-gaya-dan-tampilan.md`, `references/istilah-statistika.md`.
 
@@ -56,8 +57,11 @@ Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar perik
 | 19 | Reviewer ahli domain terapan (templat diisi bidangnya) | `agents/19-reviewer-domain-terapan.md` | `ulasan/babXX-<domain>.md` | tidak |
 | 20 | Reviewer ahli pedagogi dan keterbacaan | `agents/20-reviewer-pedagogi.md` | `ulasan/babXX-pedagogi.md` | tidak |
 | 21 | Penelaah pakar pendidikan dan penulisan buku ajar | `agents/21-penelaah-pakar-buku-ajar.md` | `ulasan/telaah-rancangan.md`, `ulasan/babXX-telaah.md`, `ulasan/telaah-buku.md` (rekomendasi kelayakan) | tidak |
+| 22 | Penyunting gaya buku ajar (konteks bersih): telaah + tulis ulang komunikatif, semi-formal, istilah, rujukan seperlunya, struktur bab | `agents/22-penyunting-gaya-buku-ajar.md` | `gaya/babXX.qmd` (versi tulis ulang), `ulasan/babXX-gaya.md` | tidak (berkas terpisah) |
+| 23 | Penerap revisi gaya (agen lain dari 22) | `agents/23-penerap-revisi-gaya.md` | `babXX.qmd` hasil penerapan, registri dan glosarium, tindak lanjut | **ya** |
+| 24 | Editor penerbitan (buku utuh) | `agents/24-editor-penerbitan.md` | `ulasan/editor-penerbitan.md`: keputusan siap terbit, temuan, lembar gaya, daftar periksa produksi | tidak |
 
-Peninjau (05–12, 16–21, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas.
+Peninjau (05–12, 16–22, 24, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas. Peran 23 selalu agen lain dari 22.
 
 **Buku multidisiplin.** Bila isi buku memadukan beberapa disiplin (mis. statistika matematis, pemodelan statistik, komputasi, *machine learning*, statistika resmi/survei, ekonomi, kesehatan, spasial), setiap disiplin ditulis penulis ahli bidangnya (04a) hanya pada bagian yang ditugaskan rancangan, lalu penulis pemadu (04b) yang menguasai semua bidang buku menggabungkan dan melengkapinya menjadi satu bab. 04a + 04b menggantikan 04; untuk buku satu disiplin, 04 tetap dipakai. **Aturan penugasan reviewer**: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19; pedagogi → 20 (wajib untuk multidisiplin); kelayakan sebagai buku ajar → 21 (wajib untuk setiap buku, pada rancangan, setiap bab, dan buku utuh); bahasa → 07; reviewer isi 05 memeriksa klaim dan angka seluruh bab. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
 
@@ -68,14 +72,16 @@ Proyek   : siapkan_proyek.py → uji_harness.sh hijau
 Buku     : 01 brief ─▶ 03 sumber+registri ─▶ 02 rancangan rinci ─▶ 21 telaah rancangan (T1) ─▶ [persetujuan penulis]
 Bab (A)  : 02 kerangka ─▶ 04 tulis ─▶ harness LULUS ─▶ 05–12 paralel (10 independen WAJIB) ─▶ 09 putuskan
            ─▶ 04 perbaiki (agen lain, periksa temuan dulu) ─▶ harness LULUS ─▶ 21 telaah bab (T2) ─▶ 09
-           ─▶ perbaikan bila ada ─▶ usulan untuk penulis ─▶ 00 render berurutan + G-RENDER/G-LOG/G-TEPI/G-PENGGALAN ─▶ komit
+           ─▶ perbaikan bila ada ─▶ 22 gaya buku ajar (tulis ulang) ─▶ 23 periksa + terapkan ─▶ harness --tahap akhir LULUS
+           ─▶ usulan untuk penulis ─▶ 00 render berurutan + G-RENDER/G-LOG/G-TEPI/G-PENGGALAN ─▶ komit
 Bab multidisiplin: 02 kerangka+penugasan ─▶ 04a per disiplin (paralel) ─▶ harness bagian LULUS (semua) ─▶ 04b pemaduan
            ─▶ harness bab LULUS ─▶ ahli bidang + 05/07/20 + 10–12 paralel ─▶ 09 putuskan ─▶ perbaikan (ahli bergiliran | pemadu)
            ─▶ harness LULUS ─▶ render ─▶ komit
 Kunci (C): 13 kunci ─▶ temuan-soal ─▶ 14 terapkan ke induk ─▶ 13 sesuaikan ─▶ pemeriksa independen
 Keputusan baru (D): catat ─▶ gerbang/konfig + fikstur ─▶ audit semua buku ─▶ sunting paralel ─▶ render ─▶ REVISI.md
 Ilustrasi (E): 15 audit ─▶ gambar ─▶ harness ─▶ render ─▶ pembaca/editor
-Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) ─▶ 21 telaah buku utuh (T3) ─▶ kemas_sumber.py
+Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) ─▶ 21 telaah buku utuh (T3)
+           ─▶ 24 editor penerbitan ─▶ 23 perbaikan mekanis (substansi → loop A) ─▶ render ─▶ 24 periksa ulang ─▶ kemas_sumber.py
 ```
 
 | Tahap | Gerbang keluar |
@@ -87,17 +93,20 @@ Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) 
 | Bagian (multidisiplin) | setiap `babXX-<kode>.qmd` LULUS harness tanpa render; serah-terima lengkap |
 | Pemaduan (multidisiplin) | semua bagian LULUS sebelum mulai; `babXX.qmd` LULUS; peta pemaduan lengkap; klaim pindah ke kunci bab; tidak ada butir "dikembalikan ke ahli" terbuka |
 | Draf bab | `harness.py` LULUS tanpa render (semua gerbang aktif) |
+| Gaya bab | versi tulis ulang 22 diperiksa dan diterapkan 23; `harness.py` **dan** `harness.py --tahap akhir` LULUS (G-GAYA-AJAR, G-STRUKTUR, G-RUMUS); setiap sitasi yang dipindah tercatat di registri; istilah baru ada di glosarium |
 | Ulasan | laporan pembaca pemula independen ada untuk bab itu; tidak ada MAYOR terbuka; setiap temuan punya tindak lanjut tertulis (temuan keliru: "tidak diterapkan" dengan bukti); MINOR yang ditunda masuk usulan untuk penulis; (multidisiplin) setiap bagian ditinjau ahli disiplinnya + 07 + 09, tanpa swatinjau |
 | Render | `harness.py --render` LULUS: G-RENDER, G-LOG, G-TAG, G-TEPI, G-PENGGALAN; tampilan PDF/Word diperiksa editor |
 | Kunci | setiap latihan: pembahasan, Jawaban akhir, rubrik = 10; temuan soal Diterapkan/Diputuskan |
+| Penerbitan | keputusan 24 *siap terbit* (atau perbaikan mekanis sudah diterapkan dan dirender ulang); tidak ada MAYOR terbuka; lembar gaya tersimpan |
 
 ## Harness engineering
 
-Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 28 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan (G-JUDUL, G-PERSAMAAN, G-HALJUDUL), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN, G-LN untuk ln di rumus naskah), dan render (G-RENDER, G-LOG untuk log LaTeX stabil, G-TAG untuk PDF bertag, G-TEPI, G-PENGGALAN).
+Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 31 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan dan struktur (G-JUDUL, G-PERSAMAAN, G-HALJUDUL, **G-RUMUS** untuk rumus dan simbol, **G-STRUKTUR** untuk pengantar, subbab ringkas, dan rangkuman), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN, G-LN untuk ln di rumus naskah; **G-GAYA-AJAR** pada `--tahap akhir` untuk sapaan, panjang kalimat, dan kepadatan sitasi), dan render (G-RENDER, G-LOG untuk log LaTeX stabil, G-TAG untuk PDF bertag, G-TEPI, G-PENGGALAN).
 
 ```bash
 python3 harness/harness.py --buku <buku> --bab babXX            # agen bab
 python3 harness/harness.py --buku <buku> --bab babXX --render   # orkestrator, berurutan
+python3 harness/harness.py --buku <buku> --bab babXX --tahap akhir  # sesudah tahap gaya (22–23)
 bash harness/uji_harness.sh                                     # setiap kali harness/konfig berubah
 ```
 
@@ -119,6 +128,8 @@ Loop tertutup dengan kriteria berhenti, batas iterasi, eskalasi, dan jejak tertu
 | C kunci → soal induk | temuan soal → penyunting soal → harness induk → kunci disesuaikan → pemeriksa | semua temuan Diterapkan/Diputuskan | 2 putaran | rumusan mengubah tujuan latihan |
 | D keputusan → gerbang → audit | keputusan → gerbang + fikstur → audit semua buku → sunting → render → `REVISI.md` | semua buku LULUS gerbang baru | per kelompok bab | pola gerbang ambigu |
 | E ilustrasi | audit → gambar → harness → render → periksa narasi | narasi cocok, harness LULUS | 2 putaran | — |
+| F gaya bab | 22 telaah + tulis ulang → 23 bandingkan, periksa, terapkan → harness (draf + akhir) | kedua mode LULUS, semua temuan bertindak lanjut | 2 putaran | tulis ulang menggeser makna 2×; sapaan buku belum diputuskan |
+| G penerbitan | 24 telaah buku utuh → 23 perbaikan mekanis (substansi → loop A) → render → 24 periksa ulang | *siap terbit*, 0 MAYOR | 2 putaran | keputusan produksi (ISBN, penerbit), perubahan substansi |
 
 Tindak lanjut ditulis penulis di bagian `## Tindak lanjut (tanggal)` setiap berkas ulasan; status putaran di `naskah/STATUS.md`.
 
@@ -148,9 +159,9 @@ Rinci: `agents/00-orkestrator.md`.
 
 ## Skill pendukung
 
-- **eyd** (wajib untuk naskah Indonesia): `scripts/periksa.py` dipanggil G-EYD; reviewer bahasa memakai `references/kalimat-efektif.md`, `kata-hubung.md`, `inventaris-kesalahan.md`, `istilah-dan-kbbi.md`, `pemenggalan-kata.md`. Bila tidak terpasang, G-EYD gagal terbaca: set `SKILL_EYD` atau laporkan bahwa pemeriksaan EYD otomatis tidak berjalan.
+- **eyd** (wajib untuk naskah Indonesia): `periksa.py` milik skill eyd dipanggil G-EYD; reviewer bahasa dan peran 22 memakai rujukan skill eyd (`kalimat-efektif.md`, `kata-hubung.md`, `inventaris-kesalahan.md`, `istilah-dan-kbbi.md`, `pemenggalan-kata.md`, `singkatan-akronim.md`). Bila tidak terpasang, G-EYD gagal terbaca: set `SKILL_EYD` atau laporkan bahwa pemeriksaan EYD otomatis tidak berjalan.
 - **humanizer-id**: reviewer bahasa memakainya untuk membuang pola tulisan mesin tanpa mengarang fakta (G-SLOP hanya menangkap frasa).
-- **buku-praktikum**: untuk modul praktikum kecil atau bila diperlukan `scripts/cek_turunan.py` (pemeriksa penurunan SymPy) bagi reviewer rumus. Untuk seri buku dengan keputusan penulis yang terus bertambah, pakai skill ini.
+- **buku-praktikum**: untuk modul praktikum kecil atau bila diperlukan `cek_turunan.py` milik skill buku-praktikum (pemeriksa penurunan SymPy) bagi reviewer rumus. Untuk seri buku dengan keputusan penulis yang terus bertambah, pakai skill ini.
 - **dataviz**: dibaca sebelum kode gambar pertama proyek (palet, kontras, bentuk grafik); konvensi gambar buku tetap di `references/ilustrasi.md`.
 - **docx / pdf**: memeriksa atau memperbaiki keluaran Word (gaya *Body Text*/*First Paragraph*, pemenggalan, bahasa id-ID) dan PDF (ekstraksi teks, halaman bab) setelah render.
 - Skill riset (mis. deep-research) boleh dipakai peninjau literatur untuk menemukan sumber, tetapi hasilnya tetap masuk registri dengan kutipan dari teks yang dibuka.
@@ -161,6 +172,8 @@ Rinci: `agents/00-orkestrator.md`.
 |---|---|---|
 | `references/prinsip-buku-ajar.md` | ringkasan operasional kajian; 5W1H; Permendikbudristek 22/2022; daftar periksa 35 butir | 02, 04, 04a, 04b, 05–12, 16–21 |
 | `references/kajian-prinsip-buku-ajar.md` | kajian lengkap (status sumber [A]/[S]/[A, terverifikasi]) | bila perlu dasar |
+| `references/gaya-buku-ajar.md` | gaya komunikatif–interaktif, semi-formal, penjelasan istilah, rujukan seperlunya, struktur bab (pengantar, subbab ringkas, rangkuman), ukuran G-GAYA-AJAR | 04, 22, 23, 24, 09 |
+| `references/rumus-dan-simbol.md` | rumus sebagai bagian kalimat, tipografi ISO 80000-2, pemenggalan rumus, keterangan dan konsistensi simbol, kode R1–R12 `cek_rumus.py` | 04, 06, 22, 23 |
 | `references/aturan-gaya-dan-tampilan.md` | semua keputusan gaya bawaan: prosa, judul, tabel/gambar, rumus, sitasi, angka/kode, struktur bab, cetak, halaman judul, anatomi buku, bahasa | semua |
 | `references/istilah-statistika.md` | kebijakan istilah, keputusan bawaan, jembatan istilah | 01, 04, 07, 09 |
 | `references/data-dan-sumber.md` | urutan data, status data, peta, prakata; registri klaim dan identitas | 01–05, 13 |
@@ -175,6 +188,7 @@ Templat di `assets/`: brief, rancangan rinci, kerangka bab, serah-terima bagian,
 ## Kemasan akhir
 
 1. Render semua buku (induk lalu kunci) berurutan dengan `--render`; semua gerbang render lulus.
+1a. Editor penerbitan (24) menelaah buku utuh; perbaikan mekanis diterapkan (23), render ulang, periksa ulang sampai *siap terbit*.
 2. Editor memeriksa butir 33–35 per buku; hapus tanda air dan set `DRAF=0` hanya untuk versi terbit yang diputuskan penulis.
 3. `python3 harness/kemas_sumber.py <folder>` → `<proyek>-<buku>-sumber.zip` per buku (induk + kunci + folder bersama + lampiran kode, tanpa sumber berhak cipta, cache, dan berkas antara) dengan `BANGUN.md`.
 4. Komit akhir; laporan ke penulis: berkas PDF/Word, zip, status gerbang, keputusan terbuka.
