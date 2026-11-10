@@ -183,7 +183,7 @@ Rinci: `agents/00-orkestrator.md`.
 | `references/ilustrasi.md` | jalur Python/TikZ, keterangan, audit | 04, 15 |
 | `references/pelajaran-proyek.md` | kesalahan berulang dan pencegahannya | 04, 05, 08, 09 |
 
-Templat di `assets/`: brief, rancangan rinci, kerangka bab, serah-terima bagian, laporan pemaduan, bab `.qmd` dan bab kunci `.qmd` (keduanya lulus harness), laporan ulasan, temuan soal, instruksi pembaca independen dan instruksi perbaikan, `KEPUTUSAN-RANCANGAN`, `REVISI`, `STATUS`, `_quarto.yml` (`latex-min-runs: 4`), `preamble.tex` (`\endhead` longtable, cegah baris yatim/janda), `hak-cipta.tex` (fon dan lisensinya), `tikz-preamble.tex`, `konfig.json`, `apa.csl`, `reference-b5.docx`.
+Templat di `assets/`: brief, rancangan rinci, kerangka bab, serah-terima bagian, laporan pemaduan, bab `.qmd` dan bab kunci `.qmd` (keduanya lulus harness), laporan ulasan, temuan soal, instruksi pembaca independen dan instruksi perbaikan, `KEPUTUSAN-RANCANGAN`, `REVISI`, `STATUS`, `_quarto.yml` (`latex-min-runs: 4`), `preamble.tex` (`\endhead` longtable, cegah baris yatim/janda), `hak-cipta.tex` (fon dan lisensinya), `tikz-preamble.tex`, `konfig.json` (termasuk `huruf`, `profil`, `ukuran`, `batas_kode`, `batas_keluaran`), `apa.csl`, `reference-b5.docx`, `reference-b5-windows.docx` (Times New Roman/Courier New/Cambria Math). Opsi huruf, profil penerbit, dan ukuran buku diterapkan `scripts/huruf.py` (aturan-gaya bagian 8, "Huruf dan templat penerbit").
 
 ## Kemasan akhir
 

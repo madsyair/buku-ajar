@@ -6,9 +6,13 @@ $-- Di TeX Live 2024+ pertimbangkan tagging=on. Lihat skill buku-ajar,
 $-- references/aturan-gaya-dan-tampilan.md, bagian Tipografi.
 \DocumentMetadata{testphase={phase-II,sec,toc,minipage,graphic,text},
   pdfversion=1.7, lang=id-ID}
-% Glif yang tidak ada di Libertinus Mono (mis. huruf Yunani di kode) diambil
-% dari Libertinus Serif lalu Libertinus Math, keluarga yang sama.
-\directlua{luaotfload.add_fallback("serimono", {"LibertinusSerif-Regular:mode=node;", "LibertinusMath-Regular:mode=node;"})}
+% Huruf cadangan dari keluarga yang sama: glif yang tidak ada di huruf mono
+% (mis. huruf Yunani di kode) atau di huruf teks (mis. ≤ dan θ pada Latin
+% Modern Roman) diambil dari huruf teks/matematika opsi. Blok ditulis ulang
+% _bersama/huruf.py menurut "huruf" di harness/konfig.json.
+$-- >>> huruf
+\directlua{luaotfload.add_fallback("serimono", {"file:LibertinusSerif-Regular.otf:mode=node;", "file:LibertinusMath-Regular.otf:mode=node;"})}
+$-- <<< huruf
 \documentclass[
 $for(babel-otherlangs)$
   $babel-otherlangs$,

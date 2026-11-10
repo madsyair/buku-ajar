@@ -10,10 +10,13 @@ Menyesuaikan untuk proyek baru:
     dan warna yang sama di tikz-preamble.tex (perintah definecolor seri...).
     Warna terang dipakai untuk isian/pita; untuk garis tipis dan titik pakai
     varian tua (lihat EMAS_TUA, MINT_TUA). Periksa kontras dengan skill dataviz.
-  - LEBAR mengikuti lebar blok teks (B5: 5,2 inci). Ubah bila ukuran kertas lain.
-  - Huruf gambar Libertinus Serif, satu keluarga dengan teks, judul, kode, dan
-    rumus buku (references/aturan-gaya-dan-tampilan.md, "Tipografi"). Berkas
-    OTF dicari di _FON_CALON (TeX Live Debian dan TeX Live resmi) lalu kpsewhich.
+  - LEBAR mengikuti lebar kolom teks dari "ukuran" dan "profil" di
+    harness/konfig.json (B5 seri: 120 mm = 4,72 inci).
+  - Huruf gambar mengikuti opsi "huruf" di harness/konfig.json (bawaan
+    libertinus; juga springer, crc, stix; lihat _bersama/huruf.py): huruf teks
+    opsi untuk label, angka, dan mathtext, huruf matematika opsi sebagai
+    cadangan glif (≤, ≈). Berkas OTF dicari dengan kpsewhich lalu _FON_CALON.
+    Variabel lingkungan BUKU_HURUF menimpa konfig (uji).
 
 Pola pakai di chunk Python Quarto (echo: false):
     sys.path[:0] = ["../_bersama", "."]
@@ -56,58 +59,135 @@ EMAS_TUA = "#C98A0B"
 MINT_TUA = "#2F8F6B"
 PALET_BUKU3 = [HUTAN, EMAS_TUA, MINT_TUA, ABU, MINT, EMAS]
 
-# Ukuran mengikuti lebar blok teks B5 (sekitar 136 mm)
-LEBAR = 5.2
+# Ukuran gambar: LEBAR = lebar kolom teks (B5 seri 120 mm = 4,72 inci; ukuran
+# buku lain dari "ukuran"/"profil" di konfig.json), dihitung sesudah fungsi
+# _lebar_kolom di bawah.
 TINGGI = 3.2
 
-# Satu keluarga huruf: Libertinus Serif, sama dengan teks dan judul buku.
-# Berkas OTF dibawa TeX Live (paket fonts-libertinus/texlive-fonts-extra).
+# Huruf gambar = huruf teks opsi "huruf" (harness/konfig.json), sama dengan
+# teks dan judul buku. Berkas OTF dibawa TeX Live.
 _FON_CALON = [
     Path("/usr/share/texlive/texmf-dist/fonts/opentype/public/libertinus-fonts"),
     Path("/usr/share/fonts/opentype/libertinus"),
 ]
 
 
-def _folder_fon():
-    for p in _FON_CALON:
-        if p.exists():
-            return p
+def _muat_huruf():
+    """(modul _bersama/huruf.py atau None, isi harness/konfig.json)."""
+    import importlib.util
+    import json
+    sini = Path(__file__).resolve().parent
+    konfig = sini.parent / "harness" / "konfig.json"
+    k = json.loads(konfig.read_text(encoding="utf-8")) if konfig.exists() else {}
+    if not (sini / "huruf.py").exists():
+        return None, k
+    spek = importlib.util.spec_from_file_location("huruf", sini / "huruf.py")
+    huruf = importlib.util.module_from_spec(spek)
+    spek.loader.exec_module(huruf)
+    return huruf, k
+
+
+def _opsi_huruf():
+    """Opsi huruf proyek dari _bersama/huruf.py dan harness/konfig.json."""
+    huruf, k = _muat_huruf()
+    if huruf is None:
+        return "libertinus", None
+    nama = os.environ.get("BUKU_HURUF") or k.get("huruf", "libertinus")
+    return nama, huruf.opsi(nama)
+
+
+def _lebar_kolom(bawaan=4.72):
+    """Lebar kolom teks (inci) dari ukuran buku dan profil di konfig.json."""
+    try:
+        huruf, k = _muat_huruf()
+        tl = huruf.tata_letak(k.get("huruf", "libertinus"), k.get("profil", "seri"),
+                              k.get("ukuran", "b5"))
+        return round(tl["kolom_mm"] / 25.4, 2)
+    except Exception:  # konfig tidak ada atau tidak sah: lebar kolom B5 seri
+        return bawaan
+
+
+LEBAR = _lebar_kolom()
+
+
+def _cari_otf(nama):
     try:
         import subprocess
-        jalur = subprocess.run(["kpsewhich", "LibertinusSerif-Regular.otf"],
-                               capture_output=True, text=True).stdout.strip()
+        jalur = subprocess.run(["kpsewhich", nama], capture_output=True, text=True).stdout.strip()
         if jalur:
-            return Path(jalur).parent
+            return Path(jalur)
     except OSError:
         pass
+    for p in _FON_CALON:
+        if (p / nama).exists():
+            return p / nama
     return None
 
 
 def _daftarkan_fon():
-    """Daftarkan Libertinus Serif agar huruf gambar sama dengan teks buku."""
-    keluarga = "serif"
-    folder = _folder_fon()
-    berkas = sorted(folder.glob("LibertinusSerif-*.otf")) if folder else []
-    for b in berkas:
-        font_manager.fontManager.addfont(str(b))
-    if berkas:
-        keluarga = "Libertinus Serif"
-    return keluarga
+    """Daftarkan OTF teks dan matematika opsi; kembalikan (keluarga teks,
+    keluarga matematika, mathtext cadangan)."""
+    _nama, o = _opsi_huruf()
+    otf = o["otf"] if o else {"regular": "LibertinusSerif-Regular.otf",
+                              "italic": "LibertinusSerif-Italic.otf",
+                              "bold": "LibertinusSerif-Bold.otf",
+                              "bolditalic": "LibertinusSerif-BoldItalic.otf",
+                              "math": "LibertinusMath-Regular.otf"}
+    keluarga, kel_math = "serif", None
+    for peran, berkas in otf.items():
+        jalur = _cari_otf(berkas)
+        if jalur is None:
+            continue
+        font_manager.fontManager.addfont(str(jalur))
+        nama = font_manager.FontProperties(fname=str(jalur)).get_name()
+        if peran == "regular":
+            keluarga = nama
+        elif peran == "math":
+            kel_math = nama
+    # Hanya berkas opsi yang boleh dipilih untuk nama keluarga itu (Latin Modern
+    # punya varian optis LMRoman5..17 bernama keluarga sama).
+    kami = {str(_cari_otf(b)) for b in otf.values()}
+    nama_kami = {keluarga, kel_math}
+    font_manager.fontManager.ttflist = [
+        f for f in font_manager.fontManager.ttflist
+        if f.name not in nama_kami or f.fname in kami]
+    font_manager.fontManager._findfont_cached.cache_clear() \
+        if hasattr(font_manager.fontManager._findfont_cached, "cache_clear") else None
+    return keluarga, kel_math, (o or {}).get("mathtext_cadangan", "stix")
+
+
+def _ukuran_dari_huruf_opsi():
+    """mathtext custom mengambil varian ukuran simbol (akar, kurung besar) dari
+    huruf cadangan STIX meskipun huruf matematika opsi punya glifnya; akibatnya
+    STIXGeneral ikut tersemat. Glif diambil dari huruf opsi satu ukuran saja
+    (cukup untuk label gambar). API privat matplotlib: dilewati bila berubah."""
+    try:
+        from matplotlib import _mathtext
+        _mathtext.UnicodeFonts.get_sized_alternatives_for_symbol = \
+            lambda self, fontname, sym: [(fontname, sym)]
+    except (ImportError, AttributeError):
+        pass
 
 
 def gaya(palet=None):
     """Terapkan tema seaborn dan rcParams seri (palet bawaan: Buku 1)."""
     logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
     warnings.filterwarnings("ignore")
-    keluarga = _daftarkan_fon()
+    keluarga, kel_math, cadangan = _daftarkan_fon()
+    # Glif yang tidak ada di huruf teks (mis. ≤ dan θ pada Latin Modern Roman)
+    # diambil dari huruf matematika opsi, bukan DejaVu bawaan matplotlib.
+    daftar = [keluarga] + ([kel_math] if kel_math else [])
+    if cadangan != "cm":
+        _ukuran_dari_huruf_opsi()
     sns.set_theme(style="whitegrid", palette=palet or PALET, font=keluarga)
     plt.rcParams.update({
         "figure.figsize": (LEBAR, TINGGI),
         "figure.dpi": 150,
         "axes.edgecolor": ABU,
         "axes.labelcolor": "#222222",
-        # Libertinus lebih sempit dan x-height-nya lebih kecil daripada
-        # Pagella; ukuran dinaikkan ±8% agar lebar teks gambar tetap sama.
+        # Ukuran ditetapkan untuk Libertinus (lebih sempit dan x-height-nya
+        # lebih kecil daripada Pagella; dinaikkan ±8%); opsi lain memakai
+        # ukuran yang sama.
         "axes.titlesize": 11.5,
         "axes.labelsize": 11,
         "xtick.labelsize": 9.5,
@@ -117,19 +197,23 @@ def gaya(palet=None):
         "grid.color": "#E5E7EB",
         "axes.spines.top": False,
         "axes.spines.right": False,
-        "font.serif": [keluarga],
-        "font.cursive": [keluarga],
-        "font.fantasy": [keluarga],
+        "font.family": daftar,
+        "font.serif": daftar,
+        "font.cursive": daftar,
+        "font.fantasy": daftar,
         "mathtext.fontset": "custom",
-        "mathtext.rm": keluarga,
+        "mathtext.rm": kel_math or keluarga,
         "mathtext.it": keluarga + ":italic",
         "mathtext.bf": keluarga + ":bold",
         "mathtext.sf": keluarga,
         "mathtext.tt": keluarga,
         "mathtext.cal": keluarga + ":italic",
-        "mathtext.fallback": "stix",
-        # Libertinus berupa OTF-CFF; Type 42 (TrueType) menyematkannya dengan tipe
-        # yang salah, jadi huruf gambar disematkan sebagai Type 3.
+        # Cadangan mathtext untuk simbol yang tidak ada di huruf teks: "cm"
+        # (Computer Modern) untuk opsi crc, "stix" untuk opsi lain; G-HURUF
+        # menandai bila cadangan di luar keluarga opsi ikut tersemat.
+        "mathtext.fallback": cadangan,
+        # Huruf OTF-CFF (Libertinus, TeX Gyre, Latin Modern, STIX Two) salah
+        # disematkan mode Type 42 (TrueType), jadi huruf gambar disematkan Type 3.
         "pdf.fonttype": 3,
     })
 

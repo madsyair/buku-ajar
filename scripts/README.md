@@ -10,7 +10,8 @@ Salinan yang digeneralisasi dari harness dan alat seri statistika Bayesian (A. S
 | `penggalan.py` | `harness/` | Pemenggalan EYD V, daftar nama yang tidak dipenggal, istilah asing (perlu `pip install Sastrawi`) |
 | `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS) |
 | `kemas_sumber.py` | `harness/` atau `alat/` | Mengemas kode sumber per buku (+ kunci) ke zip dengan `BANGUN.md` |
-| `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, fon Libertinus Serif (Type 3), koma desimal, `label_panel()`, `tampil()` |
+| `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, huruf teks dan matematika opsi `huruf` (Type 3), `LEBAR` = lebar kolom, koma desimal, `label_panel()`, `tampil()` |
+| `huruf.py` | `_bersama/` | Opsi huruf (`libertinus`, `springer`, `crc`, `stix`), profil penerbit (`seri`, `springer`, `crc`, `wiley`), dan ukuran buku (`b5`, `unesco`, `a5`, `a4`, `6x9`, `7x10`) dari `konfig.json`: menulis blok `>>> huruf`/`>>> profil` di `_quarto.yml` dan `_bersama/*.tex`, menghitung ukuran mono kode/keluaran, `options(width)` di `<buku>/.Rprofile`, gaya Word Windows; dipakai `gaya_gambar.py` dan G-HURUF. `python3 _bersama/huruf.py --daftar` |
 | `catatan.lua` | `_bersama/` | Filter Div `::: {.catatan}`: "*Catatan:*" kecil di bawah tabel/gambar (PDF dan Word) |
 | `bahasa-asing.lua` | `_bersama/` | Frasa miring di `istilah-asing.txt` diberi `lang=en` (pemenggalan Inggris) |
 
@@ -44,7 +45,8 @@ Hal lain yang masih tertanam di kode dan mungkin perlu diubah:
 
 - `harness.py`: batas lebar (`BATAS_LEBAR`, `BATAS_LEBAR_KELUARAN`), judul (`MAKS_KATA_JUDUL_*`), daftar `SLOP_ID`, pola atribusi lembaga (`POLA_ATRIBUSI_MANUAL`: BPS, Stan Development Team, R Core Team — tambahkan lembaga bidang lain), daftar penghubung `POLA_KONJ`, singkatan (`SINGKATAN`).
 - `penggalan.py`: daftar eponim yang tidak dipenggal di `nama_diri()` (Bayes, Poisson, Gauss, …).
-- `gaya_gambar.py`: palet per buku (`PALET_BUKU*`), `LEBAR` (B5 = 5,2 inci), jalur fon `_FON_CALON`.
+- `gaya_gambar.py`: palet per buku (`PALET_BUKU*`); `LEBAR` dihitung dari kolom (B5 seri 4,72 inci); jalur fon dicari dengan `kpsewhich`, lalu `_FON_CALON`.
+- `konfig.json`: `huruf`, `profil`, `ukuran`, `docx_huruf`, `batas_kode`, `batas_keluaran`; sesudah mengubahnya jalankan `python3 _bersama/huruf.py --proyek . --buku <buku>`.
 - `_bersama/preamble.tex` (dari `assets/preamble.tex`): warna seri, sampul, tanda air; blok lebar (`\tambahlebar`) dihitung dari kertas dan margin.
 - `_bersama/doc-class.tex` (dari `assets/doc-class.tex`): modul `testphase` `\DocumentMetadata`; di TeX Live 2024+ pertimbangkan `tagging=on`.
 - `G-GAYA` memakai skill math-article bila terpasang (`SKILL_GAYA`), selain itu pemeriksa cadangan.

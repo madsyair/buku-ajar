@@ -10,6 +10,7 @@ python3 harness/harness.py --buku <buku> --bab bab02 --render   # dengan render 
 python3 harness/harness.py --buku <buku> --bab bab02 --tahap akhir  # sesudah tahap gaya (peran 22–23)
 bash harness/uji_harness.sh                                     # uji regresi harness
 python3 harness/harness.py --tag-pdf <buku>/_book/<buku>.pdf    # G-TAG saja pada PDF jadi
+python3 harness/harness.py --huruf-pdf <pdf>... [--huruf springer]  # G-HURUF saja
 ```
 
 Keluaran: `[LULUS]/[GAGAL] G-…` per gerbang, rincian temuan (baris qmd atau knit.md), dan laporan `harness/laporan/<buku>-<bab>.md` (tabel status, rincian, bukti referensi, WARNING EYD yang perlu ditinjau manual). Kode keluar 0 = semua gerbang lulus. Bab **tidak** dianggap selesai sebelum Status LULUS.
@@ -25,8 +26,8 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-ANGKA | statis | angka desimal, persen, ribuan di prosa dan `fig/tbl-cap` teks diketik tangan; pengecualian `angka-tetap` per bab | angka inline |
 | G-KELUARAN | statis | komentar kode yang menyerupai keluaran (`# 0.21`, `# [1]`) | keluaran asli |
 | G-PYTHON | statis | chunk Python memakai objek `r.` atau menghitung (`numpy.random`, `scipy.stats`, `statsmodels`, `pymc`) | R menghitung, Python menggambar |
-| G-LEBAR-KODE | statis | baris R > 72, Python > 79 karakter | cetak B5 |
-| G-LEBAR-KELUARAN | rajut | keluaran `##` > 78 karakter (`TEPI=1`) | tanpa luapan tepi |
+| G-LEBAR-KODE | statis | baris R > `batas_kode` (bawaan 72), Python > `batas_kode_python` (79) karakter; batas dibaca dari `konfig.json` | kode muat di kolom (ukuran mono dihitung `huruf.py`) |
+| G-LEBAR-KELUARAN | rajut | keluaran `##` > `batas_keluaran` (bawaan 78) karakter (`TEPI=1`); `huruf.py` menulis `options(width = batas_keluaran − 3)` ke `<buku>/.Rprofile` | tanpa luapan tepi |
 | G-BOCOR | rajut | peringatan, galat, repr objek, `fig-cap` yang tak dievaluasi, `Inf/NaN/NA` di prosa | tampilan bersih |
 | G-RUJUKAN | statis | `@fig/@tbl/@eq/@sec` tanpa sasaran; label ganda di buku; label yang tidak pernah dirujuk; kunci sitasi tak ada di bib | rujukan |
 | G-SITASI | statis | sitasi berlokasi (`[@k, hlm. 3]`); nama penulis manual di kalimat bersitasi kurung (nama diambil otomatis dari `pustaka.bib` + konfig `penulis`) | penulis–tahun tanpa lokasi |
@@ -51,6 +52,7 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-LOG | `--render` | log LaTeX akhir (bukan log TikZ) tanpa "Rerun to correct" (hook `lastpage`), "Label(s) may have changed", "Rerun to get cross-references/outlines right", atau label "multiply defined". Obat: `latex-min-runs: 4` di `_quarto.yml` dan `\endhead` longtable di `preamble.tex`. Perlu `latex-clean: false`. Fikstur `uji-buku/log/{rerun,ganda,bersih}.txt` (berakhiran .txt karena `kemas_sumber.py` membuang `*.log`) diuji lewat `masalah_log_latex()` | daftar isi dan rujukan stabil |
 | G-TEPI | `--render` | Overfull hbox > 3 pt di log LaTeX (rumus, tabel, kode, teks), dilaporkan dengan judul bab dan baris .tex; log LuaLaTeX memakai format *Overfull* yang sama dengan XeLaTeX | tanpa luapan tepi |
 | G-TAG | `--render` (`TAG=1`) atau `--tag-pdf` | PDF bertag: `pdfinfo` melaporkan `Tagged: yes`; pohon struktur (`pdfinfo -struct`) berakar Document dan memuat H1, P, dan Figure; `/Lang` = id-ID (pikepdf bila ada). Gagal bila `pdf-engine` bukan `lualatex` atau partial `doc-class.tex` (`\DocumentMetadata`) tidak dipasang. Fikstur: `uji-buku/tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS), sumbernya di `uji-buku/sumber-tag/`. `TAG=0` hanya untuk proyek lama yang belum pindah ke LuaLaTeX, dengan alasan tercatat | PDF bertag (butir 35) |
+| G-HURUF | `--render` (`HURUF=1`) atau `--huruf-pdf` | Setiap huruf tersemat (`pdffonts`, awalan subset dibuang) di PDF buku dan PDF gambar (`*_files/figure-pdf/`, `gambar/`) diawali salah satu prefiks keluarga opsi `huruf` di `konfig.json` (`izin` di `_bersama/huruf.py`: teks, matematika, mono, dan pasangan TikZ-nya); log LaTeX tanpa "Missing character" (`\tracinglostchars=2` di `preamble.tex`). Huruf asing (DejaVu, Inter, STIXGeneral, CMR pada opsi Times) berarti glif jatuh ke huruf cadangan lain. Fikstur: `uji-buku/huruf/huruf-baik.pdf` (LULUS untuk libertinus, GAGAL untuk springer) dan `huruf-asing.pdf` (GAGAL) | satu keluarga huruf (butir 34) |
 
 Pengecualian hanya lewat `harness/pengecualian.json` dan **wajib beralasan**:
 
@@ -159,7 +161,7 @@ Render dijalankan **orkestrator, berurutan** (satu buku sekali jalan, tidak para
 python3 harness/harness.py --buku <buku> --bab <bab-terakhir-diubah> --render
 ```
 
-Setelah render: G-RENDER, G-LOG (log LaTeX akhir stabil, tanpa label ganda), G-TAG (PDF bertag), G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), dan G-PENGGALAN (audit PDF). Sekali per buku editor mengukur panjang baris (median dan persentil-95 karakter per baris prosa dari `pdftotext -layout`, harus 40–70; `aturan-gaya-dan-tampilan.md` bagian 8) dan memastikan `pdffonts` hanya memuat keluarga Libertinus. Sesudah itu editor/pembaca memeriksa tampilan (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
+Setelah render: G-RENDER, G-LOG (log LaTeX akhir stabil, tanpa label ganda), G-TAG (PDF bertag), G-HURUF (huruf tersemat hanya keluarga opsi), G-TEPI (daftar luapan per bab dengan lebar pt dan baris .tex), dan G-PENGGALAN (audit PDF). Sekali per buku editor mengukur panjang baris (median dan persentil-95 karakter per baris prosa dari `pdftotext -layout`, harus 40–70; `aturan-gaya-dan-tampilan.md` bagian 8) (G-HURUF memastikan `pdffonts` hanya memuat keluarga opsi huruf). Sesudah itu editor/pembaca memeriksa tampilan (lihat `agents/09-editor.md`): halaman bab, gambar dan catatan tidak terpisah, label tidak tertimpa, blok kode tidak terbelah, tidak ada "??" rujukan, tanda air dan "Draf revisi ke-N" tampil, paragraf menjorok di PDF dan Word.
 
 ## 7. Batas harness
 

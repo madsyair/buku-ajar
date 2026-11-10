@@ -8,8 +8,11 @@
 %   \halamanhakcipta[<lokasi kode sumber>]{<judul>}{<penulis tanpa gelar>}%
 %     {<tahun>}{<keterangan draf>}{<perangkat penyusun>}
 %
-% Data yang belum ada ditulis "belum ditetapkan", tidak dikarang. Bila keluarga
-% huruf diganti, ganti juga kalimat Fon beserta lisensinya.
+% Data yang belum ada ditulis "belum ditetapkan", tidak dikarang. Kalimat Fon
+% beserta lisensinya (\serifon) ditulis _bersama/huruf.py menurut opsi huruf.
+% >>> huruf
+\providecommand{\serifon}{satu keluarga Libertinus, yaitu Libertinus Serif (teks, judul, dan gambar), Libertinus Math (matematika), dan Libertinus Mono (kode), dengan lisensi SIL Open Font License 1.1}
+% <<< huruf
 
 \providecommand{\LuaLaTeX}{LuaLaTeX}
 \makeatletter
@@ -36,9 +39,7 @@
   Cetakan: belum dicetak (draf, bukan versi terbit)\par
   Penyunting, ilustrator, dan desainer: belum ditetapkan\par
   Disusun dengan #6.\\
-  Fon: satu keluarga Libertinus, yaitu Libertinus Serif (teks, judul, dan
-  gambar), Libertinus Math (matematika), dan Libertinus Mono (kode), dengan
-  lisensi SIL Open Font License 1.1.\par
+  Fon: \serifon.\par
   Lisensi kode: belum ditetapkan\\
   Kode sumber: #1\par
   \endgroup

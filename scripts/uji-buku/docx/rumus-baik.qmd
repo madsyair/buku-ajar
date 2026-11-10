@@ -1,0 +1,17 @@
+# Bab uji rumus Word {#sec-uji}
+
+Rumus sebaris $\hat\theta = \bar{x}$ dan $\sigma^2 > 0$ menjadi persamaan Word.
+
+$$
+\begin{aligned}
+p(\theta \mid y) &\propto p(y \mid \theta)\, p(\theta) \\
+&= \frac{1}{\sqrt{2\pi}} e^{-\theta^2/2}
+\end{aligned}
+$$
+
+| Besaran | Rumus |
+|---|---|
+| rerata | $\frac{1}{n}\sum_i x_i$ |
+| ragam | $\operatorname{Var}(X)$ |
+
+Kode `x$y` dan biaya \$5 bukan rumus.

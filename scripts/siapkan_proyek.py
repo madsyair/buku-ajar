@@ -5,9 +5,9 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
   <proyek>/harness/       harness.py, referensi.py, penggalan.py, cek_rumus.py, kemas_sumber.py,
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
-  <proyek>/_bersama/      gaya_gambar.py, catatan.lua, bahasa-asing.lua,
-                          tikz-preamble.tex, preamble.tex, doc-class.tex,
-                          apa.csl, reference-b5.docx
+  <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua,
+                          tikz-preamble.tex, preamble.tex, doc-class.tex, hak-cipta.tex,
+                          apa.csl, reference-b5.docx, reference-b5-windows.docx
   <proyek>/KEPUTUSAN-RANCANGAN.md, REVISI.md, .gitignore
   <proyek>/<buku>/        _quarto.yml, pustaka.bib, index.qmd, references.qmd,
                           naskah/{00-brief.md, 01-rancangan-rinci.md, keputusan-istilah.md,
@@ -16,7 +16,7 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
 
 Pemakaian:
   python3 <skill>/scripts/siapkan_proyek.py --proyek ~/sumber/seri-x --buku buku1 \
-      --judul "Dasar-Dasar Statistika" --penulis "Nama Penulis"
+      --judul "Dasar-Dasar Statistika" --penulis "Nama Penulis" [--huruf springer --profil springer --ukuran 6x9]
   python3 <skill>/scripts/siapkan_proyek.py --proyek ~/sumber/seri-x --buku kunci-buku1 \
       --judul "Kunci Jawaban dan Pembahasan untuk Pengajar"
 """
@@ -59,6 +59,11 @@ def main():
     ap.add_argument("--judul", required=True)
     ap.add_argument("--penulis", default="Nama Penulis (tanpa gelar)")
     ap.add_argument("--timpa", action="store_true")
+    ap.add_argument("--huruf", help="opsi huruf: libertinus (bawaan), springer, crc, stix")
+    ap.add_argument("--profil", help="profil penerbit: seri (bawaan), springer, crc, wiley")
+    ap.add_argument("--ukuran", help="ukuran buku: b5 (bawaan), unesco, a5, a4, 6x9, 7x10")
+    ap.add_argument("--docx-huruf", choices=["", "windows"],
+                    help="gaya Word huruf Windows (otomatis untuk --huruf springer)")
     a = ap.parse_args()
     P = Path(a.proyek).expanduser().resolve()
     B = P / a.buku
@@ -79,10 +84,10 @@ def main():
     (P / "harness" / "laporan").mkdir(parents=True, exist_ok=True)
 
     # folder bersama
-    for f in ["gaya_gambar.py", "catatan.lua", "bahasa-asing.lua"]:
+    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
     for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
-              "reference-b5.docx", "hak-cipta.tex"]:
+              "reference-b5.docx", "reference-b5-windows.docx", "hak-cipta.tex"]:
         salin(ASET / f, P / "_bersama" / f, t)
 
     # dokumen proyek
@@ -118,6 +123,31 @@ def main():
     (N / "03-kerangka").mkdir(parents=True, exist_ok=True)
     (N / "ulasan").mkdir(parents=True, exist_ok=True)
     (P / "lampiran-kode" / a.buku).mkdir(parents=True, exist_ok=True)
+
+    # Opsi huruf dan profil: satu kunci di harness/konfig.json, lalu blok
+    # bertanda di _quarto.yml dan _bersama/*.tex ditulis ulang (huruf.py).
+    import importlib.util
+    spek = importlib.util.spec_from_file_location("huruf", SKRIP / "huruf.py")
+    huruf = importlib.util.module_from_spec(spek)
+    spek.loader.exec_module(huruf)
+    kb = P / "harness" / "konfig.json"
+    k = json.loads(kb.read_text(encoding="utf-8"))
+    for kunci, nilai in [("huruf", a.huruf), ("profil", a.profil), ("ukuran", a.ukuran),
+                         ("docx_huruf", a.docx_huruf)]:
+        if nilai is not None:
+            k[kunci] = nilai
+    k.setdefault("huruf", huruf.BAWAAN)
+    k.setdefault("profil", huruf.PROFIL_BAWAAN)
+    k.setdefault("docx_huruf", "")
+    k.setdefault("ukuran", huruf.UKURAN_BAWAAN)
+    huruf.opsi(k["huruf"])
+    huruf.profil(k["profil"])
+    huruf.ukuran(k["ukuran"])
+    kb.write_text(json.dumps(k, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    for f in huruf.terapkan(P, [a.buku]):
+        print(f"  huruf: {f}")
+    print(f"  huruf {k['huruf']}, profil {k['profil']}, ukuran {k['ukuran']}, "
+          f"Word {huruf.nama_docx(k['huruf'], k['profil'], k['docx_huruf'], k['ukuran'])[0]}")
     print("Selesai. Langkah berikut: isi naskah/00-brief.md, sesuaikan harness/konfig.json, "
           "lalu jalankan: bash harness/uji_harness.sh")
 

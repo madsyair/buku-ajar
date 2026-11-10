@@ -65,6 +65,37 @@ if command -v pdfinfo > /dev/null; then
 else
   echo "dilewati: G-TAG (pdfinfo/poppler-utils tidak terpasang)"
 fi
+# G-HURUF: huruf tersemat harus keluarga opsi. huruf-baik.pdf (gaya_gambar,
+# Libertinus) LULUS untuk libertinus dan GAGAL untuk springer; huruf-asing.pdf
+# (matplotlib bawaan: DejaVu Sans + Inter sebagai cadangan glif) GAGAL.
+if command -v pdffonts > /dev/null; then
+  for kasus in "huruf-baik libertinus LULUS" "huruf-baik springer GAGAL" "huruf-asing libertinus GAGAL"; do
+    set -- $kasus
+    if python3 harness/harness.py --huruf-pdf harness/uji-buku/huruf/$1.pdf --huruf $2 > /dev/null 2>&1; then
+      hasil=LULUS
+    else
+      hasil=GAGAL
+    fi
+    if [ "$hasil" = "$3" ]; then echo "benar: G-HURUF $1 ($2) $hasil"; else echo "SALAH: G-HURUF $1 ($2) seharusnya $3"; status=1; fi
+  done
+else
+  echo "dilewati: G-HURUF (pdffonts/poppler-utils tidak terpasang)"
+fi
+# G-DOCX-RUMUS dan G-DOCX pada DOCX fikstur (dibuat Pandoc dari reference-b5.docx):
+# rumus-baik.docx (5 rumus OMML dari rumus-baik.qmd) LULUS; rumus-gagal.docx (TeX
+# mentah di teks, gambar beralt "rumus") GAGAL; docx-baik.docx LULUS; docx-gagal.docx
+# ("??" dan @fig- mentah) GAGAL.
+for kasus in "rumus-baik --docx-rumus LULUS" "rumus-gagal --docx-rumus GAGAL" \
+             "docx-baik --docx-cek LULUS" "docx-gagal --docx-cek GAGAL"; do
+  set -- $kasus
+  tambahan=""; [ "$2" = --docx-rumus ] && tambahan="--sumber harness/uji-buku/docx/rumus-baik.qmd"
+  if python3 harness/harness.py $2 harness/uji-buku/docx/$1.docx $tambahan > /dev/null 2>&1; then
+    hasil=LULUS
+  else
+    hasil=GAGAL
+  fi
+  if [ "$hasil" = "$3" ]; then echo "benar: ${2#--} $1 $hasil"; else echo "SALAH: ${2#--} $1 seharusnya $3"; status=1; fi
+done
 # G-LN: \log tanpa basis di rumus prosa GAGAL (babln); babbaik memuat \ln,
 # \log_{10}, kode log() dan R inline log() dan harus bersih.
 for bab in babln babbaik; do

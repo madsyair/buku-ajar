@@ -6,7 +6,7 @@
 invisible(Sys.setlocale("LC_CTYPE", "C.UTF-8"))
 angka <- function(x, d = 2) {
   sub("^-", "−", formatC(x, format = "f", digits = d,
-                               decimal.mark = ",", big.mark = "."))
+                         decimal.mark = ",", big.mark = "."))
 }
 persen <- function(x, d = 1) paste0(angka(100 * x, d), "%")
 dir.create("fit", showWarnings = FALSE)
@@ -18,7 +18,8 @@ rubrik <- function(kolom, unsur, skor) {
   knitr::kable(data.frame(
     U = c(unsur, "**Total**"),
     S = c(skor, paste0("**", sum(skor), "**"))),
-    col.names = c(kolom, "Skor"), align = "lr", row.names = FALSE)
+    col.names = c(kolom, "Skor"), align = "lr",
+    row.names = FALSE)
 }
 # data dan objek bab induk dibangun ulang di sini (tanpa source())
 ```

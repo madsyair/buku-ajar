@@ -4,6 +4,10 @@
 project:
   type: book
   output-dir: _book
+  # Fon rumus Word (m:mathFont) dipasang sesudah render: Pandoc tidak menyalin
+  # m:mathPr dari reference-doc (G-DOCX-RUMUS memeriksanya).
+  post-render:
+    - ../_bersama/huruf.py --pasca-render
 
 book:
   title: "JUDUL BUKU"            # judul saja; TANPA subtitle (keputusan penulis, G-HALJUDUL)
@@ -58,22 +62,32 @@ format:
     pdf-engine: lualatex              # PDF bertag; XeLaTeX tidak mendukung tagging
     template-partials:
       - ../_bersama/doc-class.tex     # \DocumentMetadata sebelum \documentclass
-    geometry:                         # kolom prosa ±118 mm: 40–70 karakter per baris
+    # Ukuran: kunci "ukuran" (b5, unesco, a5, a4, 6x9, 7x10) dan "profil" (seri,
+    # springer, crc, wiley) di harness/konfig.json. Bawaan: B5, 12 pt, kolom
+    # prosa 120 mm (40–70 karakter per baris).
+    # >>> profil: seri, ukuran b5 (dibangkitkan _bersama/huruf.py)
+    # kolom 120.0 mm; mono kode 7.2 pt (72 karakter), keluaran 6.8 pt (78 karakter)
+    geometry:
       - paperwidth=176mm
       - paperheight=250mm
-      - inner=29mm
-      - outer=29mm
+      - inner=28mm
+      - outer=28mm
       - top=22mm
       - bottom=24mm
-    # Satu keluarga huruf: Libertinus (teks, judul, rumus, kode; juga gambar,
-    # TikZ, sampul, dan reference-b5.docx). sansfont sengaja Libertinus Serif.
+    fontsize: 12pt
+    linestretch: 1.1
+    # <<< profil
+    # Huruf: satu kunci "huruf" di harness/konfig.json (libertinus, springer,
+    # crc, stix); blok di bawah ditulis ulang oleh _bersama/huruf.py, jangan
+    # disunting tangan. Bawaan Libertinus: satu keluarga untuk teks, judul,
+    # rumus, kode, gambar, TikZ, dan Word; sansfont sengaja Libertinus Serif.
+    # >>> huruf: libertinus (dibangkitkan _bersama/huruf.py dari harness/konfig.json)
     mainfont: Libertinus Serif
     sansfont: Libertinus Serif
     mathfont: Libertinus Math
     monofont: Libertinus Mono
     monofontoptions: [Scale=0.8]
-    fontsize: 12pt
-    linestretch: 1.1
+    # <<< huruf
     callout-icon: false               # tanpa ikon FontAwesome: satu keluarga huruf
     code-block-bg: "#F4F6F5"          # dipakai blok lebar kode (preamble.tex)
     code-block-border-left: "#0F3D3E"
@@ -82,7 +96,7 @@ format:
     toc-depth: 2
     lof: false
     fig-format: pdf
-    fig-width: 5.2
+    fig-width: 4.7                    # lebar kolom B5 120 mm; sesuaikan untuk ukuran lain
     fig-height: 3.2
     fig-pos: "H"                      # gambar dan tabel tidak mengambang
     tbl-pos: "H"
@@ -98,7 +112,8 @@ format:
     # nomor halaman salah). Empat putaran: awal, indeks, makeindex, lalu stabil.
     latex-min-runs: 4
   docx:
-    reference-doc: ../_bersama/reference-b5.docx   # Body Text/First Paragraph: indent 0,75 cm, spasi 0
+    callout-icon: false               # ikon kotak di Word adalah gambar kecil (G-DOCX)
+    reference-doc: ../_bersama/reference-b5.docx   # huruf.py: springer atau docx_huruf "windows" -> reference-b5-windows.docx
     toc: true
     toc-depth: 2
     fig-format: png

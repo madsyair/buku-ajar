@@ -28,11 +28,13 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
 3. **Editor memutuskan** atas temuan yang bertentangan (pemula minta penjelasan tambahan vs mahir minta ringkas) dan menyusun daftar kerja berurutan prioritas: MAYOR ketepatan → MAYOR keterbacaan → MINOR.
 4. **Perbaikan** oleh penulis bab atau penyunting (bukan peninjau, bukan agen yang menulis laporan), dengan instruksi tertulis (`assets/templat-instruksi-perbaikan-pembaca.md`). Setiap temuan isi diperiksa dulu seperti reviewer isi (hitung ulang, registri); temuan yang keliru ditulis "tidak diterapkan" beserta bukti. Lalu harness sampai LULUS, lalu bagian Tindak lanjut di setiap berkas ulasan. MINOR yang butuh contoh baru atau keputusan penulis ditunda dan masuk "Usulan untuk diputuskan penulis" (bagian di bawah).
 5. **Telaah pakar buku ajar** (`agents/21-penelaah-pakar-buku-ajar.md`, T2): setelah perbaikan putaran ulasan, penelaah menilai kelayakan bab sebagai bab buku ajar (materi, penyajian, kebahasaan, desain) dan memberi rekomendasi; temuannya masuk daftar kerja editor seperti temuan lain. Telaah rancangan (T1) dijalankan sebelum bab pertama ditulis, dan telaah buku utuh (T3) setelah render semua bab.
-6. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
+6. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN/G-HURUF dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
+7. **Tinjau dan perbaiki keluaran Word** (orkestrator, sesudah render): jalankan gerbang Word (G-DOCX-RUMUS, G-DOCX; ikut `--render`), lalu tinjau DOCX dengan daftar periksa `assets/templat-tinjauan-docx.md` dan tulis temuannya ke `naskah/ulasan/tinjauan-docx-<tanggal>.md`. Perbaiki **di sumber** (reference-doc lewat `_bersama/huruf.py`, filter Lua, `.qmd`, `_quarto.yml`), bukan di berkas DOCX, render ulang, dan ulangi sampai bersih. **Batas 3 putaran**; temuan yang tersisa sesudah putaran ke-3 dicatat dan dieskalasi ke penulis.
 
 **Kriteria berhenti** (semua harus terpenuhi):
 
 - harness LULUS dengan `--render` (semua gerbang aktif, termasuk G-LOG);
+- daftar periksa DOCX bersih atau sisa temuannya tercatat (maks. 3 putaran tinjau-perbaiki Word);
 - laporan pembaca pemula independen bab itu ada dan setiap temuannya bertindak lanjut;
 - rekomendasi penelaah pakar buku ajar (21) untuk bab minimal "layak dengan perbaikan kecil";
 - tidak ada temuan MAYOR terbuka di berkas ulasan mana pun (setiap MAYOR punya tindak lanjut "diperbaiki" atau keputusan penulis);

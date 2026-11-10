@@ -13,17 +13,27 @@
 % memakai huruf teks tebal, bukan huruf sans.
 \setkomafont{disposition}{\normalfont\bfseries\color{seriutama}}
 \addtokomafont{chapter}{\Huge}
-% Glif yang tidak ada di Libertinus Mono (mis. huruf Yunani di kode) diambil
-% dari Libertinus Serif (fallback didefinisikan di _bersama/doc-class.tex).
+% Glif yang tidak ada di huruf mono (mis. huruf Yunani di kode) diambil dari
+% huruf teks/matematika opsi (fallback didefinisikan di _bersama/doc-class.tex).
+% Blok ditulis ulang _bersama/huruf.py; seri_mono_nama dipakai pemutus kode
+% sebaris di bawah.
+% >>> huruf
 \ifdefined\directlua\setmonofont{Libertinus Mono}[Scale=0.8,RawFeature={fallback=serimono}]\fi
+\ifdefined\directlua\directlua{seri_mono_nama = "LibertinusMono"}\fi
+% <<< huruf
+% Glif yang tidak ada di huruf mana pun dicatat di log ("Missing character"),
+% diperiksa G-HURUF.
+\tracinglostchars=2
 
-% Blok lebar: kode, keluaran, dan gambar boleh lebih lebar daripada kolom
-% prosa (kolom prosa dipersempit agar baris teks 40–70 karakter), tetapi
-% tetap di dalam batas 18 mm dari tepi kertas. Di dalam kotak atau daftar
+% Semua blok di dalam kolom teks (keputusan seri 2026-11-07): kode, keluaran,
+% rumus tampilan, gambar, dan tabel tidak melebihi kolom prosa; ukuran huruf
+% mono dihitung _bersama/huruf.py agar batas_kode/batas_keluaran karakter muat.
+% \tambahlebar > 0 (mis. \setlength{\tambahlebar}{11mm} sesudah preamble ini)
+% menghidupkan kembali blok lebar; di dalam kotak atau daftar
 % (\linewidth < \textwidth) blok tidak dilebarkan.
 \newlength{\tambahlebar}
 \newlength{\tambahini}
-\AtBeginDocument{\setlength{\tambahlebar}{\dimexpr(\paperwidth-36mm-\textwidth)/2\relax}}
+\setlength{\tambahlebar}{0pt}
 % Tabel panjang belum didukung tagging LaTeX 2023: isinya tidak ditag agar
 % struktur dokumen tetap sah (lihat KEPUTUSAN-RANCANGAN.md proyek).
 \providecommand{\seritagstop}{\ifdefined\tagstop\tagstop\fi}
@@ -32,11 +42,17 @@
   \ifdim\linewidth<\textwidth\setlength{\tambahini}{0pt}\fvset{breaklines,breakanywhere}%
   \else\setlength{\tambahini}{\tambahlebar}\fi}
 
-% Ukuran huruf blok kode dan keluaran: Libertinus Mono 7,8 pt (Scale 0,8 di
-% _quarto.yml dikalikan 9,75 pt) agar 72 karakter kode dan 78 karakter
-% keluaran muat tanpa dipenggal.
-\newcommand{\kodekecil}{\fontsize{9.75pt}{11.6pt}\selectfont}
-% Di blok lebar, kode (maks. 72 karakter) dan keluaran (maks. 78) muat utuh.
+% Ukuran huruf blok kode dan keluaran (nominal dikalikan Scale huruf mono),
+% dihitung _bersama/huruf.py dari lebar kolom (ukuran buku, profil) dan batas
+% baris di konfig.json. B5 seri, Libertinus Mono (lebar glif 0,64 em): kode
+% 7,2 pt sehingga 72 karakter (331,8 pt) muat di kotak kode selebar kolom 120 mm;
+% keluaran 6,8 pt sehingga 78 karakter (339,5 pt) muat di kolom (340,2 pt).
+% >>> profil
+% b5, profil seri: kolom 120.0 mm; kode 7.2 pt, keluaran 6.8 pt (nominal x Scale 0.8)
+\newcommand{\kodekecil}{\fontsize{9.0pt}{10.8pt}\selectfont}
+\newcommand{\keluarankecil}{\fontsize{8.5pt}{10.2pt}\selectfont}
+% <<< profil
+% Kode (maks. batas_kode karakter) dan keluaran (maks. batas_keluaran) muat utuh.
 % Di blok sempit (kotak, daftar) baris panjang dipenggal agar tidak melewati
 % tepi; breaklines hanya dipakai di sana karena memecah tag paragraf PDF.
 \usepackage{fvextra}
@@ -46,14 +62,15 @@
   % Keluaran R (verbatim) memakai blok lebar yang sama. Didefinisikan di sini
   % karena tcolorbox memuat paket verbatim yang menimpa definisi di preamble.
   \renewenvironment{verbatim}{\VerbatimEnvironment\aturtambah
-    \begin{Verbatim}[fontsize=\kodekecil,
+    \begin{Verbatim}[fontsize=\keluarankecil,
       xleftmargin=-\tambahini,xrightmargin=-\tambahini]}%
     {\end{Verbatim}}%
-  % Kotak kode Quarto dibungkus blok lebar
+  % Kotak kode Quarto; bantalan kiri-kanan kecil (garis 2 pt + 1,4 mm + 0,6 mm)
+  % agar batas_kode karakter muat (huruf.py: BANTALAN_KODE)
   \ifdefined\Shaded
-    \renewenvironment{Shaded}{\aturtambah\begin{tcolorbox}[borderline west={3pt}{0pt}{shadecolor},
+    \renewenvironment{Shaded}{\aturtambah\begin{tcolorbox}[borderline west={2pt}{0pt}{shadecolor},
       boxrule=0pt, breakable, colback={codebgcolor}, enhanced, frame hidden, sharp corners,
-      left=2mm, right=1mm, top=1mm, bottom=1mm, boxsep=0pt,
+      left=1.4mm, right=0.6mm, top=1mm, bottom=1mm, boxsep=0pt,
       grow to left by=\tambahini, grow to right by=\tambahini]}{\end{tcolorbox}}%
   \fi
   % Gambar diperkecil hanya bila lebih lebar daripada blok lebar
@@ -184,7 +201,7 @@
 % Kode sebaris (\texttt) boleh dipatahkan sesudah _ / . < > = [ ( , tanpa
 % tanda hubung, agar nama fungsi dan berkas panjang tidak melewati tepi kolom.
 % Dikerjakan di Lua (LuaLaTeX): penalti 200 disisipkan sesudah karakter itu
-% bila hurufnya Libertinus Mono dan karakter berikutnya masih huruf kode.
+% bila hurufnya huruf mono opsi (seri_mono_nama) dan karakter berikutnya masih huruf kode.
 \ifdefined\directlua
 \directlua{
   local patah = {[0x5F]=true, [0x2F]=true, [0x2E]=true, [0x3C]=true, [0x3E]=true,
@@ -194,7 +211,7 @@
   local function ismono(f)
     if mono[f] == nil then
       local d = font.getfont(f)
-      mono[f] = d ~= nil and d.name ~= nil and string.find(d.name, "LibertinusMono", 1, true) ~= nil
+      mono[f] = d ~= nil and d.name ~= nil and string.find(d.name, seri_mono_nama or "LibertinusMono", 1, true) ~= nil
     end
     return mono[f]
   end
