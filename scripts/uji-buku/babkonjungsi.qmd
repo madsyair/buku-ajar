@@ -1,0 +1,5 @@
+# Bab konjungsi {#sec-konjungsi}
+
+Rata-rata posterior dihitung atas semua orang di data, seperti yang dikerjakan Gelman dkk. pada contoh mereka. Model diperiksa dengan residu berkelompok, karena residu satu orang tidak terbaca.
+
+Beberapa prior, seperti prior normal dengan simpangan baku 0,5, karena bentuknya sederhana dan mudah ditafsirkan pembaca, tetap dicoba di bab ini. Prior lain, mis. prior Student-t, dipakai bila datanya berekor tebal. Jadi, bila prior terlalu lebar dibanding skala data, peluang menumpuk di 0 dan 1.

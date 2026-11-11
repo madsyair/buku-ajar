@@ -15,7 +15,8 @@ status=0
 # Format: fikstur:gerbang[:R]  (:R = gerbang butuh R + knitr)
 GAGAL="babgagal:G-ANGKA babbahasa:G-EYD:R babbocor:G-BOCOR:R babsitasi:G-REFERENSI
 babcap:G-BOCOR:R babgayasitasi:G-SITASI babinf:G-BOCOR:R babjudul:G-JUDUL
-bablarangan:G-LARANGAN babln:G-LN babrumus:G-RUMUS babstruktur:G-STRUKTUR"
+bablarangan:G-LARANGAN babln:G-LN babrumus:G-RUMUS babstruktur:G-STRUKTUR
+babkonjungsi:G-KONJUNGSI"
 ADA_R=0; command -v Rscript > /dev/null && Rscript -e 'library(knitr)' > /dev/null 2>&1 && ADA_R=1
 for butir in $GAGAL; do
   bab=${butir%%:*}; sisa=${butir#*:}; gerbang=${sisa%%:*}
@@ -49,6 +50,11 @@ keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babbaik --ta
 if echo "$keluaran" | grep -q "\[GAGAL\] G-\(GAYA-AJAR\|STRUKTUR\|RUMUS\)"; then
   echo "SALAH: babbaik seharusnya lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; status=1
 else echo "benar: babbaik lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; fi
+# G-KONJUNGSI: "seperti" di kalimat sebelumnya tidak boleh meloloskan ", karena" (baris 3);
+# aposisi "seperti … 0,5,", "mis.", dan "Jadi, bila …" tetap sah (baris 5)
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+harness.gerbang_konjungsi(pathlib.Path('harness/uji-buku/babkonjungsi.qmd'), harness.muat_pengecualian())" | grep -o "baris [0-9]*:" | tr '\n' ' ')
+if [ "$temuan" = "baris 3: " ]; then echo "benar: konjungsi lintas kalimat"; else echo "SALAH: konjungsi seharusnya hanya baris 3 (dapat: $temuan)"; status=1; fi
 # G-TAG (PDF bertag) diuji pada PDF fikstur tanpa render: tag-tanpa.pdf
 # (pdfLaTeX/LuaLaTeX tanpa DocumentMetadata) GAGAL, tag-baik.pdf LULUS.
 if command -v pdfinfo > /dev/null; then

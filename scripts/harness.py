@@ -359,6 +359,26 @@ POLA_KONJ = re.compile(
     r"|sebelum(?!\s+itu|nya)|sejak(?!\s+itu)|selama(?!\s+itu))\b")
 
 
+# Singkatan bertitik yang bukan akhir kalimat (selain SINGKATAN di G-PARAGRAF).
+SINGKATAN_KONJ = ["mis.", "misal.", "dkk.", "dll.", "dsb.", "dst.", "hlm.", "s.d.", "vs.", "bdk.",
+                  "a.l.", "sbb.", "No.", "no.", "Vol.", "vol.", "ed.", "Ed.", "Prof.", "Dr.", "et al.",
+                  "e.g.", "i.e.", "cf.", "Jl.", "Bab.", "Gbr."]
+POLA_AKHIR_KALIMAT = re.compile(r"[.!?][\"”’)*_]*\s+(?=[\"“‘(*_]*[A-Z0-9])")
+
+
+def _awal_kalimat_konj(teks, posisi):
+    """Indeks awal kalimat yang memuat teks[posisi]. Titik pada singkatan (dkk., mis.)
+    dan angka (1.000; desimal seri memakai koma, 0,5) bukan batas kalimat."""
+    t = teks[:posisi]
+    for s in sorted(set(SINGKATAN_KONJ + SINGKATAN), key=len, reverse=True):
+        t = re.sub(r"(?<![\w.])" + re.escape(s), lambda m: m.group(0).replace(".", "§"), t)
+    t = re.sub(r"(?<=\d)\.(?=\d)", "§", t)
+    awal = 0
+    for m in POLA_AKHIR_KALIMAT.finditer(t):
+        awal = m.end()
+    return awal
+
+
 def gerbang_konjungsi(qmd, peng):
     prosa, _ = pilah_qmd(qmd.read_text(encoding="utf-8"))
     abaikan = peng.get("konjungsi-abaikan", [])
@@ -376,11 +396,16 @@ def gerbang_konjungsi(qmd, peng):
             sisip = re.match(r"([^,.;:]*),", sisa)
             if sisip and len(sisip.group(1).split()) <= 3:
                 continue  # keterangan sisipan, mis. ", bila perlu,"
-            segmen = re.split(r"[,;:(]", bersih[:m.start()])
+            awal = _awal_kalimat_konj(bersih, m.start())
+            segmen = re.split(r"[;:(]|,(?!\d)", bersih[awal:m.start()])  # 0,5 bukan pemisah
             if len(segmen) >= 2 and re.match(
                     r"\s*(?:bukan|misalnya|yaitu|yakni|seperti|termasuk|terutama|khususnya|antara lain"
                     r"|kecuali|selain|tidak hanya|baik)\b", segmen[-1]):
                 continue  # koma menutup sisipan/aposisi (EYD V B.13)
+            if len(segmen) == 1 and re.fullmatch(
+                    r"\s*[*_]*(?:Jadi|Namun|Akibatnya|Artinya|Maka|Sebaliknya|Selain itu|Oleh karena itu"
+                    r"|Karena itu|Dengan demikian|Dengan kata lain|Misalnya|Contohnya)[*_]*\s*", segmen[0]):
+                continue  # "Jadi, bila …": anak kalimat mendahului induk di awal kalimat
             konteks = bersih[max(0, m.start() - 50):m.end() + 30]
             if any(a in bersih for a in abaikan):
                 continue
