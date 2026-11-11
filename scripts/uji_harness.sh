@@ -104,9 +104,13 @@ for kasus in "rumus-baik --docx-rumus LULUS" "rumus-gagal --docx-rumus GAGAL" \
 done
 # G-DOCX, fitur otomatis Word (word-otomatis.lua; fikstur dari uji-buku/docx/buat_fikstur.py):
 # setiap fikstur GAGAL dengan pesan pemeriksaannya sendiri; docx-baik di atas LULUS.
+# Sitasi Zotero (zotero-word.lua): docx-baik memuat 2 bidang ZOTERO_ITEM, 1 ZOTERO_BIBL,
+# dan ZOTERO_PREF_1-2; docx-zotero (JSON rusak) dan docx-tanpa-otomatis (sitasi statis
+# citeproc biasa) GAGAL.
 for kasus in "docx-tanpa-otomatis|bidang SEQ Persamaan" "docx-ref|menunjuk bookmark yang tidak ada" \
              "docx-daftar|TOC Daftar Gambar" "docx-hakcipta|hak cipta sesudah daftar isi" \
-             "docx-alt|tanpa teks alternatif" "docx-margin|seharusnya 28/28/22/24 mm"; do
+             "docx-alt|tanpa teks alternatif" "docx-margin|seharusnya 28/28/22/24 mm" \
+             "docx-zotero|JSON ZOTERO_ITEM tidak sah" "docx-tanpa-otomatis|sitasi statis"; do
   f=${kasus%%|*}; pesan=${kasus#*|}
   keluaran=$(python3 harness/harness.py --docx-cek harness/uji-buku/docx/$f.docx 2>&1)
   if [ $? -ne 0 ] && printf '%s' "$keluaran" | grep -qF "$pesan"; then

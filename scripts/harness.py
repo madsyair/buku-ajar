@@ -48,7 +48,9 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-DOCX       Word: ukuran halaman dan margin = ukuran buku, gambar di dalam bidang teks dan
                berteks alternatif, tanpa ikon kotak, tanpa "??"/@rujukan mentah, judul Heading1
                bernomor; dengan word-otomatis.lua: SEQ = objek bernomor, REF ke bookmark yang ada,
-               TOC isi/gambar/tabel, hak cipta sebelum daftar isi (setelah --render; DOCX=0)
+               TOC isi/gambar/tabel, hak cipta sebelum daftar isi; dengan zotero-word.lua: setiap
+               sitasi bidang ADDIN ZOTERO_ITEM berJSON sah (itemData tersemat, plainCitation =
+               hasil), tanpa sitasi statis, satu ZOTERO_BIBL, ZOTERO_PREF_n (setelah --render; DOCX=0)
   G-HURUF      semua huruf tersemat di PDF buku dan PDF gambar termasuk keluarga opsi
                "huruf" di konfig.json (_bersama/huruf.py; setelah --render; HURUF=0 mematikan)
 
@@ -919,7 +921,107 @@ def _teks_xml(par):
     return "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par))
 
 
-def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True):
+SKEMA_CSL_CITATION = "https://github.com/citation-style-language/schema/raw/master/csl-citation.json"
+
+
+def bidang_word(document_xml, statis=None):
+    """Bidang kompleks Word (fldChar begin/separate/end, termasuk bersarang)
+    sebagai daftar (kode, teks hasil). Bila `statis` berupa list, tautan
+    sitasi (w:hyperlink ke bookmark ref-<kunci>) di luar bidang Zotero dicatat."""
+    import xml.etree.ElementTree as ET
+    W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    tumpukan, hasil_bidang = [], []
+    for el in ET.fromstring(document_xml).iter():
+        if el.tag == W + "hyperlink" and statis is not None \
+                and (el.get(W + "anchor") or "").startswith("ref-") \
+                and not any("ZOTERO_" in "".join(f["kode"]) for f in tumpukan):
+            statis.append(el.get(W + "anchor"))
+        if el.tag == W + "fldChar":
+            jenis = el.get(W + "fldCharType")
+            if jenis == "begin":
+                tumpukan.append({"kode": [], "hasil": [], "tahap": "kode"})
+            elif jenis == "separate" and tumpukan:
+                tumpukan[-1]["tahap"] = "hasil"
+            elif jenis == "end" and tumpukan:
+                f = tumpukan.pop()
+                teks = "".join(f["hasil"])
+                hasil_bidang.append(("".join(f["kode"]), teks))
+                if tumpukan and tumpukan[-1]["tahap"] == "hasil":
+                    tumpukan[-1]["hasil"].append(teks)
+        elif el.tag == W + "instrText" and tumpukan:
+            tumpukan[-1]["kode"].append(el.text or "")
+        elif el.tag in (W + "t", W + "tab") and tumpukan and tumpukan[-1]["tahap"] == "hasil":
+            tumpukan[-1]["hasil"].append(el.text or "" if el.tag == W + "t" else "\t")
+    return hasil_bidang
+
+
+def masalah_zotero(docx):
+    """Sitasi Zotero hidup (scripts/zotero-word.lua): setiap sitasi bidang
+    ADDIN ZOTERO_ITEM CSL_CITATION dengan JSON sah (citationID, schema,
+    plainCitation = teks hasil bidang, citationItems dengan uris dan itemData
+    berjudul/berjenis/berpenulis/bertahun), tanpa tautan sitasi ref-<kunci>
+    di luar bidang Zotero, tepat satu ZOTERO_BIBL, dan ZOTERO_PREF_1..n
+    (<= 255 karakter) di docProps/custom.xml yang tersambung menjadi
+    <data data-version="3"> dengan <style id=...>. Dokumen tanpa sitasi lulus."""
+    import zipfile
+    import xml.etree.ElementTree as ET
+    with zipfile.ZipFile(docx) as z:
+        statis = []
+        semua = bidang_word(z.read("word/document.xml"), statis)
+        custom = z.read("docProps/custom.xml").decode("utf-8") if "docProps/custom.xml" in z.namelist() else ""
+    masalah, item, bibl = [], 0, 0
+    if statis:
+        masalah.append(f"{len(statis)} sitasi statis (tautan ke ref-… di luar bidang Zotero), mis. "
+                       f"{', '.join(sorted(set(statis))[:5])}: pasang zotero-word.lua (at: post-render)")
+    for kode, teks in semua:
+        k = kode.strip()
+        if k.startswith("ADDIN ZOTERO_ITEM"):
+            item += 1
+            try:
+                d = json.loads(k[k.index("{"): k.rindex("}") + 1])
+            except ValueError as e:
+                masalah.append(f"JSON ZOTERO_ITEM tidak sah: {e}: {k[:70]}")
+                continue
+            p = d.get("properties", {})
+            if not d.get("citationID") or d.get("schema") != SKEMA_CSL_CITATION:
+                masalah.append(f"ZOTERO_ITEM tanpa citationID/schema: {k[:70]}")
+            if p.get("plainCitation") != teks:
+                masalah.append(f"plainCitation {p.get('plainCitation')!r} != hasil bidang {teks!r}")
+            if not d.get("citationItems"):
+                masalah.append("ZOTERO_ITEM tanpa citationItems")
+            for b in d.get("citationItems", []):
+                it = b.get("itemData", {})
+                if not b.get("uris") or not it.get("title") or not it.get("type") \
+                        or not (it.get("author") or it.get("editor")) or not it.get("issued"):
+                    masalah.append(f"citationItem {b.get('id')} tanpa uris/title/type/author/issued")
+        elif k.startswith("ADDIN ZOTERO_BIBL"):
+            bibl += 1
+            if not k.endswith("CSL_BIBLIOGRAPHY") or not teks.strip():
+                masalah.append("ZOTERO_BIBL tanpa CSL_BIBLIOGRAPHY atau hasil kosong")
+    if not item:
+        return masalah
+    if bibl != 1:
+        masalah.append(f"{bibl} bidang ZOTERO_BIBL (seharusnya 1)")
+    potong = {}
+    if custom:
+        for prop in ET.fromstring(custom):
+            m = re.fullmatch(r"ZOTERO_PREF_(\d+)", prop.get("name", ""))
+            if m:
+                potong[int(m.group(1))] = "".join(prop.itertext())
+    if not potong or sorted(potong) != list(range(1, len(potong) + 1)) \
+            or any(len(v) > 255 for v in potong.values()):
+        masalah.append("ZOTERO_PREF_1.. (maks. 255 karakter) tidak ada atau tidak berurutan di docProps/custom.xml")
+    else:
+        try:
+            d = ET.fromstring("".join(potong[i] for i in sorted(potong)))
+            if d.get("data-version") != "3" or d.find("style") is None or not d.find("style").get("id"):
+                masalah.append("ZOTERO_PREF tanpa data-version 3 atau <style id>")
+        except ET.ParseError as e:
+            masalah.append(f"ZOTERO_PREF bukan XML: {e}")
+    return masalah
+
+
+def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True, zotero=True):
     """Pemeriksaan otomatis keluaran Word (daftar periksa
     assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, margin =
     margin ukuran di konfig.json, gambar tidak melebihi bidang teks dan
@@ -928,7 +1030,8 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=
     bila number-sections. otomatis=True (word-otomatis.lua terpasang): jumlah
     bidang SEQ Gambar/Tabel/Persamaan = jumlah objek bernomor, setiap REF
     menunjuk bookmark yang ada, bidang TOC daftar isi/gambar/tabel ada, dan
-    halaman hak cipta (gaya "Hak Cipta") sebelum daftar isi."""
+    halaman hak cipta (gaya "Hak Cipta") sebelum daftar isi. zotero=True
+    (zotero-word.lua terpasang): masalah_zotero."""
     import zipfile
     with zipfile.ZipFile(docx) as z:
         xml = z.read("word/document.xml").decode("utf-8", errors="replace")
@@ -986,6 +1089,8 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=
         masalah.append("tidak ada judul bergaya Heading1")
     if bernomor and not any(g == "Heading1" and re.match(r"\d+\.?\s", s) for g, s in judul):
         masalah.append("judul bab tidak bernomor di Word (number-sections)")
+    if zotero:
+        masalah += masalah_zotero(docx)
     if not otomatis:
         return masalah
     # --- fitur otomatis Word (scripts/word-otomatis.lua)
@@ -1021,7 +1126,8 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=
     return masalah
 
 
-def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True):
+def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True,
+                 zotero=True):
     if docx is None:
         daftar = list((buku / "_book").glob("*.docx"))
         if not daftar:
@@ -1035,7 +1141,8 @@ def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False, margin_mm=None
         yml = (buku / "_quarto.yml").read_text(encoding="utf-8")
         bernomor = bool(re.search(r"^number-sections:\s*true", yml, flags=re.M))
         otomatis = "word-otomatis.lua" in yml
-    masalah = masalah_docx(docx, ukuran_mm, bernomor, margin_mm, otomatis)
+        zotero = "zotero-word.lua" in yml
+    masalah = masalah_docx(docx, ukuran_mm, bernomor, margin_mm, otomatis, zotero)
     catat("G-DOCX", not masalah, "\n".join(sorted(set(masalah))[:40]))
 
 

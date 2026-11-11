@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Bangun ulang fikstur G-DOCX (fitur otomatis Word) dengan Pandoc dan Pillow:
-  docx-baik.docx            docx-baik.md + tiruan-quarto.lua + word-otomatis.lua (LULUS)
-  docx-tanpa-otomatis.docx  tanpa word-otomatis.lua: SEQ, TOC, hak cipta (GAGAL)
+  docx-baik.docx            docx-baik.md + tiruan-quarto.lua + word-otomatis.lua
+                            + zotero-word.lua (sitasi bidang Zotero; LULUS)
+  docx-tanpa-otomatis.docx  tanpa word-otomatis.lua dan zotero-word.lua (citeproc
+                            biasa): SEQ, TOC, hak cipta, sitasi statis (GAGAL)
+  docx-zotero.docx          JSON satu bidang ZOTERO_ITEM rusak (GAGAL)
   docx-ref.docx             REF ke bookmark yang tidak ada (GAGAL)
   docx-daftar.docx          tanpa bidang TOC Daftar Gambar (GAGAL)
   docx-hakcipta.docx        halaman hak cipta sesudah daftar isi (GAGAL)
@@ -23,6 +26,10 @@ REF = next(p for p in [SKRIP.parent / "assets" / "reference-b5.docx",
                        SKRIP.parent / "_bersama" / "reference-b5.docx"] if p.exists())
 LUA = next(p for p in [SKRIP / "word-otomatis.lua", SKRIP.parent / "_bersama" / "word-otomatis.lua"]
            if p.exists())
+ZOTERO = next(p for p in [SKRIP / "zotero-word.lua", SKRIP.parent / "_bersama" / "zotero-word.lua"]
+              if p.exists())
+CSL = next(p for p in [SKRIP.parent / "assets" / "apa.csl", SKRIP.parent / "_bersama" / "apa.csl"]
+           if p.exists())
 
 
 def render(tujuan, otomatis=True):
@@ -31,9 +38,13 @@ def render(tujuan, otomatis=True):
         Image.new("RGB", (400, 200), "white").save(Path(t) / "kecil.png", dpi=(100, 100))
         shutil.copy(DI / "docx-baik.md", Path(t) / "a.md")
         perintah = ["pandoc", "a.md", "-t", "docx", "--reference-doc", str(REF),
-                    "--lua-filter", str(DI / "tiruan-quarto.lua")]
+                    "--lua-filter", str(DI / "tiruan-quarto.lua"),
+                    "-M", "lang=id-ID", "-M", "link-citations=true",
+                    "--bibliography", str(DI.parent / "pustaka.bib"), "--csl", str(CSL)]
         if otomatis:
-            perintah += ["--lua-filter", str(LUA)]
+            perintah += ["--lua-filter", str(LUA), "--lua-filter", str(ZOTERO)]
+        else:
+            perintah += ["--citeproc"]
         subprocess.run(perintah + ["-o", str(tujuan)], cwd=t, check=True)
 
 
@@ -63,5 +74,7 @@ ubah(baik, DI / "docx-daftar.docx", lambda x: x.replace('\\c &quot;Gambar&quot;'
      .replace('\\c "Gambar"', '\\c "Foto"'))
 ubah(baik, DI / "docx-hakcipta.docx", pindah_hak_cipta)
 ubah(baik, DI / "docx-alt.docx", lambda x: re.sub(r'descr="[^"]*"', 'descr=""', x))
+ubah(baik, DI / "docx-zotero.docx", lambda x: x.replace('CSL_CITATION {&quot;', 'CSL_CITATION {', 1)
+     .replace('CSL_CITATION {"', 'CSL_CITATION {', 1))
 ubah(baik, DI / "docx-margin.docx", lambda x: re.sub(r'(<w:pgMar [^>]*w:left=)"\d+"', r'\1"1247"', x))
 print("fikstur G-DOCX dibangun ulang di", DI)

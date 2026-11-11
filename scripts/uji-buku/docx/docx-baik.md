@@ -38,3 +38,11 @@ Tabel 1.1: Angka
 ## 1.1 Subbab {#sec-sub number="1.1"}
 
 Teks subbab.
+
+Sitasi Zotero (zotero-word.lua): menurut @kleiber2008, model ini lazim
+[lihat @gelman2013; @berndt1991].
+
+# Daftar Pustaka {.unnumbered}
+
+::: {#refs}
+:::

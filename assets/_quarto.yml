@@ -41,6 +41,12 @@ filters:
   # cipta, teks alternatif, lebar gambar, "Lampiran" (G-DOCX memeriksanya).
   - at: post-render
     path: ../_bersama/word-otomatis.lua
+  # Hanya DOCX: sitasi dan Daftar Pustaka sebagai bidang Zotero (ADDIN
+  # ZOTERO_ITEM/ZOTERO_BIBL, data butir tersemat dari pustaka.bib); dapat
+  # diperbarui plugin Zotero di Word tanpa Zotero saat render. Matikan dengan
+  # zotero-word: false (references/zotero-word.md; G-DOCX memeriksanya).
+  - at: post-render
+    path: ../_bersama/zotero-word.lua
 
 bibliography: pustaka.bib
 csl: ../_bersama/apa.csl              # penulis-tahun

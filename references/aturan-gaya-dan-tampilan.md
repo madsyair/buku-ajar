@@ -289,6 +289,7 @@ Aturan G-DOCX-RUMUS: (a) jumlah `m:oMath` di `word/document.xml` ≥ jumlah rumu
 | Kode sebaris | 0,8 × ukuran teks (B5: 8,5 pt) | tinjauan DOCX |
 | Lampiran | "Appendix A — …" → "Lampiran A — …" | tinjauan DOCX |
 | Margin | reference-doc dari `huruf.py` (margin `ukuran` di `konfig.json`) | G-DOCX: margin = konfig (toleransi 1 mm) |
+| Sitasi dan Daftar Pustaka (`zotero-word.lua`) | `{ADDIN ZOTERO_ITEM CSL_CITATION {json}}` berhasil teks citeproc bertaut; naratif: nama teks + bidang bersuppress-author; `{ADDIN ZOTERO_BIBL … CSL_BIBLIOGRAPHY}`; `ZOTERO_PREF_n` di `docProps/custom.xml` | G-DOCX: JSON sah, plainCitation = hasil, tanpa sitasi statis, satu ZOTERO_BIBL, ZOTERO_PREF ada |
 
 - Bidang teks dan ukuran teks dibaca dari reference-doc (`w:pgSz`, `w:pgMar`, gaya Body Text). Karena itu, filter mengikuti ukuran buku dan profil tanpa disunting. Metadata `word-bidang-teks-cm` di format docx menimpanya.
 - Penomoran per bab memakai `SEQ Bab \c`, bukan `STYLEREF 1 \s`: nomor bab Quarto berupa teks, bukan penomoran daftar Word, dan `STYLEREF \s` hanya membaca nomor daftar. Nomor pertama di setiap bab juga diberi `\r 1` karena LibreOffice mengabaikan `\s` (tanpa `\r`, Gambar 2.1 menjadi 2.2).
@@ -317,12 +318,12 @@ Aturan G-DOCX-RUMUS: (a) jumlah `m:oMath` di `word/document.xml` ≥ jumlah rumu
 - **Indeks hanya di PDF** (indeks LaTeX). Word tidak wajib berindeks.
 - Ukuran teks Word (10,5 pt pada profil `seri`) lebih kecil dari PDF (12 pt), jadi jumlah halaman berbeda. Rujukan ke judul tak bernomor tetap tautan biasa, bukan bidang REF.
 
-**Sitasi sebagai bidang Word: keputusan penulis.** Bawaannya sitasi berupa teks CSL dengan tautan ke Daftar Pustaka. Dua opsi lanjutan tidak dipasang skill dan hanya dipakai bila penulis memutuskannya (catat di `KEPUTUSAN-RANCANGAN.md`):
+**Sitasi sebagai bidang Word.** Sejak 2026-11-11 skill memasang opsi 2 di bawah secara bawaan, tetapi **tanpa Better BibTeX dan tanpa Zotero saat render**: `_bersama/zotero-word.lua` (`at: post-render`, hanya DOCX) menjalankan citeproc sendiri. Filter itu menulis setiap sitasi sebagai bidang `ADDIN ZOTERO_ITEM CSL_CITATION` dengan data butir tersemat dari `pustaka.bib`, Daftar Pustaka sebagai `ADDIN ZOTERO_BIBL`, dan preferensi dokumen `ZOTERO_PREF_n` (gaya dari `<id>` CSL, bahasa dari `lang`). Hasil bidang sama dengan teks citeproc PDF dan tetap bertaut. Penulis yang memakai Zotero 7 cukup menekan *Refresh*, dan dapat mengganti gaya lewat *Document Preferences*. Langkah penulis, cara kerja, dan batasan ada di `references/zotero-word.md`; G-DOCX memeriksanya. Matikan dengan `zotero-word: false`, sehingga sitasi kembali menjadi teks CSL bertaut. Pertimbangan semula kedua opsi (catat pilihan penulis di `KEPUTUSAN-RANCANGAN.md`):
 
 1. **Bidang CITATION/BIBLIOGRAPHY bawaan Word** (`customXml` Sources.xml dari `pustaka.bib`). Kelebihan: daftar pustaka dapat diperbarui di Word tanpa perangkat lain. Kekurangan: Word hanya punya gaya bawaannya (tanpa "dkk." dan aturan bahasa Indonesia). Akibatnya, formatnya berbeda dari PDF; sebagian jenis entri BibTeX hilang saat dikonversi.
-2. **Bidang Zotero** (`ADDIN ZOTERO_ITEM CSL_CITATION`, `ADDIN ZOTERO_BIBL`) lewat Better BibTeX (filter Lua `zotero.lua`). Kelebihan: memakai CSL yang sama dengan PDF dan dapat diperbarui dengan plugin Zotero di Word. Kekurangan: semua entri `pustaka.bib` harus ada di pustaka Zotero penulis dengan kunci yang sama, dan penyunting harus memasang Zotero.
+2. **Bidang Zotero** (`ADDIN ZOTERO_ITEM CSL_CITATION`, `ADDIN ZOTERO_BIBL`). Kelebihan: memakai CSL yang sama dengan PDF dan dapat diperbarui dengan plugin Zotero di Word. Lewat filter `zotero.lua` Better BibTeX, Zotero harus berjalan saat render dan semua entri `pustaka.bib` harus ada di pustaka Zotero dengan kunci yang sama. `zotero-word.lua` skill menghindari kedua syarat itu dengan butir tersemat. Kekurangan yang tersisa: penyunting harus memasang Zotero untuk memperbarui sitasi, nama penulis sitasi naratif berupa teks biasa, dan sitasi baru memerlukan impor `pustaka.bib` ke Zotero.
 
-Anjuran: opsi 2 bila naskah Word akan disunting pihak lain yang memakai Zotero; bila tidak, pertahankan sitasi bertaut.
+Anjuran: biarkan bidang Zotero terpasang (tanpa Zotero dokumen tetap terbaca seperti sitasi bertaut). Matikan hanya bila penerbit meminta DOCX tanpa bidang; *Unlink Citations* di Zotero melakukan hal yang sama pada salinan dokumen.
 
 ## 9. Bahasa (ringkas)
 

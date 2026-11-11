@@ -6,6 +6,7 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
   <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua, word-otomatis.lua,
+                          zotero-word.lua,
                           tikz-preamble.tex, preamble.tex, doc-class.tex, hak-cipta.tex,
                           apa.csl, reference-b5.docx, reference-b5-windows.docx
   <proyek>/KEPUTUSAN-RANCANGAN.md, REVISI.md, .gitignore
@@ -84,7 +85,8 @@ def main():
     (P / "harness" / "laporan").mkdir(parents=True, exist_ok=True)
 
     # folder bersama
-    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua", "word-otomatis.lua"]:
+    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua", "word-otomatis.lua",
+              "zotero-word.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
     for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
               "reference-b5.docx", "reference-b5-windows.docx", "hak-cipta.tex"]:

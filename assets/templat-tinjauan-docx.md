@@ -48,7 +48,7 @@ Kolom "Otomatis" menyebut gerbang yang sudah memeriksa butir itu. Butir bertanda
 
 ## Keputusan penulis
 
-- Sitasi sebagai bidang Word (CITATION/BIBLIOGRAPHY bawaan Word atau bidang Zotero lewat Better BibTeX): ya/tidak, alasan. Bawaan: sitasi CSL bertaut. Kelebihan dan kekurangan: `references/aturan-gaya-dan-tampilan.md`, "Sitasi sebagai bidang Word".
+- Sitasi sebagai bidang Zotero (`zotero-word.lua`, bawaan sejak 2026-11-11; `zotero-word: false` mematikannya): tetap/matikan, alasan. Periksa jumlah ZOTERO_ITEM = jumlah sitasi, satu ZOTERO_BIBL, `ZOTERO_PREF_n`, dan teks sitasi terbaca di LibreOffice (G-DOCX). Langkah penulis dan batasan: `references/zotero-word.md`.
 
 ## Ringkasan putaran
 
