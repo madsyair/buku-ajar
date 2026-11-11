@@ -54,7 +54,22 @@ else echo "benar: babbaik lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)
 # aposisi "seperti … 0,5,", "mis.", dan "Jadi, bila …" tetap sah (baris 5)
 temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
 harness.gerbang_konjungsi(pathlib.Path('harness/uji-buku/babkonjungsi.qmd'), harness.muat_pengecualian())" | grep -o "baris [0-9]*:" | tr '\n' ' ')
-if [ "$temuan" = "baris 3: " ]; then echo "benar: konjungsi lintas kalimat"; else echo "SALAH: konjungsi seharusnya hanya baris 3 (dapat: $temuan)"; status=1; fi
+# ", jadi" di tengah kalimat (EYD V B.5) ditandai (baris 7)
+if [ "$temuan" = "baris 3: baris 7: " ]; then echo "benar: konjungsi lintas kalimat dan ', jadi'"; else echo "SALAH: konjungsi seharusnya baris 3 dan 7 (dapat: $temuan)"; status=1; fi
+# G-PERTANYAAN (WARNING, tidak menggagalkan): hanya subbab tanpa pertanyaan di paragraf
+# prosa pertamanya yang ditandai (babpertanyaan, baris 5); babbaik tidak memicu peringatan.
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+for p in harness.peringatan_pertanyaan(pathlib.Path('harness/uji-buku/babpertanyaan.qmd').read_text(encoding='utf-8')): print(p)" | grep -o "baris [0-9]*:" | tr '\n' ' ')
+if [ "$temuan" = "baris 5: " ]; then echo "benar: G-PERTANYAAN hanya menandai subbab tanpa pertanyaan"; else echo "SALAH: G-PERTANYAAN seharusnya hanya baris 5 (dapat: $temuan)"; status=1; fi
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+print(len(harness.peringatan_pertanyaan(pathlib.Path('harness/uji-buku/babbaik.qmd').read_text(encoding='utf-8'))))")
+if [ "$temuan" = "0" ]; then echo "benar: babbaik tanpa peringatan G-PERTANYAAN"; else echo "SALAH: babbaik memicu $temuan peringatan G-PERTANYAAN"; status=1; fi
+# WARNING tidak menggagalkan status: babpertanyaan tidak boleh gagal di G-PERTANYAAN
+# (gerbang ini tidak tercatat di daftar gerbang) dan harness tidak crash.
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babpertanyaan 2>&1)
+if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[PERINGATAN\] G-PERTANYAAN" && ! echo "$keluaran" | grep -q "\[GAGAL\] G-PERTANYAAN"; then
+  echo "benar: babpertanyaan memberi PERINGATAN G-PERTANYAAN, bukan GAGAL"
+else echo "SALAH: babpertanyaan seharusnya hanya PERINGATAN G-PERTANYAAN"; status=1; fi
 # G-TAG (PDF bertag) diuji pada PDF fikstur tanpa render: tag-tanpa.pdf
 # (pdfLaTeX/LuaLaTeX tanpa DocumentMetadata) GAGAL, tag-baik.pdf LULUS.
 if command -v pdfinfo > /dev/null; then

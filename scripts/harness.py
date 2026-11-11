@@ -40,6 +40,8 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                (simbol tanpa keterangan, arti ganda, pemenggalan) untuk reviewer rumus
   G-STRUKTUR   pengantar bab 120+ kata (studi kasus/cerita), subbab ringkas
                (≤ subbab_maks_kata), Rangkuman/Ringkasan di akhir bab (bukan buku kunci)
+  G-PERTANYAAN (WARNING, tidak menggagalkan) subbab bernomor tanpa kalimat tanya di paragraf
+               prosa pertamanya; pengecualian judul: konfig "pertanyaan_kecuali"
   G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
                panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
@@ -125,6 +127,9 @@ KONFIG_BAWAAN = {
     "rerata_kata_kalimat_maks": 20,
     "kalimat_maks_kata": 35,
     "sitasi_per_1000_kata_maks": 4,
+    # G-PERTANYAAN (WARNING): judul subbab (awalan, tanpa beda huruf besar/kecil) yang tidak
+    # diperiksa kalimat tanya di paragraf prosa pertamanya
+    "pertanyaan_kecuali": ["Ringkasan", "Rangkuman", "Latihan", "Contoh utama", "Bacaan lanjut"],
     # Istilah yang sudah diputuskan penulis: pola regex -> saran (dan tanggal keputusan)
     "istilah_terlarang": [],
     # Opsi huruf (libertinus, springer, crc, stix), profil ukuran (seri, springer,
@@ -393,6 +398,9 @@ def gerbang_konjungsi(qmd, peng):
         for m in re.finditer(r",\s+(karena|sebab)\s+itu\b", bersih):
             masalah.append(f"baris {nomor}: '{m.group(1)} itu' penghubung antarkalimat di tengah kalimat; "
                            f"pecah kalimat ('. Karena itu, …') atau tulis '… karena …'")
+        for m in re.finditer(r",\s+jadi\b(?!\s+(?:sebuah|satu|dua|bahan|masalah)\b)", bersih):
+            masalah.append(f"baris {nomor}: 'jadi' penghubung antarkalimat (EYD V B.5) di tengah kalimat; "
+                           f"pecah kalimat ('. Jadi, …') atau tulis '… sehingga …'/'… maka …'")
         for m in POLA_KONJ.finditer(bersih):
             sisa = bersih[m.end():]
             sisip = re.match(r"([^,.;:]*),", sisa)
@@ -1613,6 +1621,70 @@ def _kata(baris):
     return re.findall(r"[A-Za-zÀ-ÿ][\w'-]*", teks)
 
 
+def peringatan_pertanyaan(teks):
+    """G-PERTANYAAN (WARNING): subbab bernomor (## atau ### tanpa .unnumbered) yang paragraf prosa
+    pertamanya tidak memuat kalimat tanya ('?' di luar kode dan rumus). Kembalikan daftar pesan."""
+    kecuali = [k.lower() for k in KONFIG["pertanyaan_kecuali"]]
+    prosa, _ = pilah_qmd(teks)
+    # kelompokkan baris per judul subbab bernomor
+    bagian, saat_ini, dalam_math = [], None, False
+    for nomor, b in prosa:
+        m = re.match(r"^(#{2,3})\s+(.*?)\s*(\{[^}]*\})?\s*$", b)
+        if m and not dalam_math:
+            atribut = m.group(3) or ""
+            if ".unnumbered" in atribut or ".unlisted" in atribut:
+                saat_ini = None
+            else:
+                saat_ini = (nomor, m.group(2).strip(), [])
+                bagian.append(saat_ini)
+            continue
+        if re.match(r"^#{1}\s", b) and not dalam_math:
+            saat_ini = None
+            continue
+        if saat_ini is None:
+            continue
+        if b.strip().startswith("$$"):
+            dalam_math = not (b.strip().count("$$") == 2) and not dalam_math
+            continue
+        if dalam_math:
+            continue
+        saat_ini[2].append(b)
+    pesan = []
+    for nomor, judul, baris in bagian:
+        if any(judul.lower().startswith(k) for k in kecuali):
+            continue
+        # paragraf prosa pertama: lewati baris kosong, pagar kotak, daftar, tabel, gambar, komentar
+        paragraf, mulai = [], False
+        for b in baris:
+            t = b.strip()
+            if not t:
+                if mulai:
+                    break
+                continue
+            if re.match(r"^(:::|\||!\[|<|[-*+]\s|\d+[.)]\s)", t) or re.fullmatch(r"\{#[^}]*\}", t):
+                if mulai:
+                    break
+                continue
+            mulai = True
+            paragraf.append(bersihkan_baris_prosa(b))
+        if not paragraf:
+            continue  # subbab tanpa paragraf prosa (hanya daftar atau kode)
+        if "?" not in " ".join(paragraf):
+            pesan.append(f"baris {nomor}: subbab '{judul[:50]}' tidak dibuka pertanyaan wajar pembaca; "
+                         "paragraf prosa pertamanya tanpa kalimat tanya (siklus subbab, SKILL.md)")
+    return pesan
+
+
+def gerbang_pertanyaan(qmd):
+    """G-PERTANYAAN, tingkat WARNING: tidak masuk daftar gerbang (tidak menggagalkan status)."""
+    pesan = peringatan_pertanyaan(qmd.read_text(encoding="utf-8"))
+    if pesan:
+        print(f"[PERINGATAN] G-PERTANYAAN: {len(pesan)} subbab")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
 def gerbang_struktur(qmd, buku):
     """Pengantar menarik, subbab ringkas, rangkuman di akhir bab (keputusan penulis 2026-11-10)."""
     if any(Path(buku).name.startswith(a) for a in KONFIG["struktur_abaikan_buku"]):
@@ -1889,6 +1961,7 @@ def main():
         gerbang_konjungsi(qmd, peng)
     gerbang_rumus(qmd, peng)
     gerbang_struktur(qmd, buku)
+    w_pertanyaan = gerbang_pertanyaan(qmd)
     if a.tahap == "akhir":
         gerbang_gaya_ajar(qmd)
     m_eq = cek_persamaan(qmd)
@@ -1922,9 +1995,14 @@ def main():
     if warning:
         baris += ["", "## WARNING EYD yang ditinjau manual", ""]
         baris += [f"- {t['kategori']}: '{t['temuan']}' → {t['saran']}" for t in warning]
+    if w_pertanyaan:
+        baris += ["", "## WARNING G-PERTANYAAN yang ditinjau manual", ""]
+        baris += [f"- {t}" for t in w_pertanyaan]
     laporan.parent.mkdir(parents=True, exist_ok=True)
     laporan.write_text("\n".join(baris) + "\n", encoding="utf-8")
     print(f"\nStatus: {'LULUS' if lulus else 'GAGAL'} — laporan: {laporan}")
+    if w_pertanyaan:
+        print(f"Catatan: {len(w_pertanyaan)} WARNING G-PERTANYAAN perlu ditinjau manual (lihat laporan).")
     if warning:
         print(f"Catatan: {len(warning)} WARNING EYD perlu ditinjau manual (lihat laporan).")
     sys.exit(0 if lulus else 1)

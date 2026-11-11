@@ -42,6 +42,7 @@ Peran ini dipakai untuk buku **satu disiplin**. Untuk buku multidisiplin (brief,
 
 - [ ] Tidak ada subjudul berbentuk tanya; setiap subbab dibuka pertanyaan di prosa.
 - [ ] Intuisi → rumus → interpretasi angka; penjelasan sederhana kerangka tercermin.
+- [ ] Siklus subbab lengkap (`SKILL.md`): pertanyaan di kalimat pertama, penjelasan tanpa notasi, intuisi → rumus, angka dari kode dan tafsirannya, pertanyaan asumsi atau "kapan gagal" yang dijawab, siap diuji jelaskan-ulang (peran 10–12); tidak ada peringatan G-PERTANYAAN.
 - [ ] Tidak ada angka hasil yang diketik; tidak ada komentar menyerupai keluaran.
 - [ ] Narasi gambar cocok dengan yang tampak (dihitung, bukan ditebak).
 - [ ] Istilah sesuai keputusan; jembatan istilah bila istilah berganti.

@@ -24,5 +24,6 @@
   {"pola": "\\btarikan acak\\b|\\bnilai tarikan\\b|\\bditarik dari (?:distribusi|prior|posterior)\\b", "saran": "membangkitkan / nilai bangkitan / *draws* (keputusan 2026-11-06)"},
   {"pola": "\\bsampel MCMC\\b", "saran": "*draws* untuk keluaran MCMC (keputusan 2026-11-06)"}
  ],
+ "pertanyaan_kecuali": ["Ringkasan", "Rangkuman", "Latihan", "Contoh utama", "Bacaan lanjut"],
  "kemasan": {}
 }

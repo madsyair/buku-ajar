@@ -16,7 +16,7 @@ Mungkin kita bertanya: apakah tiga hari cukup untuk menggambarkan penjualan sebu
 
 ## Rerata tiga pengamatan {#sec-rerata-baik}
 
-Rerata tiga pengamatan dihitung langsung dari data. Nilainya adalah `r angka(mean(c(1, 2, 4)), 2)` sehingga angka di teks selalu sama dengan keluaran kode.
+Berapa rerata ketiga pengamatan itu? Rerata dihitung langsung dari data. Nilainya adalah `r angka(mean(c(1, 2, 4)), 2)` sehingga angka di teks selalu sama dengan keluaran kode.
 
 ```{r}
 #| label: data-gambar

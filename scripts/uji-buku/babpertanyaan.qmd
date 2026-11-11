@@ -1,0 +1,19 @@
+# Bab pertanyaan {#sec-pertanyaan}
+
+Bu Rina mencatat penjualan beras warungnya setiap malam. Pada suatu minggu ia hanya sempat mencatat tiga hari. Ia ingin tahu seberapa biasa angka itu. Kita akan membantunya menghitung.
+
+## Subbab tanpa pertanyaan {#sec-tanpa-tanya}
+
+Rerata dihitung dengan menjumlahkan semua pengamatan, lalu membaginya dengan banyaknya pengamatan. Hasilnya menggambarkan nilai tengah data. Rumus dan kodenya menyusul di bawah ini.
+
+Kalimat tanya di paragraf kedua tidak menolong. Mengapa demikian?
+
+## Subbab dengan pertanyaan {#sec-dengan-tanya}
+
+Seberapa jauh rerata tiga hari mewakili penjualan sebulan? Jawabannya bergantung pada sebaran data. Kita memeriksanya dengan simpangan baku.
+
+## Rangkuman {#sec-rangkuman-pertanyaan}
+
+- Rerata menggambarkan nilai tengah.
+- Simpangan baku menunjukkan sebaran.
+- Tiga hari belum cukup untuk menyimpulkan penjualan sebulan.

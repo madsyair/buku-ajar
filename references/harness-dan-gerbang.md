@@ -35,7 +35,8 @@ Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TA
 | G-REFERENSI | statis + R | setiap sitasi punya klaim di `klaim.json` untuk kalimat itu; kutipan bukti benar-benar ada di sumber (berkas, Rd, DESCRIPTION, citation, hitung ulang); entri bib ber-DOI/ISBN/URL dan terverifikasi di `referensi.json`; penanda klaim usang | registri klaim |
 | G-JUDUL | statis + rajut | judul tabel/gambar > 12 kata atau lebih dari satu frasa; frasa panel > 6 kata; multipanel tanpa `label_panel()` atau keterangan tanpa (a)(b); arah panel ("kiri", "panel kanan"); judul/subjudul berupa kalimat tanya | keputusan judul |
 | G-PERSAMAAN | statis | "Persamaan" berkapital di tengah kalimat; `@eq-` di awal kalimat | "persamaan" huruf kecil |
-| G-KONJUNGSI | statis | koma sebelum penghubung subordinatif di tengah kalimat; ", karena itu" di tengah kalimat; pengecualian per kalimat `konjungsi-abaikan` | kajian koma konjungsi |
+| G-KONJUNGSI | statis | koma sebelum penghubung subordinatif di tengah kalimat; ", karena itu" dan ", jadi" di tengah kalimat (EYD V B.5; "jadi sebuah/satu/dua/bahan/masalah" dikecualikan); pengecualian per kalimat `konjungsi-abaikan` | kajian koma konjungsi |
+| G-PERTANYAAN | statis, **WARNING** | setiap subbab bernomor (`##` atau `###` tanpa `.unnumbered`) harus punya kalimat tanya ("?" di luar kode dan rumus) di paragraf prosa pertamanya; dilewati: judul berawalan entri `pertanyaan_kecuali` di `konfig.json` (bawaan Ringkasan, Rangkuman, Latihan, Contoh utama, Bacaan lanjut) dan sub-bagian enam langkah (`.unnumbered`). Tidak menggagalkan status: peringatan dicetak `[PERINGATAN]` dan ditulis di laporan ("WARNING G-PERTANYAAN yang ditinjau manual") untuk reviewer pedagogi (20) dan penyunting gaya (22). Fikstur `babpertanyaan.qmd` (satu subbab tanpa pertanyaan, satu dengan pertanyaan) diuji lewat `peringatan_pertanyaan()`; `babbaik.qmd` tanpa peringatan | siklus subbab (`SKILL.md`) |
 | G-LARANGAN | statis | kata terlarang di prosa dan keterangan (bawaan: Sokratik/Socrates/Feynman); konfig `larangan` | nama teknik tidak ditulis |
 | G-ISTILAH | statis | istilah yang sudah diganti keputusan penulis (konfig `istilah_terlarang`); pengecualian `istilah-abaikan` | keputusan istilah |
 | G-LN | statis (`LN=1`) | `\log` tanpa subskrip basis di rumus prosa dan `fig/tbl-cap` (logaritma natural ditulis `\ln`); `\log_{10}`, `\log_2` lulus; blok kode, R inline, kode sebaris, dan berkas kode dilewati; pengecualian `ln-abaikan`. Fikstur: `uji-buku/babln.qmd` (GAGAL), `babbaik.qmd` memuat `\ln`, `\log_{10}`, `log()` (LULUS); fungsi `masalah_ln()` juga diuji langsung | ln di naskah, kode `log` |
@@ -96,6 +97,8 @@ Semua yang khusus proyek ada di sini, bukan di kode harness:
  "rerata_kata_kalimat_maks": 20, "kalimat_maks_kata": 35, "sitasi_per_1000_kata_maks": 4
 }
 ```
+
+`pertanyaan_kecuali` (daftar awalan judul subbab yang tidak diperiksa G-PERTANYAAN) bawaannya `["Ringkasan", "Rangkuman", "Latihan", "Contoh utama", "Bacaan lanjut"]`; tulis ulang seluruh daftar bila mengubahnya.
 
 Ambang struktur dan gaya (`pengantar_…` sampai `sitasi_…`) adalah pegangan kerja yang dapat diubah penulis per buku; nilai di atas adalah bawaan harness bila kunci tidak ditulis.
 

@@ -29,6 +29,21 @@ Label internal skill: gaya **bertanya** ("Sokratik") dan gaya **menjelaskan-ulan
 
 Rinci: `references/prinsip-buku-ajar.md` (ringkasan operasional kajian; daftar periksa butir 1–35), `references/aturan-gaya-dan-tampilan.md`, `references/istilah-statistika.md`.
 
+## Siklus gabungan per subbab
+
+Gaya bertanya dan gaya menjelaskan-ulang bekerja sebagai **satu siklus** di setiap subbab:
+
+1. pertanyaan wajar pembaca di kalimat pertama;
+2. penjelasan tanpa notasi;
+3. intuisi → rumus;
+4. angka dari kode buku dan tafsirannya;
+5. pertanyaan asumsi atau "kapan gagal" yang dijawab;
+6. uji jelaskan-ulang oleh pembaca uji (peran 10–12).
+
+Nama teknik tetap label internal dan G-LARANGAN tetap berlaku. Perancang kerangka mencantumkan keenam unsur per subbab (`agents/02-…`), penulis memeriksanya di daftar periksa (`agents/04-…`), dan G-PERTANYAAN (WARNING) menandai subbab yang tidak dibuka pertanyaan (`references/harness-dan-gerbang.md`). Rinci: `references/prinsip-buku-ajar.md` bagian 3–4.
+
+Hemat token (model per peran, gerbang sebelum agen, agen paralel terbatas): `agents/00-orkestrator.md`, bagian "Hemat token".
+
 ## Peran
 
 Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar periksa, kriteria lulus, larangan). Baca berkas peran sebelum menjalankannya; beri subagen jalur berkas, bukan ringkasan dari ingatan.
