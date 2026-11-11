@@ -18,7 +18,7 @@
 % Blok ditulis ulang _bersama/huruf.py; seri_mono_nama dipakai pemutus kode
 % sebaris di bawah.
 % >>> huruf
-\ifdefined\directlua\setmonofont{Libertinus Mono}[Scale=0.8,RawFeature={fallback=serimono}]\fi
+\ifdefined\directlua\setmonofont{Libertinus Mono}[Scale=0.8,Ligatures=NoCommon,RawFeature={fallback=serimono}]\fi
 \ifdefined\directlua\directlua{seri_mono_nama = "LibertinusMono"}\fi
 % <<< huruf
 % Glif yang tidak ada di huruf mana pun dicatat di log ("Missing character"),

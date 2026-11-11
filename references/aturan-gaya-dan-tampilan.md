@@ -202,6 +202,20 @@ Pelajaran dari uji yang kini dicegah gerbang atau skrip:
 - Pada opsi `crc`, Unicode Yunani atau ≤ yang **dicampur dengan `$…$` dalam satu label** jatuh ke kotak kosong STIX karena Latin Modern Roman tidak punya glifnya. Tulis simbol di dalam `$…$` (`$\theta \leq 1$`). Label tanpa `$` aman karena memakai rantai huruf teks → matematika.
 - Latin Modern punya varian optis bernama keluarga sama (LMRoman5–17); `gaya_gambar.py` hanya mendaftarkan berkas opsi.
 - Pemeriksaan seri 2026-11-08: keenam PDF di `seri-bayesian/kirim/` dan 968 PDF gambar proyek seri hanya memuat Libertinus (LibertinusSerif, LibertinusMath, LibertinusMono, LibertinusT1Math). Huruf lain hanya ada di dua PDF fikstur harness (`harness/uji-buku/gambar/fig-baik.pdf`, `fig-cap.pdf`: TeXGyrePagella), bukan di buku.
+- TeX Gyre Cursor punya ligatur fi/fl, jadi `fit` di kode menjadi U+FB01. Libertinus Mono tidak punya ligatur itu. Sejak 2026-11-11 `huruf.py` (dan `assets/preamble.tex`) memasang huruf mono dengan `Ligatures=NoCommon` untuk semua opsi.
+
+**Seri asal memakai opsi `springer` dengan profil `seri` (2026-11-11).** Permintaan penulis: "Ganti font buku seperti template Springer." Hanya keluarga huruf yang diganti. Ukuran tetap profil `seri` (B5, 12 pt, kolom 120 mm, margin 28/28/22/24 mm), karena profil `springer` 10 pt pada B5 melanggar batas 40–70 karakter (median 73). Seri belum memakai blok bertanda, jadi perubahan dipasang manual, setara `huruf.py`. Penanda `>>> huruf` sudah ditambahkan, dan `harness/konfig.json` (`"huruf": "springer"`) serta salinan `_bersama/huruf.py` dibaca `gaya_gambar.py` dan G-HURUF.
+
+| Unsur | Seri sebelum (2026-11-07) | Seri sesudah (2026-11-11) |
+|---|---|---|
+| Teks dan judul, rumus, sans | Libertinus Serif, Libertinus Math, Libertinus Serif | TeX Gyre Termes, TeX Gyre Termes Math, TeX Gyre Heros |
+| Kode | Libertinus Mono, Scale 0,8; blok kode 9 pt × 0,8 = 7,2 pt, keluaran 8,5 pt × 0,8 = 6,8 pt | TeX Gyre Cursor, Scale 0,85, `Ligatures=NoCommon`; blok kode 9 pt × 0,85 = **7,65 pt** (72 karakter + bantalan = 338,7 pt), keluaran 8,5 pt × 0,85 = **7,225 pt** (78 karakter = 338,1 pt) |
+| Cadangan glif | Libertinus Serif/Math untuk mono | Termes Math untuk teks (`\babelfont{rm}`); Termes lalu Termes Math untuk mono |
+| TikZ, gambar, sampul | libertinus + libertinust1math; Libertinus Serif; Libertinus | newtxtext + newtxmath[varvw]; Termes/Termes Math (Type 3); Termes/Termes Math |
+| Word | `reference-b5.docx` (Libertinus) | `reference-b5-windows.docx` (Times New Roman, Courier New, Cambria Math) |
+
+- Ukuran mono dipilih sedikit di bawah hitungan `huruf.py` (7,7 / 7,25 pt). Hitungan itu memakai `\textwidth` 341,4 pt (120 mm dalam pt TeX), sedangkan komentar seri memakai batas aman 340,2 pt (120 mm dalam bp). Dengan 7,65 / 7,225 pt nominalnya tetap 9 / 8,5 pt.
+- **Hasil ukur** (Kunci Buku 3, 136 halaman; sebelumnya 138 halaman): karakter per baris prosa (`pdftotext -layout`, metode bagian 8) median **64**, p95 **76**. Dengan metode yang sama, Libertinus menghasilkan 63/74, jadi median tetap di 40–70. `pdffonts` buku hanya memuat TeXGyreTermes (Regular, Italic, Bold, BoldItalic), TeXGyreTermesMath, dan TeXGyreCursor (Regular, Bold). Log tanpa "Missing character". G-LOG, G-TAG, G-TEPI, dan G-HURUF LULUS. Proyek uji (bab berisi Yunani, ≤, ≈ di prosa dan komentar kode, kode 72 karakter, keluaran 78 karakter, gambar matplotlib, dan TikZ): kode berakhir 145,6 mm dan keluaran 146,8 mm dari tepi kiri kertas (tepi kolom 148 mm). Gambar matplotlib memuat TeXGyreTermes dan TeXGyreTermesMath; TikZ memuat TeXGyreTermesX, NewTXMI, dan txsys.
 
 ### Profil penerbit dan ukuran buku (2026-11-08)
 

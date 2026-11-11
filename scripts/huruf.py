@@ -262,8 +262,10 @@ def blok(nama, nama_profil=PROFIL_BAWAAN, docx_huruf="", nama_ukuran=UKURAN_BAWA
             f"\\babelfont{{rm}}[RawFeature={{fallback=serimain}}]{{{o['main']}}}"
             f"\\else\\setmainfont{{{o['main']}}}[RawFeature={{fallback=serimain}}]\\fi\\fi"]
            if o["cadangan_main"] else [])
+    # Ligatures=NoCommon: TeX Gyre Cursor punya ligatur fi/fl yang mengubah
+    # kode ("fit" menjadi U+FB01); ditemukan di seri 2026-11-11.
     pre += [f"\\ifdefined\\directlua\\setmonofont{{{o['mono']}}}[Scale={o['skala_mono']},"
-           f"RawFeature={{fallback=serimono}}]\\fi",
+           f"Ligatures=NoCommon,RawFeature={{fallback=serimono}}]\\fi",
            f"\\ifdefined\\directlua\\directlua{{seri_mono_nama = \"{o['mono_lua']}\"}}\\fi"]
     s = o["skala_mono"]
     k1, o1 = round(tl["kode_pt"] / s, 2), round(tl["keluaran_pt"] / s, 2)
