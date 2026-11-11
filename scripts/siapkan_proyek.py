@@ -3,6 +3,7 @@
 
 Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
   <proyek>/harness/       harness.py, referensi.py, penggalan.py, cek_rumus.py, kemas_sumber.py,
+                          selaras_angka.py,
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
   <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua, word-otomatis.lua,
@@ -72,7 +73,8 @@ def main():
     print(f"Proyek {P}, buku {a.buku}")
 
     # harness
-    for f in ["harness.py", "referensi.py", "penggalan.py", "cek_rumus.py", "kemas_sumber.py", "uji_harness.sh"]:
+    for f in ["harness.py", "referensi.py", "penggalan.py", "cek_rumus.py", "kemas_sumber.py", "selaras_angka.py",
+              "uji_harness.sh"]:
         salin(SKRIP / f, P / "harness" / f, t)
     salin(SKRIP / "uji-buku", P / "harness" / "uji-buku", t)
     tulis(P / "harness" / "klaim.json", "[]\n", False)

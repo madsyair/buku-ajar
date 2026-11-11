@@ -53,6 +53,8 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                TOC isi/gambar/tabel, hak cipta sebelum daftar isi; dengan zotero-word.lua: setiap
                sitasi bidang ADDIN ZOTERO_ITEM berJSON sah (itemData tersemat, plainCitation =
                hasil), tanpa sitasi statis, satu ZOTERO_BIBL, ZOTERO_PREF_n (setelah --render; DOCX=0)
+  G-SELARAS    PROTOTIPE (WARNING, nonaktif bawaan): nilai sama di tabel dan narasi dengan
+               desimal sama (harness/selaras_angka.py; SELARAS=warning|gagal)
   G-HURUF      semua huruf tersemat di PDF buku dan PDF gambar termasuk keluarga opsi
                "huruf" di konfig.json (_bersama/huruf.py; setelah --render; HURUF=0 mematikan)
 
@@ -70,6 +72,7 @@ Pemakaian:
   python3 harness/harness.py --tag-pdf buku1/_book/buku.pdf     # G-TAG saja
   python3 harness/harness.py --docx-rumus buku.docx --sumber bab01.qmd ...   # G-DOCX-RUMUS saja
   python3 harness/harness.py --docx-cek buku.docx [--ukuran unesco]          # G-DOCX saja
+  python3 harness/harness.py --selaras buku1/bab05.qmd               # G-SELARAS saja
   python3 harness/harness.py --huruf-pdf gambar/x.pdf [--huruf springer]   # G-HURUF saja
 """
 import argparse
@@ -1905,6 +1908,35 @@ def gerbang_haljudul(buku):
     catat("G-HALJUDUL", not masalah, "\n".join(masalah))
 
 
+# ---------------------------------------------------------------- G-SELARAS (prototipe)
+def gerbang_selaras(qmd, md=None, ketat=None):
+    """G-SELARAS (prototipe, dari seri Bayesian 2026-11-11): nilai yang sama di tabel dan di prosa yang
+    merujuknya harus ditulis dengan jumlah desimal yang sama (tabel 0,254 dan narasi
+    0,25 untuk sel yang sama → temuan). Logika di harness/selaras_angka.py; aturan di
+    references/aturan-gaya-dan-tampilan.md ("Angka, desimal, dan keselarasan tabel–narasi"). Tingkat awal WARNING (tidak
+    menggagalkan). Belum dipanggil untuk setiap bab: main() menjalankannya hanya bila
+    SELARAS=warning atau SELARAS=gagal; SELARAS=gagal (atau ketat=True) mencatatnya
+    sebagai gerbang yang dapat GAGAL."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import selaras_angka
+    if ketat is None:
+        ketat = os.environ.get("SELARAS") == "gagal"
+    qmd = Path(qmd)
+    if md is None:
+        md = qmd.parent / "build" / f"{qmd.stem}.knit.md"
+    pesan = [f"{t['label']} (baris prosa {t['baris_prosa']}): tabel {t['tabel']} "
+             f"({t['d_tabel']} desimal) ≠ narasi {t['prosa']} ({t['d_prosa']} desimal)"
+             + (f" dari `r {t['expr']}`" if t["expr"] else "") + f" [{t['yakin']}]"
+             for t in selaras_angka.periksa(qmd, md)]
+    if ketat:
+        catat("G-SELARAS", not pesan, "\n".join(pesan[:40]))
+    elif pesan:
+        print(f"[PERINGATAN] G-SELARAS: {len(pesan)} angka tabel–narasi beda desimal")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
 # ---------------------------------------------------------------- utama
 def main():
     ap = argparse.ArgumentParser()
@@ -1923,7 +1955,12 @@ def main():
     ap.add_argument("--sumber", nargs="*", default=[], help="berkas .qmd sumber untuk --docx-rumus")
     ap.add_argument("--docx-cek", metavar="DOCX", help="hanya jalankan G-DOCX pada DOCX ini (uji fikstur)")
     ap.add_argument("--ukuran", default="b5", help="ukuran buku untuk --docx-cek")
+    ap.add_argument("--selaras", metavar="QMD", help="jalankan G-SELARAS saja pada bab ini "
+                    "(build/<bab>.knit.md bila ada; WARNING, SELARAS=gagal untuk ketat)")
     a = ap.parse_args()
+    if a.selaras:
+        gerbang_selaras(a.selaras)
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
     if a.tag_pdf:
         gerbang_tag(None, pdf=Path(a.tag_pdf))
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
@@ -1981,6 +2018,8 @@ def main():
     if os.environ.get("ATRIBUSI_MANUAL", "1") == "1":
         m = cek_atribusi_manual(qmd, buku)
         catat("G-ATRIBUSI", not m, "\n".join(m[:40]))
+    if os.environ.get("SELARAS") in ("warning", "gagal"):  # prototipe; belum untuk semua bab
+        gerbang_selaras(qmd, md)
     gerbang_lampiran(buku, a.bab, AKAR / KONFIG["lampiran"] / a.buku)
     warning = []
     if md:

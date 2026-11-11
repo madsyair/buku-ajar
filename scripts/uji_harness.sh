@@ -158,5 +158,20 @@ sys.exit(1 if harness.masalah_log_latex(open('harness/uji-buku/log/$log.txt', en
   harap=GAGAL; [ "$log" = bersih ] && harap=LULUS
   if [ "$hasil" = "$harap" ]; then echo "benar: G-LOG $log $hasil"; else echo "SALAH: G-LOG $log seharusnya $harap"; status=1; fi
 done
+# G-SELARAS (prototipe, WARNING; 2026-11-11): babselaras.qmd memuat kasus salah (tabel 0,254
+# tiga desimal, narasi 0,25 dua desimal untuk sel yang sama) dan kasus benar (tabel dan
+# narasi R-hat sama-sama tiga desimal). Hanya kasus salah yang ditandai; tingkat WARNING
+# tidak menggagalkan (status 0), SELARAS=gagal menggagalkan (status 1).
+keluar=$(python3 harness/harness.py --selaras harness/uji-buku/babselaras.qmd 2>&1); kode=$?
+if [ $kode -eq 0 ] && echo "$keluar" | grep -q "tbl-selaras-salah" && ! echo "$keluar" | grep -q "tbl-selaras-benar"; then
+  echo "benar: G-SELARAS WARNING hanya kasus salah"
+else
+  echo "SALAH: G-SELARAS seharusnya WARNING untuk tbl-selaras-salah saja (status $kode)"; status=1
+fi
+if SELARAS=gagal python3 harness/harness.py --selaras harness/uji-buku/babselaras.qmd > /dev/null 2>&1; then
+  echo "SALAH: G-SELARAS ketat seharusnya GAGAL"; status=1
+else
+  echo "benar: G-SELARAS ketat GAGAL"
+fi
 rm -rf lampiran-kode/harness harness/laporan/harness_uji-buku-*
 exit $status

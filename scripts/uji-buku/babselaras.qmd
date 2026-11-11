@@ -1,0 +1,37 @@
+# Bab keselarasan angka {#sec-selaras}
+
+```{r}
+#| include: false
+angka <- function(x, d = 2) {
+  formatC(x, format = "f", digits = d,
+          decimal.mark = ",", big.mark = ".")
+}
+p_atas <- c(0.254, 0.611)
+rhat <- c(1.004, 1.012)
+```
+
+Fikstur G-SELARAS memuat dua tabel. Tabel pertama sengaja tidak selaras dengan narasinya, sedangkan tabel kedua selaras.
+
+## Kasus salah {#sec-selaras-salah}
+
+```{r}
+#| label: tbl-selaras-salah
+#| tbl-cap: "Peluang posterior di atas ambang (tiga desimal)"
+#| echo: false
+knitr::kable(data.frame(model = c("A", "B"), peluang = p_atas),
+             digits = 3, format.args = list(decimal.mark = ","))
+```
+
+Menurut @tbl-selaras-salah, peluang posterior model A di atas ambang adalah `r angka(p_atas[1], 2)`. Tabel menulis nilai yang sama dengan tiga desimal, sedangkan narasi hanya dua desimal.
+
+## Kasus benar {#sec-selaras-benar}
+
+```{r}
+#| label: tbl-selaras-benar
+#| tbl-cap: "R-hat kedua model (tiga desimal)"
+#| echo: false
+knitr::kable(data.frame(model = c("A", "B"), rhat = rhat),
+             digits = 3, format.args = list(decimal.mark = ","))
+```
+
+Menurut @tbl-selaras-benar, R-hat terbesar adalah `r angka(max(rhat), 3)`. Tabel dan narasi sama-sama memakai tiga desimal.

@@ -100,6 +100,47 @@ dari posterior ...
 | Kode panjang (simulasi, penyusunan tabel, parquet) disembunyikan (`echo: false`) dan dirujuk: "kode lengkap ada di `lampiran-kode/<buku>/babXX.R`". | G-LAMPIRAN |
 | Hindari mencetak `summary(fit)` utuh (panjang, berbahasa Inggris); cetak ringkasan terpilih. | editor |
 
+### Angka, desimal, dan keselarasan tabel–narasi
+
+Aturan ini diputuskan untuk seri Bayesian pada 11 November 2026. Kajian dan sumbernya ada di `naskah-bersama/kajian-digit-desimal-2026-11-11.md` proyek seri. Inventaris pertama menemukan 75 pasangan beda desimal di 442 tabel. Pola tersering adalah tabel 3 desimal dengan narasi 2 desimal, karena desimal dipilih per kalimat dan per tabel, bukan per jenis besaran.
+
+Prinsip:
+
+1. **Satu jenis, satu jumlah desimal.** Desimal yang sama berlaku di tabel, narasi, keterangan, dan teks gambar.
+2. **Narasi mengutip tabel apa adanya.** Kalimat yang merujuk sel tabel memakai desimal kolom itu. Pembulatan yang lebih kasar hanya untuk ringkasan yang ditandai kata *sekitar* atau *kira-kira*.
+3. **Desimal tidak melebihi ketelitian.** Digit terakhir tidak boleh lebih halus daripada 2 × MCSE. Bila desimal bawaan melanggar batas ini, kurangi desimal untuk seluruh kolom dan narasinya (Gelman, Vehtari, dan McElreath, *Bayesian Workflow*, subbab 11.6).
+4. **Ambang menentukan desimal diagnostik.** Diagnostik ditulis dengan desimal yang cukup untuk memutuskan lolos atau tidak terhadap ambangnya.
+
+| Jenis besaran | Desimal bawaan | Alasan singkat |
+|---|---|---|
+| Peluang, proporsi | 2; 3 bila < 0,05 atau > 0,95 dan MCSE ≤ 0,0005 | dua digit bermakna; ujung skala perlu rincian |
+| Persen | 1; tingkat interval dan kriteria (95%) 0; angka resmi mengikuti sumber (BPS: 2) | 1 desimal persen = 3 desimal proporsi |
+| Rata-rata, median, batas interval | desimal yang memberi 2 digit bermakna pada SD posterior (praktis 2); batas = titik estimasi | dua digit bermakna; ekor kurang teliti |
+| Simpangan baku | sama dengan rata-ratanya | dibaca berpasangan |
+| Koefisien (logit, ln) | 2 | ketelitian di bawah 0,01 jarang bermakna |
+| Rasio *odds*, rasio laju | 2 | `exp()` koefisien dua desimal |
+| Rasio deskriptif (faktor Bayes, rasio waktu) | 1 bila ≥ 1; 2 bila < 1 | menyatakan besar perbedaan |
+| R-hat | 3 | ambang 1,01: dengan 2 desimal, 1,005–1,014 semuanya tampil "1,01" |
+| ESS | 0, dengan pemisah ribuan | cacahan efektif; ambang 100 per rantai |
+| MCSE | desimal estimasi + 1 (praktis 3) | menilai digit terakhir estimasi |
+| elpd, selisih elpd, SE | 1 | skala ln densitas total |
+| Pareto k | 2 | ambang 0,7 dan min(1 − 1/log10 S; 0,7) |
+| E-BFMI | 2 | ambang 0,30 |
+| Statistik uji / nilai-p | 2 / 3; di bawah 0,001 ditulis "< 0,001" | membedakan 0,049 dan 0,051 |
+| Rupiah | 0, atau ribu/juta rupiah dengan 1 desimal bila ketidakpastiannya ribuan | dua sampai tiga digit bermakna |
+| Jam; detik komputasi | 1; 1 bila ≥ 1 detik, 2 bila < 1 detik | berubah antarjalan |
+| Orang, kasus; laju per 100.000 | 0; 1 | cacahan bulat |
+
+Pendekatannya adalah desimal tetap per jenis, dengan ketidakpastian sebagai batas atas. Desimal rata-rata dan batas interval ditetapkan sekali per contoh berjalan dari SD posteriornya, lalu dipakai tetap di contoh itu. Digit yang berubah-ubah per angka tidak dipakai, karena keselarasan tabel–narasi tidak dapat diperiksa mesin.
+
+Penerapan:
+
+- Chunk setup setiap bab mendefinisikan `D <- c(peluang = 2, persen = 1, ringkasan = 2, sd = 2, koef = 2, rasio = 2, rhat = 3, ess = 0, mcse = 3, elpd = 1, k = 2, bfmi = 2, stat = 2, p = 3)`.
+- Tabel ditulis `knitr::kable(x, digits = D[c("ringkasan", "sd", "rhat", "ess")], format.args = list(decimal.mark = ",", big.mark = "."))`. Jangan menulis `digits = 3` lepas.
+- Narasi ditulis `` `r angka(x, D["ringkasan"])` ``. Nilai yang dikutip dari tabel diambil dari objek tabel yang sama.
+- Persen dan proporsi tidak dicampur untuk besaran yang sama di tabel dan narasi.
+- Pemeriksaan dengan **G-SELARAS** (`harness/selaras_angka.py`): `python3 harness/selaras_angka.py --md laporan.md` membuat inventaris semua buku, dan `python3 harness/harness.py --selaras <buku>/<bab>.qmd` memeriksa satu bab. Tingkat awalnya WARNING. Gerbang ini diaktifkan untuk semua bab dengan `SELARAS=gagal` setelah buku diperbaiki.
+
 ## 7. Kotak dan struktur bab
 
 Struktur bawaan setiap bab (sesuaikan di brief):
