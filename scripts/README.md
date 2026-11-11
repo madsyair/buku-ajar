@@ -8,12 +8,13 @@ Salinan yang digeneralisasi dari harness dan alat seri statistika Bayesian (A. S
 | `harness.py` | `harness/` | Gerbang mutu per bab (daftar di `references/harness-dan-gerbang.md`) |
 | `referensi.py` | `harness/` | G-REFERENSI: registri klaim dan identitas pustaka |
 | `penggalan.py` | `harness/` | Pemenggalan EYD V, daftar nama yang tidak dipenggal, istilah asing (perlu `pip install Sastrawi`) |
-| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS) |
+| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS); G-DOCX pada `docx/docx-baik.docx` (LULUS) dan enam fikstur fitur otomatis Word; setiap fikstur GAGAL dengan pesannya sendiri (`docx/buat_fikstur.py` membangunnya ulang dengan Pandoc) |
 | `kemas_sumber.py` | `harness/` atau `alat/` | Mengemas kode sumber per buku (+ kunci) ke zip dengan `BANGUN.md` |
 | `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, huruf teks dan matematika opsi `huruf` (Type 3), `LEBAR` = lebar kolom, koma desimal, `label_panel()`, `tampil()` |
 | `huruf.py` | `_bersama/` | Opsi huruf (`libertinus`, `springer`, `crc`, `stix`), profil penerbit (`seri`, `springer`, `crc`, `wiley`), dan ukuran buku (`b5`, `unesco`, `a5`, `a4`, `6x9`, `7x10`) dari `konfig.json`: menulis blok `>>> huruf`/`>>> profil` di `_quarto.yml` dan `_bersama/*.tex`, menghitung ukuran mono kode/keluaran, `options(width)` di `<buku>/.Rprofile`, gaya Word Windows; dipakai `gaya_gambar.py` dan G-HURUF. `python3 _bersama/huruf.py --daftar` |
 | `catatan.lua` | `_bersama/` | Filter Div `::: {.catatan}`: "*Catatan:*" kecil di bawah tabel/gambar (PDF dan Word) |
 | `bahasa-asing.lua` | `_bersama/` | Frasa miring di `istilah-asing.txt` diberi `lang=en` (pemenggalan Inggris) |
+| `word-otomatis.lua` | `_bersama/` | Hanya DOCX (`at: post-render`): nomor bab/gambar/tabel/persamaan sebagai bidang SEQ, rujukan silang REF, Daftar Isi/Gambar/Tabel sesudah halaman hak cipta, teks alternatif, lebar gambar, lebar kolom, dan "Lampiran"; bidang teks dibaca dari reference-doc (`references/aturan-gaya-dan-tampilan.md`, "Rumus dan fitur otomatis di Word") |
 
 ## Memasang di proyek baru
 

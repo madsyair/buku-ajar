@@ -45,8 +45,10 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
   G-DOCX-RUMUS rumus Word asli (OMML) di DOCX: jumlah m:oMath >= rumus sumber - toleransi,
                tanpa TeX mentah di teks biasa, tanpa gambar rumus (setelah --render; DOCX_RUMUS=0)
-  G-DOCX       Word: ukuran halaman = ukuran buku, gambar di dalam bidang teks, tanpa ikon
-               kotak, tanpa "??"/@rujukan mentah, judul Heading1 bernomor (setelah --render; DOCX=0)
+  G-DOCX       Word: ukuran halaman dan margin = ukuran buku, gambar di dalam bidang teks dan
+               berteks alternatif, tanpa ikon kotak, tanpa "??"/@rujukan mentah, judul Heading1
+               bernomor; dengan word-otomatis.lua: SEQ = objek bernomor, REF ke bookmark yang ada,
+               TOC isi/gambar/tabel, hak cipta sebelum daftar isi (setelah --render; DOCX=0)
   G-HURUF      semua huruf tersemat di PDF buku dan PDF gambar termasuk keluarga opsi
                "huruf" di konfig.json (_bersama/huruf.py; setelah --render; HURUF=0 mematikan)
 
@@ -888,12 +890,20 @@ def _attr(tag, nama):
     return int(m.group(1)) if m else 0
 
 
-def masalah_docx(docx, ukuran_mm=None, bernomor=False):
+def _teks_xml(par):
+    return "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par))
+
+
+def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True):
     """Pemeriksaan otomatis keluaran Word (daftar periksa
-    assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, gambar
-    tidak melebihi bidang teks, tanpa ikon kotak (gambar <= 0,2 inci), tanpa
-    "??" atau rujukan @fig-/@sec-/@tbl-/@eq- mentah, ada Heading1, dan judul
-    bernomor bila number-sections."""
+    assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, margin =
+    margin ukuran di konfig.json, gambar tidak melebihi bidang teks dan
+    berteks alternatif, tanpa ikon kotak (gambar <= 0,2 inci), tanpa "??" atau
+    rujukan @fig-/@sec-/@tbl-/@eq- mentah, ada Heading1, dan judul bernomor
+    bila number-sections. otomatis=True (word-otomatis.lua terpasang): jumlah
+    bidang SEQ Gambar/Tabel/Persamaan = jumlah objek bernomor, setiap REF
+    menunjuk bookmark yang ada, bidang TOC daftar isi/gambar/tabel ada, dan
+    halaman hak cipta (gaya "Hak Cipta") sebelum daftar isi."""
     import zipfile
     with zipfile.ZipFile(docx) as z:
         xml = z.read("word/document.xml").decode("utf-8", errors="replace")
@@ -902,11 +912,17 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False):
     pgsz = re.search(r"<w:pgSz [^>]*>", sect[-1]).group(0) if sect else ""
     pgmar = re.search(r"<w:pgMar [^>]*>", sect[-1]).group(0) if sect else ""
     w, h = _attr(pgsz, "w:w"), _attr(pgsz, "w:h")
+    mm = 25.4 / 1440
     if ukuran_mm:
-        mm = 25.4 / 1440
         if abs(w * mm - ukuran_mm[0]) > 2 or abs(h * mm - ukuran_mm[1]) > 2:
             masalah.append(f"halaman {w * mm:.0f} × {h * mm:.0f} mm, seharusnya {ukuran_mm[0]} × {ukuran_mm[1]} mm "
                            "(reference-doc ukuran buku dari huruf.py)")
+    if margin_mm:
+        nyata = [_attr(pgmar, f"w:{k}") * mm for k in ("left", "right", "top", "bottom")]
+        if any(abs(a - b) > 1 for a, b in zip(nyata, margin_mm)):
+            masalah.append("margin kiri/kanan/atas/bawah " + "/".join(f"{a:.0f}" for a in nyata) +
+                           " mm, seharusnya " + "/".join(f"{b:g}" for b in margin_mm) +
+                           " mm seperti PDF (reference-doc dari huruf.py untuk ukuran di konfig.json)")
     bidang = (w - _attr(pgmar, "w:left") - _attr(pgmar, "w:right")) * 635  # EMU
     for tag in re.findall(r"<wp:extent [^>]*>", xml):
         cx = _attr(tag, "cx")
@@ -914,24 +930,73 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False):
             masalah.append(f"gambar {cx / 914400:.2f} in melebihi bidang teks {bidang / 914400:.2f} in")
         if cx <= 0.2 * 914400:
             masalah.append(f"gambar kecil {cx / 914400:.2f} in (ikon kotak? set callout-icon: false di format docx)")
+    for tag in re.findall(r"<wp:docPr [^>]*>", xml):
+        m = re.search(r'descr="([^"]*)"', tag)
+        if not m or not m.group(1).strip():
+            nama = re.search(r'name="([^"]*)"', tag)
+            masalah.append(f"gambar tanpa teks alternatif ({nama.group(1) if nama else '?'}): "
+                           "isi fig-alt atau keterangan (word-otomatis.lua)")
     teks = " ".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", xml))
     if "??" in teks:
         masalah.append("'??' di teks: rujukan silang atau sitasi tidak terselesaikan")
     for r in sorted(set(re.findall(r"@(?:fig|sec|tbl|eq|lst|thm)-[\w-]+", teks)))[:10]:
         masalah.append(f"rujukan mentah '{r}' di teks")
     judul = []
-    for par in re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S):
-        st = re.search(r'<w:pStyle w:val="(Heading\d)"', par)
-        if st:
-            judul.append((st.group(1), "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par)).strip()))
+    paragraf = re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S)
+    keterangan = {"Gambar": 0, "Tabel": 0}
+    nomor_persamaan = 0
+    for par in paragraf:
+        st = re.search(r'<w:pStyle w:val="([^"]+)"', par)
+        gaya = st.group(1) if st else ""
+        if re.fullmatch(r"Heading\d", gaya):
+            judul.append((gaya, _teks_xml(par).strip()))
+        elif any("Caption" in g for g in re.findall(r'<w:pStyle w:val="([^"]+)"', par)):
+            # Quarto: pPr kedua berisi ImageCaption sesudah pPr gaya paragraf
+            m = re.match(r"\s*(Gambar|Tabel)[\s\u00a0]+[\dA-Z]+(?:\.\d+)?", _teks_xml(par))
+            if m:
+                keterangan[m.group(1)] += 1
+        elif gaya == "NomorPersamaan":
+            nomor_persamaan += 1
     if not any(g == "Heading1" for g, _ in judul):
         masalah.append("tidak ada judul bergaya Heading1")
     if bernomor and not any(g == "Heading1" and re.match(r"\d+\.?\s", s) for g, s in judul):
         masalah.append("judul bab tidak bernomor di Word (number-sections)")
+    if not otomatis:
+        return masalah
+    # --- fitur otomatis Word (scripts/word-otomatis.lua)
+    instr = re.findall(r"<w:instrText[^>]*>([^<]*)</w:instrText>", xml)
+    seq = {n: sum(1 for i in instr if re.match(rf"\s*SEQ {n}\b", i)) for n in ("Gambar", "Tabel", "Persamaan")}
+    statis = 0
+    for om in re.findall(r"<m:oMath>.*?</m:oMath>", xml, flags=re.S):
+        # "\qquad(1.1)" tanpa word-otomatis.lua: spasi lebar lalu nomor; kurungnya
+        # bisa teks atau pembatas m:d
+        if re.search(r"(?:\(|\s)\s*[\dA-Z]+\.\d+\s*\)?\s*$", "".join(re.findall(r"<m:t[^>]*>([^<]*)</m:t>", om))):
+            statis += 1
+    harap = {"Gambar": keterangan["Gambar"], "Tabel": keterangan["Tabel"], "Persamaan": nomor_persamaan + statis}
+    for n in ("Gambar", "Tabel", "Persamaan"):
+        if seq[n] != harap[n]:
+            masalah.append(f"{seq[n]} bidang SEQ {n}, objek bernomor {harap[n]}"
+                           + (f" ({statis} nomor persamaan statis di dalam rumus)" if n == "Persamaan" and statis else "")
+                           + ": pasang word-otomatis.lua (at: post-render) di _quarto.yml")
+    bookmark = set(re.findall(r'<w:bookmarkStart [^>]*w:name="([^"]+)"', xml))
+    for r in sorted({m.group(1) for i in instr for m in [re.match(r"\s*REF\s+(\S+)", i)] if m} - bookmark)[:10]:
+        masalah.append(f"REF {r} menunjuk bookmark yang tidak ada")
+    toc = [(i, k) for k, i in enumerate(instr) if re.match(r"\s*TOC\b", i)]
+    if not any(r"\o" in i for i, _ in toc):
+        masalah.append("bidang TOC daftar isi tidak ada (toc: false di docx dan word-otomatis.lua)")
+    for n, daftar in (("Gambar", "Daftar Gambar"), ("Tabel", "Daftar Tabel")):
+        if harap[n] and not any(f'\\c "{n}"' in i for i, _ in toc):
+            masalah.append(f"bidang TOC {daftar} (\\c \"{n}\") tidak ada")
+    pos_hc = xml.find('<w:pStyle w:val="HakCipta"')
+    pos_toc = xml.find("TOC \\o")
+    if pos_hc < 0:
+        masalah.append('halaman hak cipta (gaya "Hak Cipta") tidak ada di Word')
+    elif pos_toc >= 0 and pos_hc > pos_toc:
+        masalah.append("halaman hak cipta sesudah daftar isi; seharusnya sesudah halaman judul, sebelum daftar isi")
     return masalah
 
 
-def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False):
+def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True):
     if docx is None:
         daftar = list((buku / "_book").glob("*.docx"))
         if not daftar:
@@ -940,10 +1005,12 @@ def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False):
         docx = daftar[0]
         modul = _modul_huruf()
         if modul is not None:
-            ukuran_mm = modul.ukuran(KONFIG.get("ukuran", "b5"))["kertas"]
+            uk = modul.ukuran(KONFIG.get("ukuran", "b5"))
+            ukuran_mm, margin_mm = uk["kertas"], uk["margin"]
         yml = (buku / "_quarto.yml").read_text(encoding="utf-8")
         bernomor = bool(re.search(r"^number-sections:\s*true", yml, flags=re.M))
-    masalah = masalah_docx(docx, ukuran_mm, bernomor)
+        otomatis = "word-otomatis.lua" in yml
+    masalah = masalah_docx(docx, ukuran_mm, bernomor, margin_mm, otomatis)
     catat("G-DOCX", not masalah, "\n".join(sorted(set(masalah))[:40]))
 
 
@@ -1646,8 +1713,8 @@ def main():
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
     if a.docx_cek:
         modul = _modul_huruf()
-        gerbang_docx(None, docx=Path(a.docx_cek),
-                     ukuran_mm=modul.ukuran(a.ukuran)["kertas"] if modul else None)
+        uk = modul.ukuran(a.ukuran) if modul else {}
+        gerbang_docx(None, docx=Path(a.docx_cek), ukuran_mm=uk.get("kertas"), margin_mm=uk.get("margin"))
         for g, ok, r in hasil:
             print(f"{g}: {'LULUS' if ok else 'GAGAL'}" + (f"\n{r}" if r else ""))
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)

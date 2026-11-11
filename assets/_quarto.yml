@@ -36,6 +36,11 @@ language:
 filters:
   - ../_bersama/bahasa-asing.lua      # istilah asing miring -> lang=en (pemenggalan Inggris)
   - ../_bersama/catatan.lua           # ::: {.catatan} di bawah tabel/gambar
+  # Hanya DOCX (PDF tidak berubah): nomor bab/gambar/tabel/persamaan sebagai
+  # bidang SEQ, rujukan silang REF, Daftar Isi/Gambar/Tabel sesudah halaman hak
+  # cipta, teks alternatif, lebar gambar, "Lampiran" (G-DOCX memeriksanya).
+  - at: post-render
+    path: ../_bersama/word-otomatis.lua
 
 bibliography: pustaka.bib
 csl: ../_bersama/apa.csl              # penulis-tahun
@@ -103,7 +108,7 @@ format:
     include-in-header:
       - ../_bersama/preamble.tex      # huruf, blok lebar, tag judul, indentfirst, draf, penggalan
       - ../_bersama/hak-cipta.tex     # \halamanhakcipta (fon dan lisensinya, data "belum ditetapkan")
-    include-before-body:              # halaman hak cipta sesudah halaman judul (Word: tulis di index.qmd)
+    include-before-body:              # halaman hak cipta sesudah halaman judul (Word: blok "Hak Cipta" di index.qmd)
       - text: '\halamanhakcipta{JUDUL BUKU}{PENULIS}{2026}{Draf revisi ke-1}{Quarto, R, Python, \LuaLaTeX}'
     keep-tex: true                    # perlu untuk G-TEPI dan G-PENGGALAN
     latex-clean: false                # perlu untuk G-TEPI dan G-LOG
@@ -114,7 +119,10 @@ format:
   docx:
     callout-icon: false               # ikon kotak di Word adalah gambar kecil (G-DOCX)
     reference-doc: ../_bersama/reference-b5.docx   # huruf.py: springer atau docx_huruf "windows" -> reference-b5-windows.docx
-    toc: true
+    # Daftar Isi, Daftar Gambar, dan Daftar Tabel dibuat word-otomatis.lua
+    # sesudah halaman hak cipta (urutan sama dengan PDF); toc Pandoc dimatikan.
+    toc: false
+    link-citations: true              # sitasi bertaut ke Daftar Pustaka (Zotero/CITATION: keputusan penulis)
     toc-depth: 2
     fig-format: png
     fig-dpi: 300

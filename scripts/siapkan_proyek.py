@@ -5,7 +5,7 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
   <proyek>/harness/       harness.py, referensi.py, penggalan.py, cek_rumus.py, kemas_sumber.py,
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
-  <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua,
+  <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua, word-otomatis.lua,
                           tikz-preamble.tex, preamble.tex, doc-class.tex, hak-cipta.tex,
                           apa.csl, reference-b5.docx, reference-b5-windows.docx
   <proyek>/KEPUTUSAN-RANCANGAN.md, REVISI.md, .gitignore
@@ -84,7 +84,7 @@ def main():
     (P / "harness" / "laporan").mkdir(parents=True, exist_ok=True)
 
     # folder bersama
-    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua"]:
+    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua", "word-otomatis.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
     for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
               "reference-b5.docx", "reference-b5-windows.docx", "hak-cipta.tex"]:
@@ -108,7 +108,15 @@ def main():
     tulis(B / "index.qmd", "# Prakata {.unnumbered}\n\nTujuan penulisan, pembaca sasaran, "
           "keunggulan buku, dan cara memakai buku ini.\n\n## Data yang digunakan dan batasannya "
           "{.unnumbered}\n\nJenis data (riil, sintetis paket, simulasi), alasannya, dan rujukan ke "
-          "lampiran Sumber Data.\n", False)
+          "lampiran Sumber Data.\n\n"
+          "<!-- Halaman hak cipta versi Word: word-otomatis.lua memindahkannya ke sesudah halaman\n"
+          "     judul dan sebelum Daftar Isi (PDF memakai hak-cipta.tex). -->\n"
+          "::: {.content-visible when-format=\"docx\"}\n::: {custom-style=\"Hak Cipta\"}\n"
+          f"**{a.judul}**\\\n{a.penulis}\n\n"
+          f"Hak cipta © {date.today():%Y} {a.penulis}. Penerbit: belum ditetapkan. "
+          "ISBN: belum ditetapkan.\n\n"
+          "Huruf dan lisensinya: samakan dengan halaman hak cipta PDF (_bersama/hak-cipta.tex).\n"
+          ":::\n:::\n", False)
     tulis(B / "references.qmd", "# Daftar Pustaka {.unnumbered}\n\n::: {#refs}\n:::\n", False)
     N = B / "naskah"
     salin(ASET / "templat-brief.md", N / "00-brief.md", False)

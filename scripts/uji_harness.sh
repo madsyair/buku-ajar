@@ -83,8 +83,8 @@ else
 fi
 # G-DOCX-RUMUS dan G-DOCX pada DOCX fikstur (dibuat Pandoc dari reference-b5.docx):
 # rumus-baik.docx (5 rumus OMML dari rumus-baik.qmd) LULUS; rumus-gagal.docx (TeX
-# mentah di teks, gambar beralt "rumus") GAGAL; docx-baik.docx LULUS; docx-gagal.docx
-# ("??" dan @fig- mentah) GAGAL.
+# mentah di teks, gambar beralt "rumus") GAGAL; docx-baik.docx (word-otomatis.lua) LULUS;
+# docx-gagal.docx ("??" dan @fig- mentah) GAGAL.
 for kasus in "rumus-baik --docx-rumus LULUS" "rumus-gagal --docx-rumus GAGAL" \
              "docx-baik --docx-cek LULUS" "docx-gagal --docx-cek GAGAL"; do
   set -- $kasus
@@ -95,6 +95,19 @@ for kasus in "rumus-baik --docx-rumus LULUS" "rumus-gagal --docx-rumus GAGAL" \
     hasil=GAGAL
   fi
   if [ "$hasil" = "$3" ]; then echo "benar: ${2#--} $1 $hasil"; else echo "SALAH: ${2#--} $1 seharusnya $3"; status=1; fi
+done
+# G-DOCX, fitur otomatis Word (word-otomatis.lua; fikstur dari uji-buku/docx/buat_fikstur.py):
+# setiap fikstur GAGAL dengan pesan pemeriksaannya sendiri; docx-baik di atas LULUS.
+for kasus in "docx-tanpa-otomatis|bidang SEQ Persamaan" "docx-ref|menunjuk bookmark yang tidak ada" \
+             "docx-daftar|TOC Daftar Gambar" "docx-hakcipta|hak cipta sesudah daftar isi" \
+             "docx-alt|tanpa teks alternatif" "docx-margin|seharusnya 28/28/22/24 mm"; do
+  f=${kasus%%|*}; pesan=${kasus#*|}
+  keluaran=$(python3 harness/harness.py --docx-cek harness/uji-buku/docx/$f.docx 2>&1)
+  if [ $? -ne 0 ] && printf '%s' "$keluaran" | grep -qF "$pesan"; then
+    echo "benar: docx-cek $f GAGAL ($pesan)"
+  else
+    echo "SALAH: docx-cek $f seharusnya GAGAL dengan '$pesan'"; status=1
+  fi
 done
 # G-LN: \log tanpa basis di rumus prosa GAGAL (babln); babbaik memuat \ln,
 # \log_{10}, kode log() dan R inline log() dan harus bersih.
