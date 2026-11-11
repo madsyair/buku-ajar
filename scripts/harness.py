@@ -1675,8 +1675,16 @@ def peringatan_pertanyaan(teks):
     return pesan
 
 
+def _berkas_bab(qmd):
+    """G-STRUKTUR, G-PERTANYAAN, G-GAYA-AJAR hanya untuk berkas bab (babXX.qmd), bukan
+    index (prakata), lampiran-*, glosarium, references, riwayat-penulis, atau kunci-*."""
+    return re.match(r"bab", Path(qmd).stem) is not None
+
+
 def gerbang_pertanyaan(qmd):
     """G-PERTANYAAN, tingkat WARNING: tidak masuk daftar gerbang (tidak menggagalkan status)."""
+    if not _berkas_bab(qmd):
+        return []
     pesan = peringatan_pertanyaan(qmd.read_text(encoding="utf-8"))
     if pesan:
         print(f"[PERINGATAN] G-PERTANYAAN: {len(pesan)} subbab")
@@ -1688,6 +1696,8 @@ def gerbang_pertanyaan(qmd):
 def gerbang_struktur(qmd, buku):
     """Pengantar menarik, subbab ringkas, rangkuman di akhir bab (keputusan penulis 2026-11-10)."""
     if any(Path(buku).name.startswith(a) for a in KONFIG["struktur_abaikan_buku"]):
+        return
+    if not _berkas_bab(qmd):  # index, lampiran-*, glosarium, references, riwayat-penulis
         return
     teks = qmd.read_text(encoding="utf-8")
     bagian = _bagian_bab(teks)
@@ -1732,6 +1742,8 @@ def gerbang_struktur(qmd, buku):
 
 def gerbang_gaya_ajar(qmd):
     """Tahap gaya akhir (references/gaya-buku-ajar.md §6): sapaan, kalimat, kepadatan sitasi."""
+    if not _berkas_bab(qmd):
+        return
     teks = qmd.read_text(encoding="utf-8")
     prosa, _ = pilah_qmd(teks)
     isi, sitasi, dalam_bacaan, dalam_kotak, dalam_math = [], 0, False, 0, False
