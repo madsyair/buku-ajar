@@ -40,7 +40,7 @@ Setiap buku memuat subbagian prakata **"Data yang digunakan dan batasannya"**: j
 
 Hanya sumber yang **teksnya dapat dibuka dan dicocokkan**:
 
-- teks lokal di `harness/sumber/<berkas>.md` (konversi PDF buku/artikel, dengan penanda `<!-- Page N -->` bila ada);
+- teks lokal di `harness/sumber/<berkas>.md` (konversi PDF buku/artikel, dengan penanda `<!-- Page N -->` bila ada). Bila ada konversi lain dari buku yang sama (mis. unggahan baru yang lebih rapi untuk tahap gaya, tetapi tanpa penanda halaman atau dengan angka tabel hilang), simpan sebagai sumber kedua `harness/sumber/versi2/<berkas>.md` dengan baris kepala asal dan tanggal; jangan timpa sumber utama yang lebih lengkap;
 - dokumentasi paket R terpasang (Rd, DESCRIPTION, `citation()`);
 - halaman web yang dibuka saat menulis (dicatat URL, tanggal akses, kutipan verbatim);
 - hitungan ulang (ekspresi R yang hasilnya dibandingkan dengan angka sumber).
@@ -72,7 +72,7 @@ Satu daftar JSON untuk seluruh proyek; setiap entri satu klaim pada satu kalimat
 
 | Jenis | Medan | Diperiksa ulang harness |
 |---|---|---|
-| `berkas` | `berkas`, `lokasi`, `kutipan` | kutipan dicari di `harness/sumber/<berkas>` setelah normalisasi (ligatur, petik lengkung, pemenggalan akhir baris) |
+| `berkas` | `berkas`, `lokasi`, `kutipan` | kutipan dicari di `harness/sumber/<berkas>` setelah normalisasi (ligatur, petik lengkung, pemenggalan akhir baris); bila tidak ditemukan, di versi kedua `harness/sumber/versi2/<berkas>`; laporan menyebut versi yang cocok (`[utama]` atau `[versi kedua]`) |
 | `rd` | `paket`, `topik`, `kutipan` | dicari di `tools::Rd2txt` |
 | `deskripsi` | `paket`, `kutipan` | DESCRIPTION paket |
 | `citation` | `kutipan` | keluaran `citation()` |

@@ -91,6 +91,26 @@ else echo "SALAH: babsitasiulang seharusnya hanya PERINGATAN G-SITASI-ULANG pada
 keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsitasiulang --tahap akhir 2>&1)
 if echo "$keluaran" | grep -q "\[GAGAL\] G-SITASI-ULANG"; then echo "benar: babsitasiulang GAGAL di G-SITASI-ULANG (--tahap akhir)"
 else echo "SALAH: babsitasiulang seharusnya GAGAL di G-SITASI-ULANG (--tahap akhir)"; status=1; fi
+# Sumber ganda (keputusan 2026-11-12): bukti "berkas" dicari di sumber utama dulu, lalu di
+# versi kedua sumber/versi2/<berkas>; laporan menyebut versi yang cocok. babsumberganda memakai
+# uji-buku/sumber/: kutipan hanya di utama (hlm. PDF 1), hanya di versi kedua (tanpa penanda
+# halaman), di keduanya (utama menang, hlm. PDF 2, melintasi baris), dan di tidak satu pun (GAGAL).
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness, referensi
+q = pathlib.Path('harness/uji-buku/babsumberganda.qmd'); prosa, _ = harness.pilah_qmd(q.read_text(encoding='utf-8'))
+m, r = referensi.periksa(q, 'babsumberganda', prosa, pathlib.Path('harness/uji-buku/pustaka.bib').read_text(encoding='utf-8'))
+print(len(m)); print(*m, sep='\n'); print(*r, sep='\n')" 2>&1)
+if [ "$(echo "$temuan" | head -1)" = "1" ] \
+   && echo "$temuan" | grep -qF "kutipan tidak ditemukan di contoh-sumber.md maupun versi2/contoh-sumber.md: 'This passage appears in neither version'" \
+   && echo "$temuan" | grep -qF "contoh-sumber.md [utama] hlm. PDF 1" \
+   && echo "$temuan" | grep -qF "versi2/contoh-sumber.md [versi kedua] tanpa penanda halaman" \
+   && echo "$temuan" | grep -qF "contoh-sumber.md [utama] hlm. PDF 2" \
+   && echo "$temuan" | grep -qF "3 bukti diperiksa ulang otomatis, 0 bukti web tercatat; 1 bukti hanya cocok di sumber versi kedua (versi2/)"; then
+  echo "benar: sumber ganda (utama dulu, lalu versi2/; versi yang cocok dilaporkan)"
+else echo "SALAH: sumber ganda seharusnya utama → versi2/ dengan satu kutipan hilang (dapat: $temuan)"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsumberganda 2>&1)
+if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[GAGAL\] G-REFERENSI"; then
+  echo "benar: babsumberganda GAGAL di G-REFERENSI (kutipan tidak ada di versi mana pun)"
+else echo "SALAH: babsumberganda seharusnya GAGAL di G-REFERENSI"; status=1; fi
 # (bukti jenis hitung memakai Rscript; dilewati tanpa R)
 if [ $ADA_R = 1 ]; then
   # Sesudah sitasi digabung: babsitasigabung memuat kalimat "Sumber yang sama juga menunjukkan …"
