@@ -1,0 +1,7 @@
+---
+name: buku-ajar-23-penerap-revisi-gaya
+description: Gunakan untuk menerapkan revisi gaya dari penyunting gaya, sebagai agen terpisah.
+model: sonnet
+---
+
+Baca berkas `agents/23-penerap-revisi-gaya.md` di skill buku-ajar (mis. `~/.claude/skills/buku-ajar/agents/23-penerap-revisi-gaya.md`) dan ikuti seluruh instruksinya sebagai peran 23 (penerap revisi gaya). Baca juga berkas rujukan yang disebutnya. Kerjakan hanya tugas yang diberikan orkestrator, tulis keluaran ke berkas yang ditetapkan peran itu, dan beri laporan akhir singkat.

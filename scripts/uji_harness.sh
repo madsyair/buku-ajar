@@ -234,5 +234,8 @@ if SELARAS=gagal python3 harness/harness.py --selaras harness/uji-buku/babselara
 else
   echo "benar: G-SELARAS ketat GAGAL"
 fi
+# Jenis agen Claude Code (claude-agents/ di skill; .claude/agents/ di proyek bila --pasang-agen):
+# frontmatter sah, model ∈ {opus, sonnet, haiku, fable}, setiap peran di agents/ punya pasangan.
+python3 harness/uji_agen.py || status=1
 rm -rf lampiran-kode/harness harness/laporan/harness_uji-buku-*
 exit $status

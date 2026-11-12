@@ -64,7 +64,16 @@ Permintaan penulis; `KEPUTUSAN-RANCANGAN.md`; `naskah/STATUS.md` setiap buku; la
 
 Praktik kerja agar alur panjang tidak menabrak batas pemakaian dan ruang disk:
 
-- **Pilih model per peran.** Pekerjaan mekanis atau terstruktur (menjalankan harness, perbaikan EYD berpola, penggantian istilah, pengecekan rujukan, kunci jawaban yang mengikuti templat) boleh memakai model lebih ringan (Sonnet atau Haiku). Penulis bab, reviewer isi, rumus, dan pemodelan, pembaca independen, dan telaah pakar memakai model terkuat.
+- **Pilih model per peran** (keputusan penulis 2026-11-12: setiap peran punya model bawaan; peran dapat dipasang sebagai jenis agen Claude Code lewat `claude-agents/` dan `siapkan_proyek.py --pasang-agen`, sehingga modelnya otomatis):
+
+  | Model | Peran atau tugas | Alasan |
+  | --- | --- | --- |
+  | **opus** | 01 perencana, 02 perancang kerangka, 03 peninjau literatur, 04/04a/04b penulis, 05 reviewer isi, 06 reviewer rumus, 08 reviewer kode, 09 editor, 13 pembuat kunci jawaban, 16 reviewer pemodelan, 17 reviewer ML, 18 reviewer statistika resmi, 19 reviewer domain, 21 penelaah pakar | Kebenaran isi, rumus, kode, dan keputusan rancangan; kekeliruan di sini mahal dan sulit ditangkap gerbang. |
+  | **sonnet** | 07 reviewer bahasa, 10/11/12 pembaca pemula/menengah/mahir, 14 penyunting soal, 15 pengaudit ilustrasi, 20 reviewer pedagogi, 22 penyunting gaya, 23 penerap revisi gaya, 24 editor penerbitan | Pekerjaan berpedoman (aturan bahasa, gaya, dan templat) atau membaca sebagai pembaca; gerbang dan reviewer opus menjaga isi. |
+  | **haiku** | Tugas mekanis di luar peran: menjalankan harness dan merangkum, penggantian istilah, EYD berpola, cek rujukan, pengemasan, pemantauan render | Hasilnya diperiksa mesin atau mudah dicek; kecepatan dan biaya lebih penting daripada penalaran. |
+  | **fable** | Sedang dievaluasi | Uji banding Fable lawan Opus pada peran 05 sedang berjalan; hasilnya diisi orkestrator di sini. Sementara itu jangan dipakai sebagai bawaan. |
+
+  Aturan: orkestrator boleh **menaikkan model satu tingkat** (haiku ke sonnet, sonnet ke opus) untuk bab yang sulit atau setelah ulasan model ringan meleset (temuan penting lolos dan baru tertangkap peninjau lain); **turunkan** bila tugasnya mekanis. Kenaikan dan alasannya dicatat di `STATUS.md`. Orkestrator sendiri adalah sesi utama; modelnya dipilih penulis.
 - **Andalkan gerbang dan skrip deterministik, bukan agen,** untuk pemeriksaan yang dapat diotomatiskan (angka, rujukan, istilah, koma konjungsi, struktur). Agen hanya untuk yang tidak dapat diperiksa mesin.
 - **Batasi agen paralel** (±3–5) agar tidak menabrak batas pemakaian. Bila batas tercapai, lanjutkan agen yang sama lewat pesan (lihat **Pemulihan**), bukan agen baru.
 - **Hemat konteks agen.** Agen membaca bagian berkas yang relevan (`grep`, `offset`), bukan seluruh buku. Laporan akhir singkat (≤ 120–200 kata); rincian ditulis ke berkas.
