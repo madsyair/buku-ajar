@@ -47,9 +47,9 @@ keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babgayaajar 
 if echo "$keluaran" | grep -q "\[GAGAL\] G-GAYA-AJAR"; then echo "benar: babgayaajar GAGAL di G-GAYA-AJAR (--tahap akhir)"
 else echo "SALAH: babgayaajar seharusnya GAGAL di G-GAYA-AJAR (--tahap akhir)"; status=1; fi
 keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babbaik --tahap akhir 2>&1)
-if echo "$keluaran" | grep -q "\[GAGAL\] G-\(GAYA-AJAR\|STRUKTUR\|RUMUS\)"; then
-  echo "SALAH: babbaik seharusnya lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; status=1
-else echo "benar: babbaik lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS (--tahap akhir)"; fi
+if echo "$keluaran" | grep -q "\[GAGAL\] G-\(GAYA-AJAR\|STRUKTUR\|RUMUS\|SITASI-ULANG\)"; then
+  echo "SALAH: babbaik seharusnya lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS, G-SITASI-ULANG (--tahap akhir)"; status=1
+else echo "benar: babbaik lolos G-GAYA-AJAR, G-STRUKTUR, G-RUMUS, G-SITASI-ULANG (--tahap akhir)"; fi
 # G-KONJUNGSI: "seperti" di kalimat sebelumnya tidak boleh meloloskan ", karena" (baris 3);
 # aposisi "seperti … 0,5,", "mis.", dan "Jadi, bila …" tetap sah (baris 5)
 temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
@@ -70,6 +70,47 @@ keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babpertanyaa
 if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[PERINGATAN\] G-PERTANYAAN" && ! echo "$keluaran" | grep -q "\[GAGAL\] G-PERTANYAAN"; then
   echo "benar: babpertanyaan memberi PERINGATAN G-PERTANYAAN, bukan GAGAL"
 else echo "SALAH: babpertanyaan seharusnya hanya PERINGATAN G-PERTANYAAN"; status=1; fi
+# G-SITASI-ULANG (keputusan penulis 2026-11-12): satu sumber disitasi sekali per paragraf.
+# babsitasiulang: @gelman2013 dua kali (baris 3), @gelman2021 dengan lokator berbeda (baris 5,
+# saran gabung "hlm. 5, 9"), naratif + kurung lintas baris (baris 7), lokator di sitasi kedua
+# (baris 8). Rujukan silang berulang, kode sebaris, komentar, blok kode, dua butir daftar, dan
+# sumber yang sama di paragraf lain tidak ditandai.
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+for p in harness.temuan_sitasi_ulang(pathlib.Path('harness/uji-buku/babsitasiulang.qmd').read_text(encoding='utf-8')): print(p)")
+baris=$(echo "$temuan" | grep -o "^baris [0-9]*: @[a-z0-9]*" | tr '\n' ' ')
+if [ "$baris" = "baris 3: @gelman2013 baris 5: @gelman2021 baris 7: @kolmogorov1950 baris 8: @berndt1991 " ] \
+   && echo "$temuan" | grep -qF "[@gelman2021, hlm. 5, 9]"; then
+  echo "benar: G-SITASI-ULANG menandai 4 sitasi berulang dan menyarankan gabung lokator"
+else echo "SALAH: G-SITASI-ULANG seharusnya baris 3, 5, 7, 8 dengan saran [@gelman2021, hlm. 5, 9] (dapat: $baris)"; status=1; fi
+# Tahap draf: PERINGATAN, bukan GAGAL; --tahap akhir: GAGAL
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsitasiulang 2>&1)
+if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[PERINGATAN\] G-SITASI-ULANG" \
+   && ! echo "$keluaran" | grep -q "\[GAGAL\] G-SITASI-ULANG"; then
+  echo "benar: babsitasiulang memberi PERINGATAN G-SITASI-ULANG pada tahap draf"
+else echo "SALAH: babsitasiulang seharusnya hanya PERINGATAN G-SITASI-ULANG pada tahap draf"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsitasiulang --tahap akhir 2>&1)
+if echo "$keluaran" | grep -q "\[GAGAL\] G-SITASI-ULANG"; then echo "benar: babsitasiulang GAGAL di G-SITASI-ULANG (--tahap akhir)"
+else echo "SALAH: babsitasiulang seharusnya GAGAL di G-SITASI-ULANG (--tahap akhir)"; status=1; fi
+# (bukti jenis hitung memakai Rscript; dilewati tanpa R)
+if [ $ADA_R = 1 ]; then
+  # Sesudah sitasi digabung: babsitasigabung memuat kalimat "Sumber yang sama juga menunjukkan …"
+  # dan paragraf dua baris yang sitasinya di baris pertama sementara penanda klaimnya di baris
+  # kedua. Klaim kalimat tanpa @kunci tetap di klaim.json dengan "sitasi_di" dan bukti hitung
+  # yang diperiksa ulang. G-SITASI-ULANG, G-REFERENSI, G-SITASI, G-ATRIBUSI harus LULUS.
+  keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsitasigabung --tahap akhir 2>&1)
+  if echo "$keluaran" | grep -q "\[LULUS\] G-SITASI-ULANG" && echo "$keluaran" | grep -q "3 bukti diperiksa ulang otomatis" \
+     && ! echo "$keluaran" | grep -q "\[GAGAL\] G-\(SITASI-ULANG\|REFERENSI\|SITASI\|ATRIBUSI\)\b"; then
+    echo "benar: babsitasigabung (sitasi_di) lolos G-SITASI-ULANG, G-REFERENSI, G-SITASI, G-ATRIBUSI"
+  else echo "SALAH: babsitasigabung seharusnya lolos G-SITASI-ULANG, G-REFERENSI, G-SITASI, G-ATRIBUSI"; status=1; fi
+  # Entri sitasi_di tetap diperiksa: paragraf tanpa sitasi sumbernya dan bukti hitung yang salah GAGAL
+  keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babsitasilepas 2>&1)
+  if echo "$keluaran" | grep -q "\[GAGAL\] G-REFERENSI" && echo "$keluaran" | grep -qF "tidak menyitasi @gelman2021 sebelumnya" \
+     && echo "$keluaran" | grep -qF "hitungan 0.666667 ≠ nilai sumber 0.75"; then
+    echo "benar: babsitasilepas GAGAL di G-REFERENSI (sitasi_di tak tertaut, bukti salah)"
+  else echo "SALAH: babsitasilepas seharusnya GAGAL di G-REFERENSI (sitasi_di tak tertaut, bukti salah)"; status=1; fi
+else
+  echo "dilewati: babsitasigabung dan babsitasilepas (bukti hitung butuh R)"
+fi
 # G-TAG (PDF bertag) diuji pada PDF fikstur tanpa render: tag-tanpa.pdf
 # (pdfLaTeX/LuaLaTeX tanpa DocumentMetadata) GAGAL, tag-baik.pdf LULUS.
 if command -v pdfinfo > /dev/null; then

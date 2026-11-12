@@ -1,0 +1,7 @@
+# Bab sitasi lepas {#sec-sitasi-lepas}
+
+Paragraf pertama menyitasi sumbernya [@gelman2021].
+
+Sumber yang sama juga menunjukkan klaim yang paragrafnya tanpa sitasi.
+
+Klaim pertama paragraf ini tertaut ke sumbernya [@gelman2013]. Sumber yang sama juga mencatat angka yang tidak cocok dengan hitungan.

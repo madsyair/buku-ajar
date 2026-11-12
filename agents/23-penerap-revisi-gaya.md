@@ -10,16 +10,18 @@ Memeriksa versi tulis ulang dan telaah peran 22, memperbaiki kekurangannya, lalu
 
 ## Keluaran
 
-`babXX.qmd` hasil penerapan; registri klaim yang diperbarui (`"tampil": "bacaan-lanjut"` untuk sitasi yang dipindah); entri glosarium dan `keputusan-istilah.md` baru; bagian `## Tindak lanjut (tanggal)` di `ulasan/babXX-gaya.md` (per temuan: *diterapkan* dengan lokasi, *diterapkan dengan perbaikan* beserta apa yang diperbaiki, atau *tidak diterapkan* beserta bukti).
+`babXX.qmd` hasil penerapan; registri klaim yang diperbarui (`"tampil": "bacaan-lanjut"` untuk sitasi yang dipindah; `"sitasi_di"` untuk kalimat yang sitasinya digabung ke kemunculan pertama paragraf); entri glosarium dan `keputusan-istilah.md` baru; bagian `## Tindak lanjut (tanggal)` di `ulasan/babXX-gaya.md` (per temuan: *diterapkan* dengan lokasi, *diterapkan dengan perbaikan* beserta apa yang diperbaiki, atau *tidak diterapkan* beserta bukti).
 
 ## Langkah
 
 1. **Bandingkan kedua versi paragraf demi paragraf** (`diff --word-diff`). Untuk setiap perubahan, pastikan makna, syarat, arah, dan besaran klaim tidak bergeser. Perubahan yang menggeser makna dikembalikan ke versi asal atau dirumuskan ulang.
 2. **Periksa sitasi yang dihapus**: klaimnya memang pengetahuan baku atau sudah tercakup di *Bacaan lanjut*, dan entri registrinya masih ada. Sitasi kutipan langsung, angka/data sumber lain, gambar/tabel adaptasi, hasil khas, dan atribusi nama metode yang terhapus dikembalikan.
+   - **Sitasi sekali per paragraf** (keputusan penulis 2026-11-12, G-SITASI-ULANG): dalam satu paragraf satu sumber disitasi sekali, pada kemunculan pertama. Kalimat sesudahnya ditulis *Sumber yang sama juga menunjukkan …* atau cukup tanpa sitasi bila jelas; untuk manual atau lembaga tulis faktanya langsung (G-ATRIBUSI). Lokator berbeda digabung di sitasi pertama (`[@k, hlm. 5, 9]`), atau dicatat di klaim bila proyek melarang lokator (G-SITASI). Pastikan sitasi yang tersisa memang menempel pada kalimat pertama yang berasal dari sumber itu.
+   - **Registri untuk sitasi yang digabung**: entri klaim kalimat yang kini tanpa `@kunci` **tidak dihapus**. Pertahankan kunci, penanda, dan bukti, lalu tambahkan `"sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)"` agar klaim tetap tertaut ke sitasi paragraf itu. G-REFERENSI menerima sitasi di kalimat pertama untuk klaim yang penandanya di kalimat atau baris lain paragraf yang sama, tetap memeriksa bukti setiap entri `sitasi_di` terhadap sumbernya, dan menolak entri `sitasi_di` yang paragrafnya tidak menyitasi `@kunci` sebelum penandanya. Bila penanda berubah karena kalimatnya ditulis ulang, perbarui penandanya, jangan hapus entrinya.
 3. **Periksa pengantar**: fakta di studi kasus ada di bab atau registri; cerita rekaan tidak menyebut orang atau lembaga nyata sebagai pelaku rekaan; pengantar dirujuk lagi.
 4. **Periksa istilah**: penjelasan benar secara teknis (bandingkan dengan definisi di bab dan sumbernya), sama dengan glosarium, dan tidak bertentangan dengan `keputusan-istilah.md`.
 5. **Periksa angka, rumus, kode**: tidak ada angka yang berubah menjadi ketikan, tidak ada label atau rujukan silang yang patah, dan rumus tetap lolos G-RUMUS.
-6. Terapkan ke `babXX.qmd`, perbarui registri dan glosarium, jalankan `harness.py` (tahap bawaan) **dan** `harness.py --tahap akhir` sampai keduanya LULUS (maks. 6 percobaan per gerbang), lalu tulis tindak lanjut.
+6. Terapkan ke `babXX.qmd`, perbarui registri dan glosarium, jalankan `harness.py` (tahap bawaan; G-SITASI-ULANG hanya WARNING) **dan** `harness.py --tahap akhir` (G-SITASI-ULANG GAGAL bila masih ada sitasi berulang) sampai keduanya LULUS (maks. 6 percobaan per gerbang), lalu tulis tindak lanjut.
 
 ## Kriteria lulus
 
@@ -27,4 +29,4 @@ Kedua mode harness LULUS; setiap temuan 22 punya tindak lanjut; tidak ada klaim 
 
 ## Larangan
 
-Menjadi agen yang sama dengan 22; menerima perubahan tanpa membandingkan; menambah klaim; menghapus entri registri; menyunting bab atau buku lain.
+Menjadi agen yang sama dengan 22; menerima perubahan tanpa membandingkan; menambah klaim; menghapus entri registri (termasuk entri kalimat yang sitasinya digabung); menyunting bab atau buku lain.

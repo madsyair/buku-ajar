@@ -1,4 +1,10 @@
 [
-  {"bab": "babsitasi", "kunci": "gelman2013", "penanda": "Klaim kedua mengutip BDA3",
-   "bukti": [{"jenis": "berkas", "berkas": "BDA3.md", "kutipan": "Bayesian methods always outperform every frequentist method"}]}
+  {"bab": "babsitasi", "kunci": "gelman2013", "penanda": "Klaim kedua mengutip BDA3", "bukti": [{"jenis": "berkas", "berkas": "BDA3.md", "kutipan": "Bayesian methods always outperform every frequentist method"}]},
+  {"bab": "babsitasigabung", "kunci": "gelman2013", "penanda": "Prior beta untuk peluang binomial menghasilkan posterior beta", "bukti": [{"jenis": "hitung", "kode": "(1 + 7) / (2 + 10)", "nilai_sumber": 0.6666666667, "toleransi": 1e-06}]},
+  {"bab": "babsitasigabung", "kunci": "gelman2013", "penanda": "Sumber yang sama juga menunjukkan bahwa rerata posterior", "sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)", "bukti": [{"jenis": "hitung", "kode": "(2 + 7) / (2 + 3 + 10)", "nilai_sumber": 0.6, "toleransi": 1e-06}]},
+  {"bab": "babsitasigabung", "kunci": "gelman2021", "penanda": "membantu kita memahami ketidakpastian prediksi", "sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)", "bukti": [{"jenis": "hitung", "kode": "qnorm(0.975)", "nilai_sumber": 1.959963985, "toleransi": 1e-06}]},
+  {"bab": "babsitasilepas", "kunci": "gelman2021", "penanda": "Paragraf pertama menyitasi sumbernya", "bukti": [{"jenis": "hitung", "kode": "qnorm(0.975)", "nilai_sumber": 1.959963985, "toleransi": 1e-06}]},
+  {"bab": "babsitasilepas", "kunci": "gelman2021", "penanda": "klaim yang paragrafnya tanpa sitasi", "sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)", "bukti": [{"jenis": "hitung", "kode": "qnorm(0.975)", "nilai_sumber": 1.959963985, "toleransi": 1e-06}]},
+  {"bab": "babsitasilepas", "kunci": "gelman2013", "penanda": "Klaim pertama paragraf ini tertaut", "bukti": [{"jenis": "hitung", "kode": "(1 + 7) / (2 + 10)", "nilai_sumber": 0.6666666667, "toleransi": 1e-06}]},
+  {"bab": "babsitasilepas", "kunci": "gelman2013", "penanda": "mencatat angka yang tidak cocok dengan hitungan", "sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)", "bukti": [{"jenis": "hitung", "kode": "(1 + 7) / (2 + 10)", "nilai_sumber": 0.75, "toleransi": 1e-06}]}
 ]

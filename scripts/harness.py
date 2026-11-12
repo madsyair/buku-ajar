@@ -42,6 +42,9 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                (≤ subbab_maks_kata), Rangkuman/Ringkasan di akhir bab (bukan buku kunci)
   G-PERTANYAAN (WARNING, tidak menggagalkan) subbab bernomor tanpa kalimat tanya di paragraf
                prosa pertamanya; pengecualian judul: konfig "pertanyaan_kecuali"
+  G-SITASI-ULANG satu sumber disitasi sekali per paragraf prosa (berkas bab); WARNING pada tahap
+               draf, GAGAL pada --tahap akhir; kalimat lanjutan tanpa @kunci dicatat di klaim.json
+               dengan "sitasi_di" dan tetap diperiksa G-REFERENSI
   G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
                panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
@@ -1679,7 +1682,7 @@ def peringatan_pertanyaan(teks):
 
 
 def _berkas_bab(qmd):
-    """G-STRUKTUR, G-PERTANYAAN, G-GAYA-AJAR hanya untuk berkas bab (babXX.qmd), bukan
+    """G-STRUKTUR, G-PERTANYAAN, G-GAYA-AJAR, G-SITASI-ULANG hanya untuk berkas bab (babXX.qmd), bukan
     index (prakata), lampiran-*, glosarium, references, riwayat-penulis, atau kunci-*."""
     return re.match(r"bab", Path(qmd).stem) is not None
 
@@ -1691,6 +1694,148 @@ def gerbang_pertanyaan(qmd):
     pesan = peringatan_pertanyaan(qmd.read_text(encoding="utf-8"))
     if pesan:
         print(f"[PERINGATAN] G-PERTANYAAN: {len(pesan)} subbab")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
+# ---------------------------------------------------------------- G-SITASI-ULANG
+# Keputusan penulis 2026-11-12: buku ajar menulis sitasi seminimal mungkin. Dalam
+# satu paragraf, satu sumber cukup disitasi sekali, pada kemunculan pertama;
+# kalimat sesudahnya tanpa sitasi ("Sumber yang sama juga menunjukkan …") dan
+# klaimnya tetap tertaut di klaim.json lewat sitasi paragraf itu (G-REFERENSI).
+# Rujukan silang Quarto (@sec-, @fig-, @tbl-, @eq-, @lst-, dan awalan teorema)
+# bukan sitasi.
+AWALAN_RUJUKAN_SILANG = ("sec", "fig", "tbl", "eq", "lst", "thm", "lem", "cor", "prp", "cnj",
+                         "def", "exm", "exr", "sol", "rem")
+POLA_KUNCI_SITASI = re.compile(r"(?<![\w.\\@])@([A-Za-z][\w:.#$%&+?<>~/-]*[\w])")
+POLA_KURUNG_SITASI = re.compile(r"\[([^\[\]]*@[^\[\]]*)\]")
+
+
+def _rujukan_silang(kunci):
+    awal = kunci.split("-", 1)[0].lower()
+    return "-" in kunci and awal in AWALAN_RUJUKAN_SILANG
+
+
+def _kosongkan(pola, teks, bendera=0):
+    """Ganti cocokan dengan spasi sepanjang aslinya (baris baru dipertahankan) agar
+    posisi karakter tetap menunjuk ke baris yang sama."""
+    return re.sub(pola, lambda m: re.sub(r"[^\n]", " ", m.group(0)), teks, flags=bendera)
+
+
+def paragraf_prosa(teks):
+    """Paragraf prosa bab: daftar paragraf, masing-masing daftar (nomor_baris, teks_bersih).
+    Di luar YAML, chunk, dan blok kode; komentar HTML, kode sebaris, dan rumus dikosongkan.
+    Batas paragraf: baris kosong, judul, pagar ::: , awal butir daftar; baris tabel dilewati."""
+    prosa, _ = pilah_qmd(teks)
+    asli = teks.splitlines()
+    baris = [""] * len(asli)
+    for nomor, b in prosa:
+        baris[nomor - 1] = b
+    gabung = "\n".join(baris)
+    gabung = _kosongkan(r"<!--.*?-->", gabung, re.S)
+    gabung = _kosongkan(r"`[^`\n]*`", gabung)
+    gabung = _kosongkan(r"\$\$.*?\$\$", gabung, re.S)
+    gabung = _kosongkan(r"(?<!\\)\$[^$\n]*(?<!\\)\$", gabung)
+    bersih = gabung.split("\n")
+    hasil, saat_ini = [], []
+    for i, b in enumerate(bersih):
+        t = baris[i].strip()
+        putus = (not t or t.startswith("#") and re.match(r"^#{1,6}\s", t) or t.startswith(":::")
+                 or t.startswith("|") or re.fullmatch(r"\{#[^}]*\}", t) is not None)
+        butir = re.match(r"^\s*(?:[-*+]|\d+[.)])\s+", baris[i]) is not None
+        if putus or butir:
+            if saat_ini:
+                hasil.append(saat_ini)
+            saat_ini = []
+            if putus:
+                continue
+        saat_ini.append((i + 1, b))
+    if saat_ini:
+        hasil.append(saat_ini)
+    return hasil
+
+
+def _sitasi_paragraf(par):
+    """Kemunculan sitasi dalam satu paragraf: daftar (kunci, nomor_baris, lokator)."""
+    teks = "\n".join(b for _, b in par)
+    awal_baris, pos = [], 0
+    for nomor, b in par:
+        awal_baris.append((pos, nomor))
+        pos += len(b) + 1
+
+    def baris_dari(posisi):
+        nomor = par[0][0]
+        for p, n in awal_baris:
+            if p <= posisi:
+                nomor = n
+        return nomor
+
+    muncul, dipakai = [], []
+    for m in POLA_KURUNG_SITASI.finditer(teks):
+        dipakai.append((m.start(), m.end()))
+        geser = m.start(1)
+        for bagian in m.group(1).split(";"):
+            k = POLA_KUNCI_SITASI.search(bagian)
+            if k and not _rujukan_silang(k.group(1)):
+                lokator = bagian[k.end():].strip().lstrip(",").strip()
+                muncul.append((k.group(1), baris_dari(geser + k.start()), " ".join(lokator.split())))
+            geser += len(bagian) + 1
+    for k in POLA_KUNCI_SITASI.finditer(teks):
+        if any(a <= k.start() < b for a, b in dipakai) or _rujukan_silang(k.group(1)):
+            continue
+        lok = re.match(r"\s*\[([^\]@]*)\]", teks[k.end():])  # @kunci [hlm. 5]
+        muncul.append((k.group(1), baris_dari(k.start()), " ".join(lok.group(1).split()) if lok else ""))
+    return sorted(muncul, key=lambda x: (x[1], teks.find("@" + x[0])))
+
+
+def gabung_lokator(lokator):
+    """['hlm. 5', 'hlm. 9'] -> 'hlm. 5, 9'; label berbeda -> 'hlm. 5, bab 3'."""
+    pisah = [re.match(r"^(\D*?)\s*(\d.*)$", x) for x in lokator]
+    label = {m.group(1) for m in pisah if m}
+    if all(pisah) and len(label) == 1 and label != {""}:
+        return f"{label.pop()} " + ", ".join(m.group(2) for m in pisah)
+    return ", ".join(lokator)
+
+def temuan_sitasi_ulang(teks):
+    """Satu sumber disitasi lebih dari sekali dalam satu paragraf. Kembalikan daftar pesan
+    'baris N: @kunci K× …' (N = baris kemunculan pertama)."""
+    pesan = []
+    for par in paragraf_prosa(teks):
+        per_kunci = {}
+        for kunci, nomor, lokator in _sitasi_paragraf(par):
+            per_kunci.setdefault(kunci, []).append((nomor, lokator))
+        for kunci, daftar in sorted(per_kunci.items(), key=lambda x: x[1][0][0]):
+            if len(daftar) < 2:
+                continue
+            ulang = sorted({n for n, _ in daftar[1:]} - {daftar[0][0]})
+            letak = f" (ulang di baris {', '.join(map(str, ulang))})" if ulang else ""
+            p = (f"baris {daftar[0][0]}: @{kunci} disitasi {len(daftar)}× dalam satu paragraf{letak}; "
+                 "sitasi sekali pada kemunculan pertama, kalimat berikutnya tanpa sitasi atau "
+                 "'Sumber yang sama …'")
+            lokator = []
+            for _, lok in daftar:
+                if lok and lok not in lokator:
+                    lokator.append(lok)
+            if len(lokator) > 1:
+                p += (f"; lokator berbeda ({' | '.join(lokator)}): gabungkan di sitasi pertama, "
+                      f"mis. [@{kunci}, {gabung_lokator(lokator)}]")
+            elif lokator:
+                p += f"; lokator '{lokator[0]}' cukup di sitasi pertama"
+            pesan.append(p)
+    return pesan
+
+
+def gerbang_sitasi_ulang(qmd, ketat=False):
+    """G-SITASI-ULANG: WARNING pada tahap draf (tidak menggagalkan), GAGAL pada --tahap akhir
+    (ketat=True). Hanya berkas bab (babXX.qmd), seperti G-STRUKTUR."""
+    if not _berkas_bab(qmd):
+        return []
+    pesan = temuan_sitasi_ulang(Path(qmd).read_text(encoding="utf-8"))
+    if ketat:
+        catat("G-SITASI-ULANG", not pesan, "\n".join(pesan[:60]))
+    elif pesan:
+        print(f"[PERINGATAN] G-SITASI-ULANG: {len(pesan)} sitasi berulang dalam paragraf")
         for p in pesan[:40]:
             print("    " + p)
     return pesan
@@ -1944,7 +2089,7 @@ def main():
     ap.add_argument("--bab")
     ap.add_argument("--render", action="store_true")
     ap.add_argument("--tahap", choices=["draf", "akhir"], default="draf",
-                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR")
+                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR; G-SITASI-ULANG menjadi GAGAL")
     ap.add_argument("--tag-pdf", metavar="PDF",
                     help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
     ap.add_argument("--huruf-pdf", metavar="PDF", nargs="+",
@@ -2011,6 +2156,9 @@ def main():
     gerbang_rumus(qmd, peng)
     gerbang_struktur(qmd, buku)
     w_pertanyaan = gerbang_pertanyaan(qmd)
+    w_sitasi_ulang = gerbang_sitasi_ulang(qmd, ketat=a.tahap == "akhir")
+    if a.tahap == "akhir":
+        w_sitasi_ulang = []  # tercatat sebagai gerbang (GAGAL/LULUS)
     if a.tahap == "akhir":
         gerbang_gaya_ajar(qmd)
     m_eq = cek_persamaan(qmd)
@@ -2049,11 +2197,16 @@ def main():
     if w_pertanyaan:
         baris += ["", "## WARNING G-PERTANYAAN yang ditinjau manual", ""]
         baris += [f"- {t}" for t in w_pertanyaan]
+    if w_sitasi_ulang:
+        baris += ["", "## WARNING G-SITASI-ULANG (GAGAL pada --tahap akhir)", ""]
+        baris += [f"- {t}" for t in w_sitasi_ulang]
     laporan.parent.mkdir(parents=True, exist_ok=True)
     laporan.write_text("\n".join(baris) + "\n", encoding="utf-8")
     print(f"\nStatus: {'LULUS' if lulus else 'GAGAL'} — laporan: {laporan}")
     if w_pertanyaan:
         print(f"Catatan: {len(w_pertanyaan)} WARNING G-PERTANYAAN perlu ditinjau manual (lihat laporan).")
+    if w_sitasi_ulang:
+        print(f"Catatan: {len(w_sitasi_ulang)} WARNING G-SITASI-ULANG; GAGAL pada --tahap akhir (lihat laporan).")
     if warning:
         print(f"Catatan: {len(warning)} WARNING EYD perlu ditinjau manual (lihat laporan).")
     sys.exit(0 if lulus else 1)

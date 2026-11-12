@@ -3,7 +3,9 @@ dikutip harus benar-benar ada di sumbernya.
 
 Dua registri:
   harness/referensi.json  kunci bib -> identitas (DOI/ISBN/URL) dan catatan verifikasi
-  harness/klaim.json      daftar klaim: bab, kunci, penanda kalimat, bukti
+  harness/klaim.json      daftar klaim: bab, kunci, penanda kalimat, bukti; opsional
+                          "sitasi_di" bila kalimat klaim tanpa @kunci karena sumbernya sudah
+                          disitasi di kalimat lebih awal pada paragraf yang sama (2026-11-12)
 
 Jenis bukti dan cara pemeriksaannya:
   berkas     kutipan dicari otomatis di teks sumber lokal harness/sumber/<berkas>
@@ -76,6 +78,30 @@ def kunci_sitasi(baris):
     return keluar
 
 
+def paragraf_baris(prosa_baris):
+    """Peta nomor baris -> teks paragrafnya (baris prosa berurutan yang tidak kosong,
+    dipisah baris kosong, judul, atau pagar :::). Dipakai agar klaim dapat tertaut ke
+    sitasi di kalimat pertama paragraf (sitasi sekali per paragraf, 2026-11-12)."""
+    peta, kelompok, sebelum = {}, [], None
+
+    def tutup():
+        teks = "\n".join(b for _, b in kelompok)
+        for n, _ in kelompok:
+            peta[n] = teks
+
+    for nomor, b in prosa_baris:
+        t = b.strip()
+        putus = not t or re.match(r"^#{1,6}\s", t) or t.startswith(":::") or (sebelum is not None and nomor != sebelum + 1)
+        if putus and kelompok:
+            tutup()
+            kelompok = []
+        if t and not re.match(r"^#{1,6}\s", t) and not t.startswith(":::"):
+            kelompok.append((nomor, b))
+        sebelum = nomor
+    if kelompok:
+        tutup()
+    return peta
+
 def periksa(qmd, bab, prosa_baris, bib_teks):
     """Kembalikan (daftar_masalah, ringkasan). Fikstur uji memakai registri di foldernya sendiri."""
     folder = qmd.parent if (qmd.parent / "klaim.json").exists() else AKAR / "harness"
@@ -84,12 +110,15 @@ def periksa(qmd, bab, prosa_baris, bib_teks):
     klaim_bab = [k for k in klaim if k["bab"] == bab]
     masalah, ringkas = [], []
 
-    # 1. Setiap sitasi punya klaim terverifikasi untuk kalimat itu
+    # 1. Setiap sitasi punya klaim terverifikasi untuk kalimat itu, atau (sitasi sekali per
+    #    paragraf, 2026-11-12) untuk kalimat lain di paragraf yang sama
     dipakai = set()
+    par_baris = paragraf_baris(prosa_baris)
     for nomor, b in prosa_baris:
         for kunci in kunci_sitasi(b):
             dipakai.add(kunci)
-            cocok = [k for k in klaim_bab if k["kunci"] == kunci and k["penanda"] in b]
+            cocok = [k for k in klaim_bab if k["kunci"] == kunci
+                     and (k["penanda"] in b or k["penanda"] in par_baris.get(nomor, ""))]
             if not cocok:
                 masalah.append(f"baris {nomor}: sitasi @{kunci} tanpa klaim terverifikasi di klaim.json "
                                f"(kalimat: {b.strip()[:80]}…)")
@@ -113,6 +142,19 @@ def periksa(qmd, bab, prosa_baris, bib_teks):
         if k["penanda"] not in teks_qmd:
             masalah.append(f"klaim usang: penanda '{k['penanda'][:60]}' tidak ada lagi di {qmd.name}")
             continue
+        if k.get("sitasi_di"):
+            # Kalimat klaim tanpa @kunci karena sumbernya sudah disitasi lebih awal di paragraf
+            # yang sama (keputusan 2026-11-12). Klaim tetap diperiksa terhadap sumbernya (di bawah)
+            # dan harus tertaut: paragrafnya menyitasi @kunci sebelum penanda.
+            tertaut = False
+            for par in set(par_baris.values()):
+                i = par.find(k["penanda"])
+                if i >= 0 and k["kunci"] in kunci_sitasi(par[:i]):
+                    tertaut = True
+            if not tertaut:
+                masalah.append(f"klaim @{k['kunci']} bertanda sitasi_di ('{k['sitasi_di'][:40]}'), tetapi paragraf "
+                               f"penanda '{k['penanda'][:50]}' tidak menyitasi @{k['kunci']} sebelumnya; "
+                               "sitasi sumber itu pada kemunculan pertama di paragraf")
         for bukti in k["bukti"]:
             jenis, kutip = bukti["jenis"], bukti.get("kutipan", "")
             label = f"@{k['kunci']} ({jenis})"
