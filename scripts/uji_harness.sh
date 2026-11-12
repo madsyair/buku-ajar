@@ -234,6 +234,38 @@ if SELARAS=gagal python3 harness/harness.py --selaras harness/uji-buku/babselara
 else
   echo "benar: G-SELARAS ketat GAGAL"
 fi
+# G-RUJUKAN-SERI (2026-11-12): rujukan lintas buku menunjuk buku, bab, subbab, dan lampiran
+# yang ada. Fikstur seri mini di uji-buku/seri/ (seri.json: Buku 1 empat bab + Lampiran A dari
+# _quarto.yml, Buku 2 tiga bab dengan Bab 2 bersubbab tiga, Buku 3 enam bab dari rancangan,
+# pola terlarang "Buku 2 Bab 4/5"). babseri.qmd harus ditandai tepat di baris 5 (bab di luar
+# jangkauan _quarto.yml), 7 (di luar rancangan), 9 (Buku 4 dan "buku keempat seri ini" tidak
+# ada), 11 (pola terlarang), 13 (subbab), 15 (judul salah), 17 (lampiran); "Bab 9 buku ini",
+# rentang "Bab 2 sampai 4", dan komentar HTML tidak ditandai.
+temuan=$(SERI_KONFIG=harness/uji-buku/seri/seri.json python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+s = harness.muat_seri()
+for p in harness.temuan_rujukan_seri(pathlib.Path('harness/uji-buku/babseri.qmd').read_text(encoding='utf-8'), s): print(p)" 2>&1)
+baris=$(echo "$temuan" | grep -o "^baris [0-9]*:" | sort -u -t' ' -k2 -n | tr '\n' ' ')
+if [ "$baris" = "baris 5: baris 7: baris 9: baris 11: baris 13: baris 15: baris 17: " ] \
+   && [ "$(echo "$temuan" | grep -c "tidak ada di seri")" = "2" ] \
+   && echo "$temuan" | grep -qF "pola rujukan terlarang" \
+   && echo "$temuan" | grep -qF "Buku 3 hanya 6 bab (menurut konfigurasi seri"; then
+  echo "benar: G-RUJUKAN-SERI menandai bab, buku, subbab, lampiran, judul, dan pola terlarang"
+else echo "SALAH: G-RUJUKAN-SERI seharusnya baris 5 7 9 11 13 15 17 (dapat: $baris)"; status=1; fi
+# Lingkup: bab, prakata, lampiran, dan kunci saja; tanpa konfigurasi seri gerbang dilewati
+temuan=$(python3 -c "import sys, pathlib; sys.path.insert(0, 'harness'); import harness
+print(*[int(harness._berkas_rujukan_seri(pathlib.Path(n))) for n in
+  ['bab03.qmd', 'index.qmd', 'lampiran-a.qmd', 'kunci-bab03.qmd', 'glosarium.qmd', 'references.qmd', 'riwayat-penulis.qmd']],
+  harness.muat_seri({}) is None)")
+if [ "$temuan" = "1 1 1 1 0 0 0 True" ]; then echo "benar: G-RUJUKAN-SERI hanya bab, prakata, lampiran, kunci; tanpa seri dilewati"
+else echo "SALAH: lingkup G-RUJUKAN-SERI (dapat: $temuan)"; status=1; fi
+# Lewat harness: babseri GAGAL di G-RUJUKAN-SERI, babbaik tidak
+keluaran=$(SERI_KONFIG=harness/uji-buku/seri/seri.json python3 harness/harness.py --buku harness/uji-buku --bab babseri 2>&1)
+if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[GAGAL\] G-RUJUKAN-SERI"; then
+  echo "benar: babseri GAGAL di G-RUJUKAN-SERI"
+else echo "SALAH: babseri seharusnya GAGAL di G-RUJUKAN-SERI"; status=1; fi
+keluaran=$(SERI_KONFIG=harness/uji-buku/seri/seri.json python3 harness/harness.py --buku harness/uji-buku --bab babbaik 2>&1)
+if echo "$keluaran" | grep -q "\[LULUS\] G-RUJUKAN-SERI"; then echo "benar: babbaik LULUS G-RUJUKAN-SERI"
+else echo "SALAH: babbaik seharusnya LULUS G-RUJUKAN-SERI"; status=1; fi
 # Jenis agen Claude Code (claude-agents/ di skill; .claude/agents/ di proyek bila --pasang-agen):
 # frontmatter sah, model ∈ {opus, sonnet, haiku, fable}, setiap peran di agents/ punya pasangan.
 python3 harness/uji_agen.py || status=1

@@ -42,6 +42,7 @@ Semua yang khusus proyek ada di `harness/konfig.json` (contoh: `assets/konfig.js
 | `penulis` | nama keluarga penulis tambahan untuk G-SITASI (nama dari `pustaka.bib` diambil otomatis) | `[]` |
 | `larangan` | pola kata terlarang di naskah (G-LARANGAN); menggantikan bawaan bila diisi | Sokratik/Socrates/Feynman |
 | `istilah_terlarang` | pola istilah yang sudah diganti keputusan penulis (G-ISTILAH) | `[]` |
+| `seri` | buku-buku dalam seri untuk G-RUJUKAN-SERI: `{"buku": {"N": {"folder", "judul", "bab", "lampiran", "sumber"}}, "rujukan_terlarang": [{"pola", "saran"}]}`; `bab`/`lampiran` hanya untuk buku yang belum (selesai) ditulis; `SERI_KONFIG=<berkas.json>` menggantinya (jalur `folder` relatif terhadap berkas itu) | `{}` (gerbang dilewati) |
 | `kemasan` | keterangan perangkat per buku untuk `BANGUN.md` | `{}` |
 
 Hal lain yang masih tertanam di kode dan mungkin perlu diubah:

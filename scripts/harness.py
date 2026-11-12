@@ -29,6 +29,12 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-SLOP       frasa basa-basi dan kosakata khas tulisan mesin (bahasa Indonesia)
   G-LARANGAN   kata terlarang di naskah (bawaan: nama teknik pengajaran)
   G-ISTILAH    istilah yang sudah diputuskan diganti (konfig.json "istilah_terlarang")
+  G-RUJUKAN-SERI rujukan lintas buku dalam seri ("Buku N Bab M", "Buku N (*Judul*) Bab M",
+               "Subbab M.K Buku N", "Lampiran A Buku N", "buku kedua seri ini") menunjuk buku,
+               bab, subbab bernomor, dan lampiran yang ada, dengan judul buku yang benar; jumlah
+               bab dari _quarto.yml tiap buku atau dari rancangan di konfig.json "seri" (buku
+               yang belum ditulis); pola lama "rujukan_terlarang" ditolak; hanya bab, prakata,
+               lampiran, dan kunci; tanpa konfig "seri" dilewati (SERI_KONFIG=berkas.json)
   G-TEPI       tidak ada isi melewati tepi halaman > 3 pt (setelah --render)
   G-TAG        PDF bertag: Tagged yes, pohon struktur Document/H1/P/Figure, /Lang id-ID
                (setelah --render; TAG=0 mematikan untuk proyek tanpa DocumentMetadata)
@@ -138,6 +144,10 @@ KONFIG_BAWAAN = {
     "pertanyaan_kecuali": ["Ringkasan", "Rangkuman", "Latihan", "Contoh utama", "Bacaan lanjut"],
     # Istilah yang sudah diputuskan penulis: pola regex -> saran (dan tanggal keputusan)
     "istilah_terlarang": [],
+    # G-RUJUKAN-SERI: buku-buku dalam satu seri, {"buku": {"N": {"folder", "judul",
+    # "bab" dan "lampiran" untuk buku yang belum ditulis, "sumber"}}, "rujukan_terlarang": [...]};
+    # kosong = gerbang dilewati (buku tunggal)
+    "seri": {},
     # Opsi huruf (libertinus, springer, crc, stix), profil ukuran (seri, springer,
     # crc, wiley), dan gaya Word ("windows": Times New Roman/Courier New/Cambria Math);
     # diterapkan oleh _bersama/huruf.py, diperiksa G-HURUF.
@@ -2001,6 +2011,185 @@ def gerbang_istilah(qmd, peng):
     catat("G-ISTILAH", not t, "\n".join(t[:60]))
 
 
+# ---------------------------------------------------------------- G-RUJUKAN-SERI
+# Rujukan lintas buku dalam satu seri ("Buku 2 Bab 7", "Buku 1 (*Judul*) Bab 14",
+# "Subbab 5.8 Buku 2", "Buku 4 Subbab 1.8", "Lampiran A Buku 2", "buku kedua seri ini")
+# harus menunjuk buku yang ada dan bab, subbab, atau lampiran yang ada di buku itu.
+# Jumlah bab dibaca dari _quarto.yml setiap buku (berkas babNN.qmd di daftar
+# chapters); buku yang belum ditulis atau baru sebagian memakai "bab" dan
+# "lampiran" dari konfigurasi seri (rancangan). Konfigurasi: kunci "seri" di
+# harness/konfig.json, atau berkas JSON yang ditunjuk variabel SERI_KONFIG:
+#   "seri": {"buku": {"1": {"folder": "buku1", "judul": "Judul Buku 1"},
+#                      "5": {"folder": "buku5", "judul": "...", "bab": 8,
+#                            "lampiran": ["A", "B", "C"], "sumber": "rancangan ..."}},
+#            "rujukan_terlarang": [{"pola": "regex", "saran": "..."}]}
+# "folder" relatif terhadap akar proyek (atau terhadap folder berkas SERI_KONFIG).
+# Hanya berkas bab, prakata (index.qmd), lampiran-*, dan kunci-babNN yang diperiksa.
+ORDINAL_BUKU = {"pertama": 1, "kedua": 2, "ketiga": 3, "keempat": 4, "kelima": 5,
+                "keenam": 6, "ketujuh": 7, "kedelapan": 8, "kesembilan": 9, "kesepuluh": 10}
+_NO = r"(?:\d+(?:\.\d+)?|[A-Z](?![\w]))"
+_ITEM = rf"(?>{_NO}(?:\s*(?:–|--|-)\s*{_NO}|\s+sampai\s+(?:(?:[Bb]ab|[Ss]ubbab)\s+)?{_NO})?)"
+_DAFTAR = (rf"{_ITEM}(?:(?:\s*,\s*(?:dan\s+|atau\s+)?|\s+dan\s+|\s+atau\s+|\s+serta\s+)"
+           rf"(?:(?:Bab|Subbab|Lampiran)\s+)?{_ITEM}(?!\s+buku\s+ini))*")
+_SATUAN = rf"(?P<jenis>[Bb]ab|[Ss]ubbab|[Ll]ampiran)\s+(?P<daftar>{_DAFTAR})"
+# ordinal hanya bila jelas menunjuk seri: "buku kedua seri ini", "buku pertama dari seri"
+_BUKU = (r"(?:Buku\s+(?P<n>\d+)|[Bb]uku\s+(?P<ord>" + "|".join(ORDINAL_BUKU)
+         + r")\s+(?:seri\s+ini|dari\s+seri|dalam\s+seri))")
+POLA_SERI_MAJU = re.compile(rf"\b(?P<buku>{_BUKU})(?P<judul>\s*\((?:[^()]|\([^()]*\))*\))?(?:\s*,)?\s*(?:{_SATUAN})?")
+POLA_SERI_MUNDUR = re.compile(rf"\b{_SATUAN}\s+(?:(?:di|dalam|dari|pada)\s+)?{_BUKU}")
+
+
+def _berkas_rujukan_seri(qmd):
+    """G-RUJUKAN-SERI: berkas bab (babNN), prakata (index), lampiran-*, dan kunci-babNN
+    (seperti _berkas_bab(), fikstur bab<nama> ikut); bukan glosarium, references, riwayat-penulis."""
+    return re.match(r"^(bab[\w-]*|index|lampiran-[\w-]+|kunci-bab[\w-]*)$", Path(qmd).stem) is not None
+
+
+def _isi_quarto(folder):
+    """(daftar berkas bab berurutan, daftar huruf lampiran) dari _quarto.yml sebuah buku."""
+    q = Path(folder) / "_quarto.yml"
+    if not q.exists():
+        return None, None
+    teks = q.read_text(encoding="utf-8")
+    bab, lampiran, di_lampiran = [], [], False
+    for b in teks.splitlines():
+        if re.match(r"^\s*appendices\s*:", b):
+            di_lampiran = True
+        elif re.match(r"^\s*(chapters|parts?)\s*:", b):
+            di_lampiran = False
+        m = re.match(r"^\s*-\s*(?:file:\s*)?[\"']?([\w./-]+\.qmd)", b)
+        if not m:
+            continue
+        nama = Path(m.group(1)).stem
+        if re.match(r"^(kunci-)?bab\d+$", nama) and not di_lampiran:
+            bab.append(Path(folder) / m.group(1))
+        ml = re.match(r"^lampiran-([a-z])$", nama)
+        if ml:
+            lampiran.append(ml.group(1).upper())
+    return bab, lampiran
+
+
+def _subbab_bernomor(berkas):
+    """Banyaknya subbab bernomor (## tanpa .unnumbered) di luar blok kode."""
+    if not Path(berkas).exists():
+        return None
+    n, dalam = 0, False
+    for b in Path(berkas).read_text(encoding="utf-8").splitlines():
+        if re.match(r"^\s*(```|~~~)", b):
+            dalam = not dalam
+            continue
+        if not dalam and re.match(r"^##\s", b) and not re.search(r"\.unnumbered|\{-\}", b):
+            n += 1
+    return n
+
+
+def muat_seri(konfig=None, akar=None):
+    """Peta buku seri: {N: {"judul", "bab", "lampiran", "subbab": {M: K}, "asal"}}.
+    Tanpa konfigurasi seri, kembalikan None (gerbang dilewati)."""
+    if konfig is None:
+        jalur = os.environ.get("SERI_KONFIG")
+        if jalur:
+            konfig = json.loads(Path(jalur).read_text(encoding="utf-8"))
+            konfig = konfig.get("seri", konfig)
+            akar = Path(jalur).resolve().parent
+        else:
+            konfig = KONFIG.get("seri") or {}
+    akar = Path(akar or AKAR)
+    if not konfig.get("buku"):
+        return None
+    peta = {}
+    for kunci, isi in konfig["buku"].items():
+        n = int(kunci)
+        bab_q, lamp_q = _isi_quarto(akar / isi["folder"]) if isi.get("folder") else (None, None)
+        jml_q = len(bab_q) if bab_q else 0
+        jml_k = int(isi.get("bab", 0))
+        jml = max(jml_q, jml_k)
+        asal = (f"_quarto.yml {isi['folder']}" if jml_q >= jml_k and jml_q
+                else f"konfigurasi seri ({isi.get('sumber', 'rancangan')})")
+        subbab = {i + 1: _subbab_bernomor(f) for i, f in enumerate(bab_q or [])}
+        peta[n] = {"judul": isi.get("judul", ""), "bab": jml, "asal": asal,
+                   "lampiran": sorted(set(lamp_q or []) | set(isi.get("lampiran", []))),
+                   "subbab": {m: k for m, k in subbab.items() if k is not None}}
+    peta["_terlarang"] = konfig.get("rujukan_terlarang", [])
+    return peta
+
+
+def _butir_daftar(daftar):
+    """'1, 3, dan 4' / '7–8' / 'Bab 2 dan Bab 4' / '5.3' → daftar nomor (rentang dibuka)."""
+    hasil = []
+    for bag in re.split(r",\s*(?:dan\s+|atau\s+)?|\s+dan\s+|\s+atau\s+|\s+serta\s+", daftar):
+        bag = re.sub(r"^(?:[Bb]ab|[Ss]ubbab|[Ll]ampiran)\s+", "", bag.strip())
+        m = re.match(rf"^({_NO})\s*(?:–|--|-|\s+sampai\s+(?:(?:[Bb]ab|[Ss]ubbab)\s+)?)\s*({_NO})$", bag)
+        if m:
+            hasil += [m.group(1), m.group(2)]
+        elif bag:
+            hasil.append(bag)
+    return hasil
+
+
+def _nomor_buku(m):
+    return int(m.group("n")) if m.group("n") else ORDINAL_BUKU[m.group("ord").lower()]
+
+
+def temuan_rujukan_seri(teks, seri):
+    """Daftar pesan 'baris N: …' untuk rujukan lintas buku yang tidak sah."""
+    pesan = []
+    teks = _kosongkan(r"<!--.*?-->", teks, re.S)
+    for i, b in enumerate(teks.splitlines(), 1):
+        for a in seri.get("_terlarang", []):
+            for m in re.finditer(a["pola"], b):
+                pesan.append(f"baris {i}: '{m.group(0)}' — pola rujukan terlarang: {a['saran']}")
+        cocok = [(m, "maju") for m in POLA_SERI_MAJU.finditer(b)]
+        cocok += [(m, "mundur") for m in POLA_SERI_MUNDUR.finditer(b)]
+        for m, arah in cocok:
+            n = _nomor_buku(m)
+            kutip = " ".join(m.group(0).split())
+            if n not in seri:
+                ada = ", ".join(str(k) for k in sorted(x for x in seri if isinstance(x, int)))
+                pesan.append(f"baris {i}: '{kutip}' — Buku {n} tidak ada di seri (buku: {ada})")
+                continue
+            info = seri[n]
+            if arah == "maju":
+                mj = re.match(r"\(\s*\*([A-Z][^*]+)\*", (m.group("judul") or "").strip()) or \
+                    re.match(r"(?:\s+seri\s+ini)?\s*,\s*\*([A-Z][^*]+)\*", b[m.end("buku"):])
+                if mj and info["judul"] and " ".join(mj.group(1).split()) != info["judul"]:
+                    pesan.append(f"baris {i}: '{kutip}' — judul Buku {n} adalah *{info['judul']}*, "
+                                 f"bukan *{mj.group(1)}*")
+            if not m.group("jenis"):
+                continue
+            jenis = m.group("jenis").lower()
+            for no in _butir_daftar(m.group("daftar")):
+                if jenis == "lampiran" or re.fullmatch(r"[A-Z]", no):
+                    if no not in info["lampiran"]:
+                        pesan.append(f"baris {i}: '{kutip}' — Buku {n} tidak punya Lampiran {no} "
+                                     f"(lampiran: {', '.join(info['lampiran']) or 'tidak ada'})")
+                    continue
+                bab, _, sub = no.partition(".")
+                if not bab.isdigit():
+                    continue
+                if not 1 <= int(bab) <= info["bab"]:
+                    pesan.append(f"baris {i}: '{kutip}' — Buku {n} hanya {info['bab']} bab "
+                                 f"(menurut {info['asal']}); Bab {bab} tidak ada")
+                elif sub and sub.isdigit():
+                    k = info["subbab"].get(int(bab))
+                    if k is not None and not 1 <= int(sub) <= k:
+                        pesan.append(f"baris {i}: '{kutip}' — Buku {n} Bab {bab} hanya {k} subbab "
+                                     f"bernomor; Subbab {bab}.{sub} tidak ada")
+    return pesan
+
+
+def gerbang_rujukan_seri(qmd, seri=None):
+    """G-RUJUKAN-SERI: lewati bila seri tidak dikonfigurasi atau berkas bukan bab, prakata,
+    lampiran, atau kunci."""
+    if not _berkas_rujukan_seri(qmd):
+        return
+    seri = seri if seri is not None else muat_seri()
+    if not seri:
+        return
+    p = temuan_rujukan_seri(Path(qmd).read_text(encoding="utf-8"), seri)
+    catat("G-RUJUKAN-SERI", not p, "\n".join(p[:60]))
+
+
 # ---------------------------------------------------------------- G-LN
 # Keputusan seri Bayesian 2026-11-07 (bawaan skill): logaritma natural ditulis
 # ln di naskah (prosa, rumus, tabel, gambar); kode R/Stan dan keluarannya tetap
@@ -2142,6 +2331,7 @@ def main():
     gerbang_sitasi(qmd, buku)
     gerbang_larangan(qmd, peng)
     gerbang_istilah(qmd, peng)
+    gerbang_rujukan_seri(qmd)
     if os.environ.get("LN", "1") == "1":
         gerbang_ln(qmd, peng)
     bukti_ref = gerbang_referensi(qmd, ident, buku)

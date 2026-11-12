@@ -1,0 +1,13 @@
+# Bab Contoh {#sec-contoh-dua}
+
+## Subbab pertama {#sec-dua-1}
+
+## Subbab kedua {#sec-dua-2}
+
+```{r}
+## komentar kode, bukan judul
+```
+
+## Bacaan lanjut {.unnumbered}
+
+## Latihan {#sec-dua-latihan}
