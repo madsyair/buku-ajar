@@ -1361,7 +1361,7 @@ def gerbang_penggalan(buku, sesudah_render):
         penggalan.tulis(buku)
     pesan += penggalan.uji() + penggalan.uji_tex()
     if sesudah_render:
-        tex = list(buku.glob("*.tex"))
+        tex = sorted(t for t in buku.glob("*.tex") if not t.name.startswith("preamble"))
         isi = tex[0].read_text(encoding="utf-8") if tex else ""
         if "indonesian" not in isi or "penggalan-id.tex" not in isi:
             pesan.append("berkas .tex tidak memuat babel indonesian atau penggalan-id.tex")
