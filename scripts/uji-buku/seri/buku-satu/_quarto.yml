@@ -1,0 +1,14 @@
+# Fikstur G-RUJUKAN-SERI: buku 1 berisi empat bab dan Lampiran A
+project:
+  type: book
+book:
+  title: "Buku Contoh Pertama"
+  chapters:
+    - index.qmd
+    - bab01.qmd
+    - bab02.qmd
+    - bab03.qmd
+    - bab04.qmd
+    - references.qmd
+  appendices:
+    - lampiran-a.qmd

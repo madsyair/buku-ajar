@@ -1,0 +1,9 @@
+# Bab sumber ganda {#sec-sumber-ganda}
+
+Kalimat pertama hanya ada di sumber utama yang berpenanda halaman [@contoh2026].
+
+Kalimat kedua hanya ada di versi kedua hasil konversi ulang [@contoh2026].
+
+Kalimat ketiga ada di kedua versi sehingga yang dilaporkan adalah sumber utama [@contoh2026].
+
+Kalimat keempat mengutip teks yang tidak ada di versi mana pun [@contoh2026].

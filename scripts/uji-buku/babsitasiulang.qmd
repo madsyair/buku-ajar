@@ -1,0 +1,19 @@
+# Bab sitasi ulang {#sec-sitasi-ulang}
+
+Paragraf ini menyitasi sumber yang sama dua kali [@gelman2013]. Kalimat berikutnya mengulang sitasi itu [@gelman2013].
+
+Lokator berbeda tetap ditandai [@gelman2021, hlm. 5]. Sitasi kedua menunjuk halaman lain [@gelman2021, hlm. 9]. Rujukan silang @sec-sitasi-ulang dan @fig-ulang berulang (@sec-sitasi-ulang, @tbl-ulang, @tbl-ulang) tanpa dihitung.
+
+@kolmogorov1950 merumuskan aksioma peluang. Aksioma itu memakai ukuran
+[@kolmogorov1950; @berndt1991]. Sumber lain cukup sekali [@berndt1991, hlm. 2].
+
+Dua sumber berbeda dalam satu paragraf sah [@gelman2013]. Sumber kedua lain lagi [@gelman2021]. Kode sebaris `@gelman2013` dan `[@gelman2021]` tidak dihitung.<!-- @gelman2021 di komentar -->
+
+- Butir daftar pertama menyitasi sumbernya [@gelman2013].
+- Butir kedua adalah blok tersendiri [@gelman2013].
+
+```
+Blok kode @gelman2013 dan @gelman2013 bukan prosa.
+```
+
+Paragraf terakhir menyitasi sumber yang sudah disitasi di paragraf lain [@gelman2013].

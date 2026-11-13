@@ -8,12 +8,15 @@ Salinan yang digeneralisasi dari harness dan alat seri statistika Bayesian (A. S
 | `harness.py` | `harness/` | Gerbang mutu per bab (daftar di `references/harness-dan-gerbang.md`) |
 | `referensi.py` | `harness/` | G-REFERENSI: registri klaim dan identitas pustaka |
 | `penggalan.py` | `harness/` | Pemenggalan EYD V, daftar nama yang tidak dipenggal, istilah asing (perlu `pip install Sastrawi`) |
-| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS) |
+| `uji_harness.sh`, `uji-buku/` | `harness/` | Uji regresi harness: fikstur gagal harus GAGAL, `babbaik` harus LULUS; G-TAG diuji pada `tag-tanpa.pdf` (GAGAL) dan `tag-baik.pdf` (LULUS); G-LN pada `babln.qmd` (GAGAL) dan `babbaik.qmd` (LULUS); G-LOG pada `log/rerun.txt`, `log/ganda.txt` (GAGAL) dan `log/bersih.txt` (LULUS); G-DOCX pada `docx/docx-baik.docx` (LULUS, termasuk bidang Zotero) dan tujuh fikstur fitur otomatis Word (`docx-zotero`: JSON ZOTERO_ITEM rusak; `docx-tanpa-otomatis` juga GAGAL karena sitasi statis); setiap fikstur GAGAL dengan pesannya sendiri (`docx/buat_fikstur.py` membangunnya ulang dengan Pandoc) |
+| `selaras_angka.py` | `harness/` | G-SELARAS (prototipe, WARNING): nilai sama di tabel kable dan narasi dengan jumlah desimal berbeda; juga inventaris seluruh buku (`python3 harness/selaras_angka.py --md laporan.md`) dan sebaran desimal per jenis besaran. Fikstur `uji-buku/babselaras.qmd` + `uji-buku/build/babselaras.knit.md` (satu kasus salah, satu benar) |
 | `kemas_sumber.py` | `harness/` atau `alat/` | Mengemas kode sumber per buku (+ kunci) ke zip dengan `BANGUN.md` |
 | `gaya_gambar.py` | `_bersama/` | Gaya matplotlib seri: palet, huruf teks dan matematika opsi `huruf` (Type 3), `LEBAR` = lebar kolom, koma desimal, `label_panel()`, `tampil()` |
 | `huruf.py` | `_bersama/` | Opsi huruf (`libertinus`, `springer`, `crc`, `stix`), profil penerbit (`seri`, `springer`, `crc`, `wiley`), dan ukuran buku (`b5`, `unesco`, `a5`, `a4`, `6x9`, `7x10`) dari `konfig.json`: menulis blok `>>> huruf`/`>>> profil` di `_quarto.yml` dan `_bersama/*.tex`, menghitung ukuran mono kode/keluaran, `options(width)` di `<buku>/.Rprofile`, gaya Word Windows; dipakai `gaya_gambar.py` dan G-HURUF. `python3 _bersama/huruf.py --daftar` |
 | `catatan.lua` | `_bersama/` | Filter Div `::: {.catatan}`: "*Catatan:*" kecil di bawah tabel/gambar (PDF dan Word) |
 | `bahasa-asing.lua` | `_bersama/` | Frasa miring di `istilah-asing.txt` diberi `lang=en` (pemenggalan Inggris) |
+| `word-otomatis.lua` | `_bersama/` | Hanya DOCX (`at: post-render`): nomor bab/gambar/tabel/persamaan sebagai bidang SEQ, rujukan silang REF, Daftar Isi/Gambar/Tabel sesudah halaman hak cipta, teks alternatif, lebar gambar, lebar kolom, dan "Lampiran"; bidang teks dibaca dari reference-doc (`references/aturan-gaya-dan-tampilan.md`, "Rumus dan fitur otomatis di Word") |
+| `zotero-word.lua` | `_bersama/` | Hanya DOCX (`at: post-render`, sesudah `word-otomatis.lua`): sitasi sebagai bidang `ADDIN ZOTERO_ITEM CSL_CITATION` dengan butir tersemat dari `pustaka.bib`, Daftar Pustaka `ADDIN ZOTERO_BIBL`, preferensi `ZOTERO_PREF_n`; tanpa Zotero saat render (`references/zotero-word.md`) |
 
 ## Memasang di proyek baru
 
@@ -39,6 +42,7 @@ Semua yang khusus proyek ada di `harness/konfig.json` (contoh: `assets/konfig.js
 | `penulis` | nama keluarga penulis tambahan untuk G-SITASI (nama dari `pustaka.bib` diambil otomatis) | `[]` |
 | `larangan` | pola kata terlarang di naskah (G-LARANGAN); menggantikan bawaan bila diisi | Sokratik/Socrates/Feynman |
 | `istilah_terlarang` | pola istilah yang sudah diganti keputusan penulis (G-ISTILAH) | `[]` |
+| `seri` | buku-buku dalam seri untuk G-RUJUKAN-SERI: `{"buku": {"N": {"folder", "judul", "bab", "lampiran", "sumber"}}, "rujukan_terlarang": [{"pola", "saran"}]}`; `bab`/`lampiran` hanya untuk buku yang belum (selesai) ditulis; `SERI_KONFIG=<berkas.json>` menggantinya (jalur `folder` relatif terhadap berkas itu) | `{}` (gerbang dilewati) |
 | `kemasan` | keterangan perangkat per buku untuk `BANGUN.md` | `{}` |
 
 Hal lain yang masih tertanam di kode dan mungkin perlu diubah:

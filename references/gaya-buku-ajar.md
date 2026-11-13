@@ -41,9 +41,11 @@ Tujuannya adalah **menghapus sitasi dari prosa, bukan menghapus dasar**. Setiap 
 | Pengetahuan baku yang ada di banyak buku teks (definisi rata-rata, sifat ragam, teorema limit pusat) | **hapus** dari prosa; sumbernya masuk *Bacaan lanjut* | buku ajar tidak mendokumentasikan pengetahuan umum kalimat demi kalimat |
 | Beberapa sitasi untuk satu klaim (`[@a; @b; @c]`) | **sisakan satu** sumber terbaik; sisanya ke *Bacaan lanjut* | keterbacaan |
 | Sitasi yang hanya menambah wibawa (*sebagaimana dikemukakan para ahli …*) | **hapus** beserta frasanya | basa-basi |
+| Sumber yang sama disitasi lagi di kalimat berikutnya dalam paragraf yang sama | **sitasi sekali**, pada kemunculan pertama; kalimat berikutnya tanpa sitasi ("Sumber yang sama juga menunjukkan …", atau cukup tanpa sitasi bila jelas); lokator berbeda digabung di sitasi pertama (`[@k, hlm. 5, 9]`) | keputusan penulis 2026-11-12; G-SITASI-ULANG |
 
 - Sumber yang dihapus dari prosa dikumpulkan di subbab **Bacaan lanjut** di akhir bab (sebelum Latihan), dikelompokkan per topik, dengan satu kalimat alasan untuk setiap sumber. Daftar pustaka buku tetap memuat semuanya.
 - Entri registri klaim untuk kalimat yang sitasinya dihapus diberi `"tampil": "bacaan-lanjut"` sehingga G-REFERENSI tetap dapat menelusuri dasarnya.
+- **Satu sumber sekali per paragraf** (keputusan penulis 2026-11-12). Entri klaim untuk kalimat yang sitasinya dihapus karena sumbernya sudah disitasi lebih awal di paragraf itu **tidak dihapus**: entri tetap ada (kunci, penanda, bukti) dan diberi `"sitasi_di": "kalimat pertama paragraf (sitasi digabung, 2026-11-12)"`. G-REFERENSI tetap memeriksa buktinya terhadap sumber dan menolak entri `sitasi_di` yang paragrafnya tidak lagi menyitasi `@kunci` sebelum penandanya. Dalam satu paragraf yang sama, sitasi di kalimat pertama juga diterima untuk klaim yang penandanya berada di baris lain paragraf itu. Bila sumbernya manual atau lembaga, tulis faktanya langsung tanpa sitasi, bukan "Panduan yang sama menyatakan" (G-ATRIBUSI). Rujukan silang `@sec-`, `@fig-`, `@tbl-`, `@eq-`, `@lst-` bukan sitasi; butir daftar dihitung terpisah.
 - **Kepadatan sasaran** (konfig `sitasi_per_1000_kata_maks`, bawaan 4) dihitung pada prosa isi, di luar *Bacaan lanjut*, kotak, dan keterangan gambar/tabel. Angka ini adalah pegangan kerja, bukan kaidah; bab bersejarah atau bab tinjauan boleh dikecualikan di `pengecualian.json` dengan alasan.
 
 ## 5. Struktur bab
@@ -62,6 +64,7 @@ Tujuannya adalah **menghapus sitasi dari prosa, bukan menghapus dasar**. Setiap 
 | Rata-rata panjang kalimat | `rerata_kata_kalimat_maks`: 20 | di atas ambang |
 | Kalimat terpanjang | `kalimat_maks_kata`: 35 | ada kalimat lebih panjang (dilaporkan) |
 | Sitasi per 1.000 kata prosa isi | `sitasi_per_1000_kata_maks`: 4 | di atas ambang |
+| Sumber yang disitasi lebih dari sekali dalam satu paragraf (G-SITASI-ULANG; WARNING pada tahap draf) | 1 kali per paragraf | ada kunci ≥ 2 kali (dilaporkan per baris, kunci, jumlah, dan saran gabung lokator) |
 | Istilah miring tanpa penjelasan dekat kemunculan pertama dan tanpa entri `keputusan-istilah.md` | — | dilaporkan (WARNING untuk peran 22/23) |
 
 ## 7. Daftar periksa peran 22 dan 23
@@ -71,5 +74,6 @@ Tujuannya adalah **menghapus sitasi dari prosa, bukan menghapus dasar**. Setiap 
 - [ ] Setiap istilah teknis/asing dijelaskan pada kemunculan pertama di bab dan ada di glosarium.
 - [ ] Sitasi tersisa hanya untuk kutipan, angka/data sumber lain, hasil khas/diperdebatkan, dan atribusi nama metode; sisanya di *Bacaan lanjut*; registri klaim mencatat `"tampil": "bacaan-lanjut"`.
 - [ ] Subbab ringkas (≤ 800 kata per bagian), satu konsep per subbab.
+- [ ] Satu sumber disitasi sekali per paragraf (G-SITASI-ULANG LULUS pada `--tahap akhir`); kalimat lanjutan dari sumber yang sama tanpa sitasi, entri klaimnya tetap di registri dengan `"sitasi_di"`.
 - [ ] Rangkuman di akhir bab, tanpa sitasi, menjawab pertanyaan pengantar.
 - [ ] Angka tetap dihitung kode (G-ANGKA), rumus dan simbol tetap benar (G-RUMUS), dan tidak ada klaim baru tanpa registri.

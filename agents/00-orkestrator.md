@@ -60,6 +60,29 @@ Permintaan penulis; `KEPUTUSAN-RANCANGAN.md`; `naskah/STATUS.md` setiap buku; la
 | Buku multidisiplin: satu penulis ahli per berkas bagian, paralel; pemaduan baru dimulai setelah semua bagian LULUS harness; setelah pemaduan `babXX.qmd` hanya dipegang satu agen pada satu waktu (pemadu atau ahli yang sedang mendapat giliran perbaikan). | Satu pemilik per berkas |
 | Batas wajar: ±3–6 agen penulis/penyunting bersamaan; model mahal (brms/Stan) memakai `mc.cores` yang sesuai jumlah agen. | CPU dan memori |
 
+## Hemat token
+
+Praktik kerja agar alur panjang tidak menabrak batas pemakaian dan ruang disk:
+
+- **Pilih model per peran** (keputusan penulis 2026-11-12: setiap peran punya model bawaan; peran dapat dipasang sebagai jenis agen Claude Code lewat `claude-agents/` dan `siapkan_proyek.py --pasang-agen`, sehingga modelnya otomatis):
+
+  | Model | Peran atau tugas | Alasan |
+  | --- | --- | --- |
+  | **opus** | 01 perencana, 02 perancang kerangka, 03 peninjau literatur, 04/04a/04b penulis, 05 reviewer isi, 06 reviewer rumus, 08 reviewer kode, 09 editor, 13 pembuat kunci jawaban, 16 reviewer pemodelan, 17 reviewer ML, 18 reviewer statistika resmi, 19 reviewer domain, 21 penelaah pakar | Kebenaran isi, rumus, kode, dan keputusan rancangan; kekeliruan di sini mahal dan sulit ditangkap gerbang. |
+  | **sonnet** | 07 reviewer bahasa, 10/11/12 pembaca pemula/menengah/mahir, 14 penyunting soal, 15 pengaudit ilustrasi, 20 reviewer pedagogi, 22 penyunting gaya, 23 penerap revisi gaya, 24 editor penerbitan | Pekerjaan berpedoman (aturan bahasa, gaya, dan templat) atau membaca sebagai pembaca; gerbang dan reviewer opus menjaga isi. Pembaca pemula (10) dikonfirmasi uji banding: masalah inti sama dengan opus. |
+  | **haiku** | Tugas mekanis di luar peran: menjalankan harness dan merangkum, penggantian istilah, EYD berpola, cek rujukan, pengemasan, pemantauan render | Hasilnya diperiksa mesin atau mudah dicek; kecepatan dan biaya lebih penting daripada penalaran. Dikonfirmasi: hitungan inventaris tepat; hasil hitungan tetap dicek dengan skrip. |
+  | **fable** | Peran reviewer (05, 06) sebagai pengganti opus | Setara opus untuk peran reviewer (05, 06; diuji 2 kali); boleh menggantikan opus untuk peran reviewer. Untuk bab penting, jalankan dua reviewer dengan model berbeda (opus dan fable) pada peran yang sama, karena setiap uji memberi temuan unik di kedua sisi. |
+
+  Uji banding per peran dengan pekerjaan nyata adalah cara memperbarui tabel ini (hasil dan keterbatasan: `references/kajian-model.md`).
+
+  Aturan: orkestrator boleh **menaikkan model satu tingkat** (haiku ke sonnet, sonnet ke opus) untuk bab yang sulit atau setelah ulasan model ringan meleset (temuan penting lolos dan baru tertangkap peninjau lain); **turunkan** bila tugasnya mekanis. Kenaikan dan alasannya dicatat di `STATUS.md`. Orkestrator sendiri adalah sesi utama; modelnya dipilih penulis.
+- **Andalkan gerbang dan skrip deterministik, bukan agen,** untuk pemeriksaan yang dapat diotomatiskan (angka, rujukan, istilah, koma konjungsi, struktur). Agen hanya untuk yang tidak dapat diperiksa mesin.
+- **Batasi agen paralel** (±3–5) agar tidak menabrak batas pemakaian. Bila batas tercapai, lanjutkan agen yang sama lewat pesan (lihat **Pemulihan**), bukan agen baru.
+- **Hemat konteks agen.** Agen membaca bagian berkas yang relevan (`grep`, `offset`), bukan seluruh buku. Laporan akhir singkat (≤ 120–200 kata); rincian ditulis ke berkas.
+- **Kelompokkan pekerjaan:** satu agen untuk beberapa bab sejenis. Hindari ulasan berulang atas berkas yang tidak berubah sejak ulasan terakhir.
+- **Render penuh hanya di akhir putaran.** Selama iterasi, harness dijalankan tanpa `--render`.
+- **Jaga ruang disk:** setiap agen menghapus log dan berkas kerja besar miliknya sendiri (cache rajut, keluaran render, salinan sementara) setelah selesai.
+
 ## Pemulihan
 
 Setelah **batas pemakaian** (agen berhenti di tengah tugas) atau **kontainer dimulai ulang**:
@@ -82,6 +105,7 @@ Setelah **batas pemakaian** (agen berhenti di tengah tugas) atau **kontainer dim
 - [ ] Tidak ada dua agen aktif pada berkas yang sama.
 - [ ] Buku multidisiplin: setiap bagian ditinjau reviewer ahli disiplinnya + 07 + 09; tidak ada reviewer yang meninjau bagian tulisannya sendiri; berkas bagian diarsipkan dan klaim dipindahkan ke kunci bab.
 - [ ] Render hanya berurutan; tidak ada agen yang memakai `--render`.
+- [ ] Praktik **Hemat token** dipatuhi: model sesuai peran, agen paralel ≤ 5, pemeriksaan otomatis lewat gerbang, laporan agen singkat.
 - [ ] Keputusan baru tercatat bertanggal; status "keputusan penulis" vs "diputuskan saat perancangan" dibedakan.
 - [ ] Setiap bab punya laporan pembaca pemula independen (subagen berkonteks bersih) beserta tindak lanjut oleh agen lain.
 - [ ] Usulan untuk diputuskan penulis disajikan bernomor dengan rekomendasi dan nilai bawaan sementara; jawaban penulis tercatat bertanggal.

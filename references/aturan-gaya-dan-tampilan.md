@@ -2,7 +2,7 @@
 
 Aturan di berkas ini disarikan dari keputusan penulis yang berlaku umum pada seri buku statistika Bayesian (Choir, 2026) dan menjadi **bawaan** skill. Setiap proyek baru menyalinnya ke `KEPUTUSAN-RANCANGAN.md` proyek (lihat `assets/templat-KEPUTUSAN-RANCANGAN.md`); bila penulis memutuskan lain, berkas proyek yang berlaku. Kolom "Gerbang" menyebut pemeriksa otomatis di `scripts/harness.py`; aturan tanpa gerbang diperiksa reviewer.
 
-Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 Rumus dan notasi · 5 Sitasi · 6 Angka dan kode · 7 Kotak dan struktur bab · 8 Tata letak cetak (termasuk halaman judul, anatomi buku, huruf dan templat penerbit, ukuran buku, gaya Word, rumus di Word) · 9 Bahasa (ringkas; rinci di skill eyd)
+Daftar isi: 1 Prosa dan alur · 2 Judul dan subjudul · 3 Tabel dan gambar · 4 Rumus dan notasi · 5 Sitasi · 6 Angka dan kode · 7 Kotak dan struktur bab · 8 Tata letak cetak (termasuk halaman judul, anatomi buku, huruf dan templat penerbit, ukuran buku, gaya Word, rumus dan fitur otomatis di Word) · 9 Bahasa (ringkas; rinci di skill eyd)
 
 ## 1. Prosa dan alur
 
@@ -99,6 +99,47 @@ dari posterior ...
 | Model mahal disimpan: `file = file.path("fit", "b3-XX-nama")`, `file_refit = "on_change"`, `seed` tetap, jalur relatif. | reviewer kode |
 | Kode panjang (simulasi, penyusunan tabel, parquet) disembunyikan (`echo: false`) dan dirujuk: "kode lengkap ada di `lampiran-kode/<buku>/babXX.R`". | G-LAMPIRAN |
 | Hindari mencetak `summary(fit)` utuh (panjang, berbahasa Inggris); cetak ringkasan terpilih. | editor |
+
+### Angka, desimal, dan keselarasan tabel–narasi
+
+Aturan ini diputuskan untuk seri Bayesian pada 11 November 2026. Kajian dan sumbernya ada di `naskah-bersama/kajian-digit-desimal-2026-11-11.md` proyek seri. Inventaris pertama menemukan 75 pasangan beda desimal di 442 tabel. Pola tersering adalah tabel 3 desimal dengan narasi 2 desimal, karena desimal dipilih per kalimat dan per tabel, bukan per jenis besaran.
+
+Prinsip:
+
+1. **Satu jenis, satu jumlah desimal.** Desimal yang sama berlaku di tabel, narasi, keterangan, dan teks gambar.
+2. **Narasi mengutip tabel apa adanya.** Kalimat yang merujuk sel tabel memakai desimal kolom itu. Pembulatan yang lebih kasar hanya untuk ringkasan yang ditandai kata *sekitar* atau *kira-kira*.
+3. **Desimal tidak melebihi ketelitian.** Digit terakhir tidak boleh lebih halus daripada 2 × MCSE. Bila desimal bawaan melanggar batas ini, kurangi desimal untuk seluruh kolom dan narasinya (Gelman, Vehtari, dan McElreath, *Bayesian Workflow*, subbab 11.6).
+4. **Ambang menentukan desimal diagnostik.** Diagnostik ditulis dengan desimal yang cukup untuk memutuskan lolos atau tidak terhadap ambangnya.
+
+| Jenis besaran | Desimal bawaan | Alasan singkat |
+|---|---|---|
+| Peluang, proporsi | 2; 3 bila < 0,05 atau > 0,95 dan MCSE ≤ 0,0005 | dua digit bermakna; ujung skala perlu rincian |
+| Persen | 1; tingkat interval dan kriteria (95%) 0; angka resmi mengikuti sumber (BPS: 2) | 1 desimal persen = 3 desimal proporsi |
+| Rata-rata, median, batas interval | desimal yang memberi 2 digit bermakna pada SD posterior (praktis 2); batas = titik estimasi | dua digit bermakna; ekor kurang teliti |
+| Simpangan baku | sama dengan rata-ratanya | dibaca berpasangan |
+| Koefisien (logit, ln) | 2 | ketelitian di bawah 0,01 jarang bermakna |
+| Rasio *odds*, rasio laju | 2 | `exp()` koefisien dua desimal |
+| Rasio deskriptif (faktor Bayes, rasio waktu) | 1 bila ≥ 1; 2 bila < 1 | menyatakan besar perbedaan |
+| R-hat | 3 | ambang 1,01: dengan 2 desimal, 1,005–1,014 semuanya tampil "1,01" |
+| ESS | 0, dengan pemisah ribuan | cacahan efektif; ambang 100 per rantai |
+| MCSE | desimal estimasi + 1 (praktis 3) | menilai digit terakhir estimasi |
+| elpd, selisih elpd, SE | 1 | skala ln densitas total |
+| Pareto k | 2 | ambang 0,7 dan min(1 − 1/log10 S; 0,7) |
+| E-BFMI | 2 | ambang 0,30 |
+| Statistik uji / nilai-p | 2 / 3; di bawah 0,001 ditulis "< 0,001" | membedakan 0,049 dan 0,051 |
+| Rupiah | 0, atau ribu/juta rupiah dengan 1 desimal bila ketidakpastiannya ribuan | dua sampai tiga digit bermakna |
+| Jam; detik komputasi | 1; 1 bila ≥ 1 detik, 2 bila < 1 detik | berubah antarjalan |
+| Orang, kasus; laju per 100.000 | 0; 1 | cacahan bulat |
+
+Pendekatannya adalah desimal tetap per jenis, dengan ketidakpastian sebagai batas atas. Desimal rata-rata dan batas interval ditetapkan sekali per contoh berjalan dari SD posteriornya, lalu dipakai tetap di contoh itu. Digit yang berubah-ubah per angka tidak dipakai, karena keselarasan tabel–narasi tidak dapat diperiksa mesin.
+
+Penerapan:
+
+- Chunk setup setiap bab mendefinisikan `D <- c(peluang = 2, persen = 1, ringkasan = 2, sd = 2, koef = 2, rasio = 2, rhat = 3, ess = 0, mcse = 3, elpd = 1, k = 2, bfmi = 2, stat = 2, p = 3)`.
+- Tabel ditulis `knitr::kable(x, digits = D[c("ringkasan", "sd", "rhat", "ess")], format.args = list(decimal.mark = ",", big.mark = "."))`. Jangan menulis `digits = 3` lepas.
+- Narasi ditulis `` `r angka(x, D["ringkasan"])` ``. Nilai yang dikutip dari tabel diambil dari objek tabel yang sama.
+- Persen dan proporsi tidak dicampur untuk besaran yang sama di tabel dan narasi.
+- Pemeriksaan dengan **G-SELARAS** (`harness/selaras_angka.py`): `python3 harness/selaras_angka.py --md laporan.md` membuat inventaris semua buku, dan `python3 harness/harness.py --selaras <buku>/<bab>.qmd` memeriksa satu bab. Tingkat awalnya WARNING. Gerbang ini diaktifkan untuk semua bab dengan `SELARAS=gagal` setelah buku diperbaiki.
 
 ## 7. Kotak dan struktur bab
 
@@ -202,6 +243,20 @@ Pelajaran dari uji yang kini dicegah gerbang atau skrip:
 - Pada opsi `crc`, Unicode Yunani atau ≤ yang **dicampur dengan `$…$` dalam satu label** jatuh ke kotak kosong STIX karena Latin Modern Roman tidak punya glifnya. Tulis simbol di dalam `$…$` (`$\theta \leq 1$`). Label tanpa `$` aman karena memakai rantai huruf teks → matematika.
 - Latin Modern punya varian optis bernama keluarga sama (LMRoman5–17); `gaya_gambar.py` hanya mendaftarkan berkas opsi.
 - Pemeriksaan seri 2026-11-08: keenam PDF di `seri-bayesian/kirim/` dan 968 PDF gambar proyek seri hanya memuat Libertinus (LibertinusSerif, LibertinusMath, LibertinusMono, LibertinusT1Math). Huruf lain hanya ada di dua PDF fikstur harness (`harness/uji-buku/gambar/fig-baik.pdf`, `fig-cap.pdf`: TeXGyrePagella), bukan di buku.
+- TeX Gyre Cursor punya ligatur fi/fl, jadi `fit` di kode menjadi U+FB01. Libertinus Mono tidak punya ligatur itu. Sejak 2026-11-11 `huruf.py` (dan `assets/preamble.tex`) memasang huruf mono dengan `Ligatures=NoCommon` untuk semua opsi.
+
+**Seri asal memakai opsi `springer` dengan profil `seri` (2026-11-11).** Permintaan penulis: "Ganti font buku seperti template Springer." Hanya keluarga huruf yang diganti. Ukuran tetap profil `seri` (B5, 12 pt, kolom 120 mm, margin 28/28/22/24 mm), karena profil `springer` 10 pt pada B5 melanggar batas 40–70 karakter (median 73). Seri belum memakai blok bertanda, jadi perubahan dipasang manual, setara `huruf.py`. Penanda `>>> huruf` sudah ditambahkan, dan `harness/konfig.json` (`"huruf": "springer"`) serta salinan `_bersama/huruf.py` dibaca `gaya_gambar.py` dan G-HURUF.
+
+| Unsur | Seri sebelum (2026-11-07) | Seri sesudah (2026-11-11) |
+|---|---|---|
+| Teks dan judul, rumus, sans | Libertinus Serif, Libertinus Math, Libertinus Serif | TeX Gyre Termes, TeX Gyre Termes Math, TeX Gyre Heros |
+| Kode | Libertinus Mono, Scale 0,8; blok kode 9 pt × 0,8 = 7,2 pt, keluaran 8,5 pt × 0,8 = 6,8 pt | TeX Gyre Cursor, Scale 0,85, `Ligatures=NoCommon`; blok kode 9 pt × 0,85 = **7,65 pt** (72 karakter + bantalan = 338,7 pt), keluaran 8,5 pt × 0,85 = **7,225 pt** (78 karakter = 338,1 pt) |
+| Cadangan glif | Libertinus Serif/Math untuk mono | Termes Math untuk teks (`\babelfont{rm}`); Termes lalu Termes Math untuk mono |
+| TikZ, gambar, sampul | libertinus + libertinust1math; Libertinus Serif; Libertinus | newtxtext + newtxmath[varvw]; Termes/Termes Math (Type 3); Termes/Termes Math |
+| Word | `reference-b5.docx` (Libertinus) | `reference-b5-windows.docx` (Times New Roman, Courier New, Cambria Math) |
+
+- Ukuran mono dipilih sedikit di bawah hitungan `huruf.py` (7,7 / 7,25 pt). Hitungan itu memakai `\textwidth` 341,4 pt (120 mm dalam pt TeX), sedangkan komentar seri memakai batas aman 340,2 pt (120 mm dalam bp). Dengan 7,65 / 7,225 pt nominalnya tetap 9 / 8,5 pt.
+- **Hasil ukur** (Kunci Buku 3, 136 halaman; sebelumnya 138 halaman): karakter per baris prosa (`pdftotext -layout`, metode bagian 8) median **64**, p95 **76**. Dengan metode yang sama, Libertinus menghasilkan 63/74, jadi median tetap di 40–70. `pdffonts` buku hanya memuat TeXGyreTermes (Regular, Italic, Bold, BoldItalic), TeXGyreTermesMath, dan TeXGyreCursor (Regular, Bold). Log tanpa "Missing character". G-LOG, G-TAG, G-TEPI, dan G-HURUF LULUS. Proyek uji (bab berisi Yunani, ≤, ≈ di prosa dan komentar kode, kode 72 karakter, keluaran 78 karakter, gambar matplotlib, dan TikZ): kode berakhir 145,6 mm dan keluaran 146,8 mm dari tepi kiri kertas (tepi kolom 148 mm). Gambar matplotlib memuat TeXGyreTermes dan TeXGyreTermesMath; TikZ memuat TeXGyreTermesX, NewTXMI, dan txsys.
 
 ### Profil penerbit dan ukuran buku (2026-11-08)
 
@@ -217,20 +272,21 @@ Dua kunci lain di `konfig.json` dapat digabung dengan opsi huruf: **`profil`** (
 | Ukuran | Kertas (mm) | Margin dalam/luar/atas/bawah (mm) | Kolom (mm) | Karakter per baris (median/p95, templat bab) | Mono kode/keluaran untuk 72/78 karakter (Libertinus, 12 pt) | Batas kode/keluaran yang dianjurkan | Sumber dan status |
 |---|---|---|---|---|---|---|---|
 | `b5` | 176 × 250 | 28 / 28 / 22 / 24 | 120 | 60 / 69 | 7,2 / 6,8 pt | 72 / 78 | keputusan seri |
-| `unesco` | 155 × 230 | 30 / 20 / 30 / 20 | 105 | 53 / 61 (batas 64/68) | 6,3 / 5,95 pt (di bawah 6,8) | **64 / 68** (mono 7,05 / 6,85 pt), atau terima mono kecil | pedoman LPPM Unsoed (lppm.unsoed.ac.id/wp-content/uploads/2024/06/Persyaratan-umum-buku-edit.docx-1.pdf: kiri 3 cm, kanan 2 cm, atas 3 cm, bawah 2 cm) dan penerbit Deepublish; dasar PO BKD yang disebut Deepublish **belum terverifikasi; cek teks pedoman PAK/BKD yang berlaku** |
+| `unesco` | 155 × 230 | 30 / 20 / 30 / 20 | 105 | 53 / 61 (batas 64/68) | 6,3 / 5,95 pt (di bawah 6,8) | **64 / 68** (mono 7,05 / 6,85 pt), atau terima mono kecil | pedoman LPPM Unsoed (lppm.unsoed.ac.id/wp-content/uploads/2024/06/Persyaratan-umum-buku-edit.docx-1.pdf: kiri 3 cm, kanan 2 cm, atas 3 cm, bawah 2 cm) dan penerbit Deepublish; dasar "PO BKD" yang disebut penerbit **tidak didukung PO BKD 2021** (lihat catatan di bawah tabel); ukuran tetap dianjurkan pedoman kampus (mis. Unsoed) dan penerbit |
 | `a5` | 148 × 210 | 18 / 15 / 18 / 20 | 115 | 56 / 67 | 6,9 / 6,5 pt | 72 / **75**, atau terima keluaran 6,5 pt | ukuran ISO; margin bawaan skill (bukan standar) |
 | `a4` | 210 × 297 | 30 / 30 / 25 / 25 | 150 | belum diukur (perkiraan > 70 pada 12 pt) | 9,05 / 8,5 pt | 72 / 78 | ukuran ISO; margin bawaan skill |
 | `6x9` | 152,4 × 228,6 | 17 / 17 / 19 / 19 | 118,4 | 62 / 77 (profil `crc`, Latin Modern 10 pt) | 7,1 / 6,7 pt | 72 / 77, atau profil `crc` (mono 7,55 / 7,15 pt) | trim `krantz.cls` (6 × 9 in) |
 | `7x10` | 177,8 × 254 | 19 / 19 / 19 / 19 | 139,8 | belum diukur | 8,45 / 7,95 pt | 72 / 78 | **belum terverifikasi**: `krantz.cls` hanya menyatakan trim 6 × 9 in; lebar `krantz2` 33pc + 2 × 0,75 in = 7 in |
 
 - Permendikbudristek 22/2022 **tidak menetapkan angka ukuran buku**. Ia hanya mewajibkan ukuran buku dan margin ditetapkan pada tahap perancangan templat halaman isi (Lampiran hlm. 42).
+- **PO BKD 2021 (Kepdirjendikti) juga tidak menetapkan ukuran buku ajar** (diperiksa 2026-11-11 pada salinan pindaian 104 halaman dari bsdi.um-surabaya.ac.id, teks OCR; catatan pemeriksaan di proyek seri `naskah-bersama/sumber/po-bkd/CATATAN.md`). Pencarian "UNESCO", "15,5", "23 cm", dan "ukuran" tidak menemukan apa pun. PO BKD 2021 hanya mengatur kewajiban dosen menulis buku ajar atau buku teks yang diterbitkan perguruan tinggi atau penerbit yang diakui (hlm. PDF 8), angka kredit "Mengembangkan Buku Ajar (cetak atau bahan kuliah elektronik)" dengan bukti sampul, kata pengantar, daftar isi, dan surat tugas (hlm. PDF 27), serta ISBN untuk buku terjemahan atau suntingan (hlm. PDF 9). Jadi, klaim penerbit bahwa ukuran UNESCO 15,5 × 23 cm "mengacu pada PO BKD" tidak didukung PO BKD 2021. Ukuran `unesco` tetap tersedia karena pedoman kampus (mis. LPPM Unsoed) dan penerbit menganjurkannya. Bila penulis memilihnya, sebutkan sumber itu sebagai dasar, bukan PO BKD.
 - Bila mono hitungan di bawah **6,8 pt**, `huruf.py` menawarkan dua jalan: (a) batas baris lebih kecil (`batas_kode`, `batas_keluaran` di `konfig.json`; G-LEBAR-KODE dan G-LEBAR-KELUARAN membaca batas itu; `options(width = batas_keluaran − 3)` ditulis ke `<buku>/.Rprofile`), atau (b) menerima mono kecil.
 - **Lebih dari 70 karakter per baris**: profil `springer` pada B5 (10 pt, kolom 120 mm) menghasilkan median 73 / p95 86; `crc` (6 × 9) p95 77; `wiley` p95 77. Angka ini melanggar aturan 40–70 karakter seri (Permendikbudristek 22/2022, Lampiran III). Saat menyerahkan naskah ke penerbit, **standar penerbit didahulukan**; untuk buku seri sendiri tetap pakai profil `seri`.
 - `siapkan_proyek.py --ukuran <u> --profil <p> --huruf <h>`; sampul tidak dibawa skill (`assets/` tanpa templat sampul), jadi ukuran sampul diatur sendiri di proyek.
 
 ### Gaya Word: huruf bawaan Windows
 
-`assets/reference-b5-windows.docx` (dibangkitkan `huruf.py --buat-docx` dari `reference-b5.docx`) memakai huruf yang ada di setiap Windows. Ukuran, menjorok baris pertama, spasi 0, kertas, dan bahasa id-ID tetap. Untuk ukuran buku dan profil lain `huruf.py` membangkitkan `reference-<ukuran>[-windows][-<pt>pt].docx`: kertas dan margin mengikuti `ukuran`, dan semua `w:sz` diskalakan ke huruf dasar profil (springer 10 pt, wiley 11 pt).
+`assets/reference-b5-windows.docx` (dibangkitkan `huruf.py --buat-docx` dari `reference-b5.docx`) memakai huruf yang ada di setiap Windows. Ukuran, menjorok baris pertama, spasi 0, kertas, margin, bahasa id-ID, tanda air DRAF, nomor halaman, dan `updateFields` tetap. Untuk ukuran buku dan profil lain `huruf.py` membangkitkan `reference-<ukuran>[-windows][-<pt>pt].docx`: kertas dan margin mengikuti `ukuran` (sama dengan PDF; jarak header dan footer tetap), tab kanan daftar isi selebar bidang teks, dan semua `w:sz` diskalakan ke huruf dasar profil (springer 10 pt, wiley 11 pt).
 
 | Unsur | Gaya Windows | Padanan di PDF |
 |---|---|---|
@@ -244,25 +300,78 @@ Dua kunci lain di `konfig.json` dapat digabung dengan opsi huruf: **`profil`** (
 - Rumus di Word memakai **Cambria Math**, jadi bentuknya berbeda dari PDF. Pandoc tidak menyalin `m:mathPr` dari reference-doc. Karena itu, `_quarto.yml` menjalankan `post-render: ../_bersama/huruf.py --pasca-render`, yang menulis `m:mathFont` (Cambria Math untuk gaya Windows, huruf matematika opsi untuk gaya lain) ke setiap DOCX di `_book/`. Hasilnya diperiksa G-DOCX-RUMUS (d).
 - Uji 2026-11-08 (python-docx): DOCX `springer` dan `wiley` memakai Times New Roman di 75 *run* dan Courier New di 77 *run*, tanpa nama Libertinus di `styles.xml`, `document.xml`, `fontTable.xml`, `settings.xml`, dan `theme1.xml`; ukuran dasar 10 pt (springer) dan 11 pt (wiley).
 
-### Rumus di Word (2026-11-08)
+### Rumus dan fitur otomatis di Word (2026-11-08, diperbarui 2026-11-11)
 
 | Aturan | Gerbang |
 |---|---|
 | Semua rumus ditulis sebagai matematika Pandoc (`$…$`, `$$…$$`, `aligned`, `cases`), bukan blok `{=latex}` mentah atau gambar. Pandoc mengubahnya menjadi persamaan Word asli (OMML) yang dapat disunting di Word. | G-DOCX-RUMUS (a)(b) |
 | Makro rumus tidak boleh hanya didefinisikan di preamble LaTeX karena DOCX tidak membacanya. Definisikan dengan `\newcommand` di blok `$$` di awal dokumen (dipahami Pandoc) atau ganti dengan perintah standar. | G-DOCX-RUMUS (b) |
 | Pakai perintah yang didukung OMML: `\operatorname`, `\mathrm`, `\boldsymbol`, `\text`. | reviewer rumus, tinjauan DOCX |
-| Nomor persamaan dan rujukan `@eq-` tampil di Word. | tinjauan DOCX |
+| Nomor persamaan dan rujukan `@eq-` tampil di Word sebagai bidang (lihat fitur otomatis di bawah). | G-DOCX (SEQ, REF) |
 | Gambar yang memuat rumus (plot, diagram) tetap gambar; rumus di prosa dan tabel tidak boleh berupa gambar. | G-DOCX-RUMUS (c) |
 | Persamaan Word asli dapat dikonversi MathType; **perlu dicek di versi MathType pengguna** (skill tidak menguji MathType). | — |
 
 Aturan G-DOCX-RUMUS: (a) jumlah `m:oMath` di `word/document.xml` ≥ jumlah rumus sumber − maks(2, 2%). Rumus sumber dihitung dari blok `$$…$$` dan `$…$` sebaris di prosa bab yang terdaftar di `_quarto.yml`, di luar chunk, kode sebaris, R inline, komentar HTML, dan `\$`. (b) Tidak ada `\frac`, `\sum`, huruf Yunani TeX, `^{`, atau `_{` di *run* teks yang bukan bergaya kode. (c) Tidak ada gambar dengan nama atau teks alternatif bermakna rumus (`eq`, `rumus`, `persamaan`, `equation`, atau TeX). (d) `m:mathFont` sesuai gaya Word. Uji templat bab 2026-11-08: rumus sebaris, `aligned`, dan rumus di tabel menjadi OMML.
+
+**Reference-doc** (`assets/reference-b5.docx`) memuat perbaikan dari tinjauan DOCX seri 2026-11-08. Isinya: margin sama dengan PDF (B5: 28/28/22/24 mm, bidang teks 12 cm; ukuran lain dari `huruf.py`), header berisi tanda air VML "DRAF" (abu-abu, miring 45°, di belakang teks) dan footer bernomor halaman `{PAGE}`, `w:updateFields` di `settings.xml` (Word menawarkan pembaruan semua bidang saat dokumen dibuka), kode blok dan keluaran 7 pt (gaya Source Code dan Verbatim Char; sekitar 75 karakter per baris di bidang 12 cm), serta gaya `Catatan` (9 pt, tanpa menjorok), `Compact` (sel tabel dan daftar rapat tanpa menjorok), `Hak Cipta`, `TOC Heading`, `TOC 1`, `TOC 2`, `Table of Figures`, `Nomor Persamaan`, `Bibliography` (menggantung 0,75 cm), `Header`, dan `Footer`. Untuk naskah akhir ke penerbit, hapus tanda air dari header reference-doc.
+
+**Fitur otomatis Word** (`_bersama/word-otomatis.lua`, filter `at: post-render`, hanya untuk DOCX; PDF tidak berubah). Filter mengganti nomor statis Quarto dengan bidang Word yang dapat diperbarui dengan F9. Hasil awal setiap bidang sama dengan nomor di PDF, jadi dokumen tetap benar walaupun bidangnya belum diperbarui.
+
+| Unsur | Bidang Word | Gerbang |
+|---|---|---|
+| Judul bab, lampiran, subbab | `{SEQ Bab}`, `{SEQ Lampiran \* ALPHABETIC}`, `{SEQ Bab \c}.{SEQ Subbab \s 1}`; nomor dibungkus bookmark `_Ref_<label>` | G-DOCX (Heading1 bernomor) |
+| Keterangan gambar dan tabel | "Gambar `{SEQ Bab \c}.{SEQ Gambar \s 1}`", "Tabel …" | G-DOCX: jumlah SEQ Gambar/Tabel = jumlah keterangan bernomor |
+| Persamaan bernomor | tabel 1 × 2 tanpa garis: rumus di tengah, `({SEQ Bab \c}.{SEQ Persamaan \s 1})` rata kanan (gaya `Nomor Persamaan`) | G-DOCX: jumlah SEQ Persamaan = nomor persamaan; nomor statis "(1.1)" di dalam rumus berarti filter tidak terpasang |
+| Rujukan silang `@fig-`, `@tbl-`, `@eq-`, `@sec-` | awalan teks + `{REF _Ref_<label> \h}`; persamaan "persamaan ({REF})" | G-DOCX: setiap REF menunjuk bookmark yang ada |
+| Daftar Isi, Daftar Gambar, Daftar Tabel | `{TOC \o "1-2" \h \z \u}`, `{TOC \h \z \c "Gambar"}`, `{TOC \h \z \c "Tabel"}` sesudah halaman hak cipta; `toc: false` di format docx | G-DOCX: ketiga bidang TOC ada (daftar gambar/tabel bila ada objeknya) |
+| Halaman hak cipta | Div `custom-style="Hak Cipta"` (di `index.qmd`, dalam `.content-visible when-format="docx"`) dipindah ke sesudah halaman judul | G-DOCX: gaya Hak Cipta ada dan sebelum daftar isi |
+| Gambar | teks alternatif dari `fig-alt` atau judul gambar (TeX diubah ke Unicode); lebar ≤ bidang teks − 0,5 cm | G-DOCX: alt-text tidak kosong, lebar ≤ bidang teks |
+| Tabel | lebar minimum setiap kolom = kata terpanjangnya; pembungkus tabel bernomor tidak lagi rata tengah | tinjauan DOCX |
+| Kode sebaris | 0,8 × ukuran teks (B5: 8,5 pt) | tinjauan DOCX |
+| Lampiran | "Appendix A — …" → "Lampiran A — …" | tinjauan DOCX |
+| Margin | reference-doc dari `huruf.py` (margin `ukuran` di `konfig.json`) | G-DOCX: margin = konfig (toleransi 1 mm) |
+| Sitasi dan Daftar Pustaka (`zotero-word.lua`) | `{ADDIN ZOTERO_ITEM CSL_CITATION {json}}` berhasil teks citeproc bertaut; naratif: nama teks + bidang bersuppress-author; `{ADDIN ZOTERO_BIBL … CSL_BIBLIOGRAPHY}`; `ZOTERO_PREF_n` di `docProps/custom.xml` | G-DOCX: JSON sah, plainCitation = hasil, tanpa sitasi statis, satu ZOTERO_BIBL, ZOTERO_PREF ada |
+
+- Bidang teks dan ukuran teks dibaca dari reference-doc (`w:pgSz`, `w:pgMar`, gaya Body Text). Karena itu, filter mengikuti ukuran buku dan profil tanpa disunting. Metadata `word-bidang-teks-cm` di format docx menimpanya.
+- Penomoran per bab memakai `SEQ Bab \c`, bukan `STYLEREF 1 \s`: nomor bab Quarto berupa teks, bukan penomoran daftar Word, dan `STYLEREF \s` hanya membaca nomor daftar. Nomor pertama di setiap bab juga diberi `\r 1` karena LibreOffice mengabaikan `\s` (tanpa `\r`, Gambar 2.1 menjadi 2.2).
+- Sitasi bertaut ke Daftar Pustaka dengan `link-citations: true` di format docx (bookmark `ref-<kunci>`); CSL tidak berubah.
+
+**Pelajaran tinjauan DOCX seri** (enam buku, 2026-11-08; semuanya sudah ditangani reference-doc, filter, atau `_quarto.yml` skill):
+
+| Temuan | Penanganan |
+|---|---|
+| Margin Word 22/18 mm (bidang teks 13,6 cm), tidak sama dengan PDF 28/28 mm (kolom 120 mm) | margin reference-doc = PDF; G-DOCX memeriksa margin terhadap `konfig.json` |
+| Halaman hak cipta jatuh **sesudah** daftar isi (daftar isi Pandoc dibuat sebelum isi); halaman judul tanpa pemisah halaman | `toc: false`; filter memindahkan halaman hak cipta lalu menyisipkan daftar isi sesudahnya |
+| Judul lampiran "Appendix A — …" dalam bahasa Inggris | filter: "Lampiran" |
+| Gambar 13,2–13,6 cm (`fig-width` 5,2 in) melebihi bidang teks 12 cm; di sel tabel Quarto tepi kanannya terpotong; gaya `Compact` mewarisi menjorok 0,75 cm sehingga gambar di sel bergeser dan terpotong | filter membatasi lebar; `Compact` tanpa menjorok |
+| Kolom tabel kable tanpa `tbl-colwidths` terlalu sempit sehingga kata terpenggal per huruf ("Respo/ns", "B/ab"); sel tabel bernomor mendapat dua `<w:jc>` sehingga kolom tampil rata tengah di LibreOffice | lebar minimum kolom; satu `<w:jc>` |
+| Tanpa header, tanda air, dan nomor halaman | tanda air DRAF dan `{PAGE}` di reference-doc |
+| Teks alternatif kosong untuk semua gambar; ikon kotak 32 px | alt-text dari `fig-alt`/judul; `callout-icon: false` |
+| Kode 9 pt sehingga baris > 59 karakter terbungkus; gaya `Catatan` dibuat Pandoc dengan menjorok dan ukuran teks biasa | kode 7 pt; gaya `Catatan` 9 pt |
+| `\bigm` + garis tegak tidak dikenal texmath (blok keluar sebagai TeX mentah); `$\theta = $` (spasi sebelum `$` penutup) bukan rumus bagi Pandoc | `\mathrel{\big` + garis tegak + `}`; tanpa spasi sebelum `$` penutup (G-DOCX-RUMUS (b)) |
+| Rujukan ke subjudul tak bernomor ("Latihan n") tertulis "Subbab 3.0.7" | tautan bernama `[Latihan 7](#sec-…)` |
+
+**Batasan yang tersisa** (dicatat di laporan tinjauan DOCX, bukan temuan):
+
+- **Huruf harus dipasang.** DOCX tidak menyematkan huruf (Pandoc tidak mendukungnya). Pembaca tanpa Libertinus melihat huruf pengganti; pasang Libertinus (SIL OFL) atau pakai gaya Word Windows (`docx_huruf: "windows"`). Rumus memakai fon `m:mathFont` (lihat di atas).
+- **Nomor halaman Daftar Isi, Daftar Gambar, dan Daftar Tabel baru muncul sesudah bidang diperbarui** (Word menawarkannya saat dokumen dibuka karena `updateFields`; atau Ctrl+A lalu F9). Sebelum itu, dan di LibreOffice atau Google Docs, daftar berisi entri bertaut tanpa nomor halaman.
+- **LibreOffice tidak menampilkan `aligned` dengan benar**: penanda perataan OMML (`&` di `m:eqArr`) dibaca Word sebagai titik perataan, tetapi LibreOffice menampilkannya sebagai simbol ("∧", "¿"). Pratinjau LibreOffice tidak mewakili rumus bertingkat di Word. Nomor persamaan sejajar atas dengan rumus bertingkat.
+- **Indeks hanya di PDF** (indeks LaTeX). Word tidak wajib berindeks.
+- Ukuran teks Word (10,5 pt pada profil `seri`) lebih kecil dari PDF (12 pt), jadi jumlah halaman berbeda. Rujukan ke judul tak bernomor tetap tautan biasa, bukan bidang REF.
+
+**Sitasi sebagai bidang Word.** Sejak 2026-11-11 skill memasang opsi 2 di bawah secara bawaan, tetapi **tanpa Better BibTeX dan tanpa Zotero saat render**: `_bersama/zotero-word.lua` (`at: post-render`, hanya DOCX) menjalankan citeproc sendiri. Filter itu menulis setiap sitasi sebagai bidang `ADDIN ZOTERO_ITEM CSL_CITATION` dengan data butir tersemat dari `pustaka.bib`, Daftar Pustaka sebagai `ADDIN ZOTERO_BIBL`, dan preferensi dokumen `ZOTERO_PREF_n` (gaya dari `<id>` CSL, bahasa dari `lang`). Hasil bidang sama dengan teks citeproc PDF dan tetap bertaut. Penulis yang memakai Zotero 7 cukup menekan *Refresh*, dan dapat mengganti gaya lewat *Document Preferences*. Langkah penulis, cara kerja, dan batasan ada di `references/zotero-word.md`; G-DOCX memeriksanya. Matikan dengan `zotero-word: false`, sehingga sitasi kembali menjadi teks CSL bertaut. Pertimbangan semula kedua opsi (catat pilihan penulis di `KEPUTUSAN-RANCANGAN.md`):
+
+1. **Bidang CITATION/BIBLIOGRAPHY bawaan Word** (`customXml` Sources.xml dari `pustaka.bib`). Kelebihan: daftar pustaka dapat diperbarui di Word tanpa perangkat lain. Kekurangan: Word hanya punya gaya bawaannya (tanpa "dkk." dan aturan bahasa Indonesia). Akibatnya, formatnya berbeda dari PDF; sebagian jenis entri BibTeX hilang saat dikonversi.
+2. **Bidang Zotero** (`ADDIN ZOTERO_ITEM CSL_CITATION`, `ADDIN ZOTERO_BIBL`). Kelebihan: memakai CSL yang sama dengan PDF dan dapat diperbarui dengan plugin Zotero di Word. Lewat filter `zotero.lua` Better BibTeX, Zotero harus berjalan saat render dan semua entri `pustaka.bib` harus ada di pustaka Zotero dengan kunci yang sama. `zotero-word.lua` skill menghindari kedua syarat itu dengan butir tersemat. Kekurangan yang tersisa: penyunting harus memasang Zotero untuk memperbarui sitasi, nama penulis sitasi naratif berupa teks biasa, dan sitasi baru memerlukan impor `pustaka.bib` ke Zotero.
+
+Anjuran: biarkan bidang Zotero terpasang (tanpa Zotero dokumen tetap terbaca seperti sitasi bertaut). Matikan hanya bila penerbit meminta DOCX tanpa bidang; *Unlink Citations* di Zotero melakukan hal yang sama pada salinan dokumen.
 
 ## 9. Bahasa (ringkas)
 
 Rinci di skill **eyd** (`references/kalimat-efektif.md`, `kata-hubung.md`, `inventaris-kesalahan.md`) dan `istilah-statistika.md`.
 
 - Setiap kalimat **utuh**: subjek dan predikat jelas; tanpa subjek berkata depan ("Dalam bab ini membahas …"); tanpa anak kalimat berdiri sendiri (kalimat diawali "Sehingga", "Karena", "Yang"); tanpa konjungsi ganda ("Meskipun … tetapi").
-- **Koma konjungsi** (EYD V B.2–B.5, B.13): **tanpa** koma sebelum penghubung subordinatif bila induk mendahului anak kalimat (*sehingga, karena, sebab, agar, supaya, bahwa, jika, bila, apabila, kalau, meskipun, walaupun, ketika, setelah, sebelum, sejak, selama*), termasuk bila kalimat diawali anak kalimat lain. **Dengan** koma sebelum *tetapi, melainkan, sedangkan, padahal*; sesudah anak kalimat yang mendahului induk; sesudah penghubung antarkalimat (*Akibatnya,* *Oleh karena itu,* *Namun,*); sebagai penutup aposisi/sisipan. ", karena itu" di tengah kalimat → pecah kalimat. *Sehingga* tidak mengawali kalimat. Kalimat > 30 kata dipecah. Gerbang: G-KONJUNGSI; pengecualian sah per kalimat di `pengecualian.json` (`konjungsi-abaikan`), dinilai satu per satu, tidak dihapus massal.
+- **Koma konjungsi** (EYD V B.2–B.5, B.13): **tanpa** koma sebelum penghubung subordinatif bila induk mendahului anak kalimat (*sehingga, karena, sebab, agar, supaya, bahwa, jika, bila, apabila, kalau, meskipun, walaupun, ketika, setelah, sebelum, sejak, selama*), termasuk bila kalimat diawali anak kalimat lain. **Dengan** koma sebelum *tetapi, melainkan, sedangkan, padahal*; sesudah anak kalimat yang mendahului induk; sesudah penghubung antarkalimat (*Akibatnya,* *Oleh karena itu,* *Namun,*); sebagai penutup aposisi/sisipan. ", karena itu" dan ", jadi" di tengah kalimat → pecah kalimat (EYD V B.5: *jadi* adalah penghubung antarkalimat, bukan antaranak kalimat). Salah: "Rantai belum bercampur, jadi R-hat besar." Benar: "Rantai belum bercampur. Jadi, R-hat besar." atau "Rantai belum bercampur sehingga R-hat besar." (juga "… maka R-hat besar"). *Jadi* sebagai kata kerja atau bagian frasa ("jadi sebuah", "jadi bahan", "jadi masalah") tidak ditandai. *Sehingga* tidak mengawali kalimat. Kalimat > 30 kata dipecah. Gerbang: G-KONJUNGSI; pengecualian sah per kalimat di `pengecualian.json` (`konjungsi-abaikan`), dinilai satu per satu, tidak dihapus massal.
 - Istilah asing yang **diputuskan tetap dalam bahasa Inggris** (contoh: *odds*) selalu dicetak miring di prosa, judul, keterangan, dan latihan. Bila kalimat yang memuat istilah itu menjadi `penanda` klaim di `harness/klaim.json`, penanda ikut diperbarui agar tetap sama persis dengan teks `.qmd` (mis. `*odds*`); kutipan bukti tidak diubah (keputusan penulis seri, dicatat 2026-11-07).
 - Istilah asing tanpa padanan lazim dicetak miring dan dijelaskan pada kemunculan pertama **di setiap bab**; verba tidak dibuat hibrida ("di-*fit*" → "dicocokkan"); akhiran pada istilah asing memakai tanda hubung (*shrinkage*-nya).
 - *fit*: **mencocokkan/pencocokan** (model dengan data), "objek hasil pencocokan", *fitted values* = nilai prediksi, *goodness of fit* = kecocokan model, *overfitting* miring; "mencocokkan" dalam arti membandingkan → "membandingkan"; istilah Inggrisnya disebut pada kemunculan pertama per buku (`istilah-statistika.md`).

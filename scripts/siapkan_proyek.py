@@ -3,9 +3,11 @@
 
 Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
   <proyek>/harness/       harness.py, referensi.py, penggalan.py, cek_rumus.py, kemas_sumber.py,
+                          selaras_angka.py,
                           uji_harness.sh, uji-buku/, klaim.json, referensi.json,
                           pengecualian.json, konfig.json, sumber/, laporan/
-  <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua,
+  <proyek>/_bersama/      gaya_gambar.py, huruf.py, catatan.lua, bahasa-asing.lua, word-otomatis.lua,
+                          zotero-word.lua,
                           tikz-preamble.tex, preamble.tex, doc-class.tex, hak-cipta.tex,
                           apa.csl, reference-b5.docx, reference-b5-windows.docx
   <proyek>/KEPUTUSAN-RANCANGAN.md, REVISI.md, .gitignore
@@ -13,6 +15,8 @@ Membuat (tanpa menimpa berkas yang sudah ada, kecuali --timpa):
                           naskah/{00-brief.md, 01-rancangan-rinci.md, keputusan-istilah.md,
                           STATUS.md, 03-kerangka/, ulasan/}
   <proyek>/lampiran-kode/<buku>/
+  <proyek>/.claude/agents/  (hanya dengan --pasang-agen) buku-ajar-NN-*.md: peran skill sebagai
+                          jenis agen Claude Code dengan model bawaan per peran (claude-agents/)
 
 Pemakaian:
   python3 <skill>/scripts/siapkan_proyek.py --proyek ~/sumber/seri-x --buku buku1 \
@@ -59,6 +63,8 @@ def main():
     ap.add_argument("--judul", required=True)
     ap.add_argument("--penulis", default="Nama Penulis (tanpa gelar)")
     ap.add_argument("--timpa", action="store_true")
+    ap.add_argument("--pasang-agen", action="store_true",
+                    help="salin claude-agents/*.md ke <proyek>/.claude/agents/ (bawaan: tidak)")
     ap.add_argument("--huruf", help="opsi huruf: libertinus (bawaan), springer, crc, stix")
     ap.add_argument("--profil", help="profil penerbit: seri (bawaan), springer, crc, wiley")
     ap.add_argument("--ukuran", help="ukuran buku: b5 (bawaan), unesco, a5, a4, 6x9, 7x10")
@@ -71,7 +77,8 @@ def main():
     print(f"Proyek {P}, buku {a.buku}")
 
     # harness
-    for f in ["harness.py", "referensi.py", "penggalan.py", "cek_rumus.py", "kemas_sumber.py", "uji_harness.sh"]:
+    for f in ["harness.py", "referensi.py", "penggalan.py", "cek_rumus.py", "kemas_sumber.py", "selaras_angka.py",
+              "uji_harness.sh", "uji_agen.py"]:
         salin(SKRIP / f, P / "harness" / f, t)
     salin(SKRIP / "uji-buku", P / "harness" / "uji-buku", t)
     tulis(P / "harness" / "klaim.json", "[]\n", False)
@@ -80,11 +87,13 @@ def main():
         {"angka-tetap": {}, "eyd-abaikan": [], "gaya-abaikan": [], "konjungsi-abaikan": [],
          "larangan-abaikan": [], "istilah-abaikan": [], "ln-abaikan": []}, indent=1) + "\n", False)
     salin(ASET / "konfig.json", P / "harness" / "konfig.json", False)
+    tulis(P / "harness" / "skill-asal.txt", str(SKILL) + "\n", True)
     (P / "harness" / "sumber").mkdir(parents=True, exist_ok=True)
     (P / "harness" / "laporan").mkdir(parents=True, exist_ok=True)
 
     # folder bersama
-    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua"]:
+    for f in ["gaya_gambar.py", "huruf.py", "catatan.lua", "bahasa-asing.lua", "word-otomatis.lua",
+              "zotero-word.lua"]:
         salin(SKRIP / f, P / "_bersama" / f, t)
     for f in ["tikz-preamble.tex", "preamble.tex", "doc-class.tex", "apa.csl",
               "reference-b5.docx", "reference-b5-windows.docx", "hak-cipta.tex"]:
@@ -95,7 +104,12 @@ def main():
     salin(ASET / "templat-REVISI.md", P / "REVISI.md", False)
     tulis(P / ".gitignore", "\n".join([
         "_book/", "build/", ".quarto/", "fit/", "*_files/", "__pycache__/",
-        "harness/sumber/", "harness/laporan/", "*.log", "*.aux", "*.rds", ""]), False)
+        "harness/sumber/", "harness/laporan/", "harness/skill-asal.txt", "*.log", "*.aux", "*.rds", ""]), False)
+
+    # jenis agen Claude Code (opsional)
+    if a.pasang_agen:
+        for f in sorted((SKILL / "claude-agents").glob("*.md")):
+            salin(f, P / ".claude" / "agents" / f.name, t)
 
     # buku
     q = (ASET / "_quarto.yml").read_text(encoding="utf-8")
@@ -108,7 +122,15 @@ def main():
     tulis(B / "index.qmd", "# Prakata {.unnumbered}\n\nTujuan penulisan, pembaca sasaran, "
           "keunggulan buku, dan cara memakai buku ini.\n\n## Data yang digunakan dan batasannya "
           "{.unnumbered}\n\nJenis data (riil, sintetis paket, simulasi), alasannya, dan rujukan ke "
-          "lampiran Sumber Data.\n", False)
+          "lampiran Sumber Data.\n\n"
+          "<!-- Halaman hak cipta versi Word: word-otomatis.lua memindahkannya ke sesudah halaman\n"
+          "     judul dan sebelum Daftar Isi (PDF memakai hak-cipta.tex). -->\n"
+          "::: {.content-visible when-format=\"docx\"}\n::: {custom-style=\"Hak Cipta\"}\n"
+          f"**{a.judul}**\\\n{a.penulis}\n\n"
+          f"Hak cipta © {date.today():%Y} {a.penulis}. Penerbit: belum ditetapkan. "
+          "ISBN: belum ditetapkan.\n\n"
+          "Huruf dan lisensinya: samakan dengan halaman hak cipta PDF (_bersama/hak-cipta.tex).\n"
+          ":::\n:::\n", False)
     tulis(B / "references.qmd", "# Daftar Pustaka {.unnumbered}\n\n::: {#refs}\n:::\n", False)
     N = B / "naskah"
     salin(ASET / "templat-brief.md", N / "00-brief.md", False)

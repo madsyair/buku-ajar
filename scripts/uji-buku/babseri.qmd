@@ -1,0 +1,23 @@
+# Rujukan Lintas Buku {#sec-seri}
+
+Buku 1 Bab 4 dan Buku 2 (*Buku Contoh Kedua*) Bab 3 sah, begitu pula Subbab 2.3 Buku 2.
+
+Buku 1 Bab 5 tidak ada karena Buku 1 hanya mempunyai empat bab.
+
+Buku 3 Bab 7 melampaui rancangan enam bab, sedangkan Buku 3 Bab 6 sah.
+
+Buku 4 Bab 1 menunjuk buku yang tidak ada, begitu pula buku keempat seri ini.
+
+Pola lama Buku 2 Bab 5 ditolak.
+
+Buku 2 Subbab 2.4 tidak ada, sedangkan Buku 2 Subbab 2.3 ada.
+
+Buku 2 (*Judul Lama*) Bab 1 memakai judul yang salah.
+
+Lampiran B Buku 1 tidak ada, sedangkan Lampiran A Buku 1 dan Buku 3 Lampiran A ada.
+
+Buku 2 Bab 3 dan Bab 9 buku ini sah karena Bab 9 menunjuk buku ini.
+
+Buku 1 Bab 2 sampai 4 sah, dan buku pertama dari seri ini juga sah.
+
+<!-- Buku 9 Bab 9 di dalam komentar diabaikan. -->

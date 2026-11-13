@@ -262,8 +262,10 @@ def blok(nama, nama_profil=PROFIL_BAWAAN, docx_huruf="", nama_ukuran=UKURAN_BAWA
             f"\\babelfont{{rm}}[RawFeature={{fallback=serimain}}]{{{o['main']}}}"
             f"\\else\\setmainfont{{{o['main']}}}[RawFeature={{fallback=serimain}}]\\fi\\fi"]
            if o["cadangan_main"] else [])
+    # Ligatures=NoCommon: TeX Gyre Cursor punya ligatur fi/fl yang mengubah
+    # kode ("fit" menjadi U+FB01); ditemukan di seri 2026-11-11.
     pre += [f"\\ifdefined\\directlua\\setmonofont{{{o['mono']}}}[Scale={o['skala_mono']},"
-           f"RawFeature={{fallback=serimono}}]\\fi",
+           f"Ligatures=NoCommon,RawFeature={{fallback=serimono}}]\\fi",
            f"\\ifdefined\\directlua\\directlua{{seri_mono_nama = \"{o['mono_lua']}\"}}\\fi"]
     s = o["skala_mono"]
     k1, o1 = round(tl["kode_pt"] / s, 2), round(tl["keluaran_pt"] / s, 2)
@@ -291,21 +293,35 @@ def buat_docx(sumber, tujuan, windows=False, pt=12, nama_ukuran=UKURAN_BAWAAN):
     """Salin reference-b5.docx; windows=True: semua gaya Times New Roman (teks,
     judul), Courier New (kode), Cambria Math (rumus OMML); pt: ukuran dasar
     profil (semua w:sz diskalakan pt/12); ukuran selain b5: w:pgSz dan w:pgMar
-    dari kertas dan margin ukuran itu. Menjorok, spasi, dan id-ID tetap."""
+    dari kertas dan margin ukuran itu (jarak header/footer tetap) dan tab
+    daftar isi selebar bidang teks. Menjorok, spasi, id-ID, tanda air DRAF,
+    nomor halaman, dan updateFields tetap."""
     import zipfile
     faktor = pt / 12
     uk = ukuran(nama_ukuran)
     twip = 1440 / 25.4
 
+    (lebar, tinggi), (dalam, luar, atas, bawah) = uk["kertas"], uk["margin"]
+    bidang = round((lebar - dalam - luar) * twip)   # bidang teks (twip)
+
     def halaman(s):
+        # Margin Word = margin PDF ukuran ini (G-DOCX memeriksanya); jarak
+        # header/footer (tanda air DRAF, nomor halaman) dipertahankan.
         if nama_ukuran == "b5":
             return s
-        (lebar, tinggi), (dalam, luar, atas, bawah) = uk["kertas"], uk["margin"]
         s = re.sub(r'<w:pgSz w:w="\d+" w:h="\d+"/>',
                    f'<w:pgSz w:w="{round(lebar * twip)}" w:h="{round(tinggi * twip)}"/>', s)
-        return re.sub(r'<w:pgMar [^>]*/>',
-                      f'<w:pgMar w:left="{round(dalam * twip)}" w:right="{round(luar * twip)}" '
-                      f'w:top="{round(atas * twip)}" w:bottom="{round(bawah * twip)}"/>', s)
+
+        def pgmar(m):
+            t = m.group(0)
+            for k, v in [("left", dalam), ("right", luar), ("top", atas), ("bottom", bawah)]:
+                t = re.sub(rf'w:{k}="\d+"', f'w:{k}="{round(v * twip)}"', t)
+            return t
+        return re.sub(r'<w:pgMar [^>]*/>', pgmar, s)
+
+    def tab_daftar(s):
+        # Tab kanan bertitik TOC 1/TOC 2/Table of Figures = lebar bidang teks.
+        return re.sub(r'(<w:tab w:val="right" w:leader="dot" w:pos=)"\d+"', rf'\1"{bidang}"', s)
 
     def skala(m):
         return f'{m.group(1)}"{max(2, round(int(m.group(2)) * faktor))}"'
@@ -322,8 +338,10 @@ def buat_docx(sumber, tujuan, windows=False, pt=12, nama_ukuran=UKURAN_BAWAAN):
                 s = data.decode("utf-8")
                 if item.filename == "word/document.xml":
                     s = halaman(s)
-                if item.filename == "word/styles.xml" and faktor != 1:
-                    s = re.sub(r'(<w:szC?s? w:val=)"(\d+)"', skala, s)
+                if item.filename == "word/styles.xml":
+                    s = tab_daftar(s)
+                    if faktor != 1:
+                        s = re.sub(r'(<w:szC?s? w:val=)"(\d+)"', skala, s)
                 if windows:
                     if item.filename == "word/styles.xml":
                         s = re.sub(r"<w:rFonts\b[^>]*/>", rfonts, s)

@@ -3,11 +3,17 @@ dikutip harus benar-benar ada di sumbernya.
 
 Dua registri:
   harness/referensi.json  kunci bib -> identitas (DOI/ISBN/URL) dan catatan verifikasi
-  harness/klaim.json      daftar klaim: bab, kunci, penanda kalimat, bukti
+  harness/klaim.json      daftar klaim: bab, kunci, penanda kalimat, bukti; opsional
+                          "sitasi_di" bila kalimat klaim tanpa @kunci karena sumbernya sudah
+                          disitasi di kalimat lebih awal pada paragraf yang sama (2026-11-12)
 
 Jenis bukti dan cara pemeriksaannya:
   berkas     kutipan dicari otomatis di teks sumber lokal harness/sumber/<berkas>
-             (salinan buku dari Project; tidak ikut didistribusikan)
+             (salinan buku dari Project; tidak ikut didistribusikan). Bila tidak
+             ditemukan di sumber utama itu, dicari di versi kedua
+             harness/sumber/versi2/<berkas> (konversi lain dari buku yang sama;
+             keputusan 2026-11-12); laporan menyebut versi yang cocok. Fikstur uji
+             yang punya folder sumber/ sendiri memakai folder itu.
   rd         kutipan dicari otomatis di dokumentasi R (tools::Rd2txt)
   deskripsi  kutipan dicari otomatis di DESCRIPTION paket R
   citation   kutipan dicari otomatis di keluaran citation()
@@ -22,6 +28,7 @@ from pathlib import Path
 
 AKAR = Path(__file__).resolve().parent.parent
 SUMBER = AKAR / "harness" / "sumber"
+VERSI_KEDUA = "versi2"   # subfolder sumber kedua: <sumber>/versi2/<berkas> (2026-11-12)
 
 LIGATUR = {"ﬁ": "fi", "ﬂ": "fl", "ﬀ": "ff", "ﬃ": "ffi", "ﬄ": "ffl",
            "‘": "'", "’": "'", "“": '"', "”": '"', "–": "-", "—": "-"}
@@ -57,6 +64,35 @@ def halaman(mentah, kutipan):
     return None
 
 
+_cache_sumber = {}
+
+
+def _baca_sumber(f):
+    """(teks mentah, teks normal) berkas sumber; disimpan agar tiap berkas dinormalkan sekali."""
+    kunci = (f, f.stat().st_mtime_ns)
+    if kunci not in _cache_sumber:
+        mentah = f.read_text(encoding="utf-8")
+        _cache_sumber[kunci] = (mentah, normal(mentah))
+    return _cache_sumber[kunci]
+
+
+def cari_bukti(akar, berkas, kutipan):
+    """Cari kutipan di sumber utama <akar>/<berkas>, lalu di versi kedua
+    <akar>/versi2/<berkas>. Kembalikan (versi, berkas_relatif, mentah):
+    versi "utama" atau "versi kedua" bila cocok; None bila berkas ada tetapi
+    kutipan tidak ditemukan; "tanpa berkas" bila kedua berkas tidak ada."""
+    kandidat = [("utama", Path(berkas)), ("versi kedua", Path(VERSI_KEDUA) / berkas)]
+    ada = [(v, rel) for v, rel in kandidat if (akar / rel).exists()]
+    if not ada:
+        return "tanpa berkas", None, None
+    nk = normal(kutipan)
+    for versi, rel in ada:
+        mentah, norm = _baca_sumber(akar / rel)
+        if nk in norm:
+            return versi, rel, mentah
+    return None, [str(rel) for _, rel in ada], None
+
+
 def _r(ekspresi):
     p = subprocess.run(["Rscript", "-e", ekspresi], capture_output=True, text=True, timeout=300)
     return p.stdout + p.stderr
@@ -76,20 +112,49 @@ def kunci_sitasi(baris):
     return keluar
 
 
+def paragraf_baris(prosa_baris):
+    """Peta nomor baris -> teks paragrafnya (baris prosa berurutan yang tidak kosong,
+    dipisah baris kosong, judul, atau pagar :::). Dipakai agar klaim dapat tertaut ke
+    sitasi di kalimat pertama paragraf (sitasi sekali per paragraf, 2026-11-12)."""
+    peta, kelompok, sebelum = {}, [], None
+
+    def tutup():
+        teks = "\n".join(b for _, b in kelompok)
+        for n, _ in kelompok:
+            peta[n] = teks
+
+    for nomor, b in prosa_baris:
+        t = b.strip()
+        putus = not t or re.match(r"^#{1,6}\s", t) or t.startswith(":::") or (sebelum is not None and nomor != sebelum + 1)
+        if putus and kelompok:
+            tutup()
+            kelompok = []
+        if t and not re.match(r"^#{1,6}\s", t) and not t.startswith(":::"):
+            kelompok.append((nomor, b))
+        sebelum = nomor
+    if kelompok:
+        tutup()
+    return peta
+
 def periksa(qmd, bab, prosa_baris, bib_teks):
     """Kembalikan (daftar_masalah, ringkasan). Fikstur uji memakai registri di foldernya sendiri."""
     folder = qmd.parent if (qmd.parent / "klaim.json").exists() else AKAR / "harness"
     ref = json.loads((folder / "referensi.json").read_text(encoding="utf-8"))
     klaim = json.loads((folder / "klaim.json").read_text(encoding="utf-8"))
+    # Fikstur uji dengan folder sumber/ sendiri memakai folder itu; selain itu harness/sumber/
+    akar_sumber = folder / "sumber" if folder != AKAR / "harness" and (folder / "sumber").is_dir() else SUMBER
     klaim_bab = [k for k in klaim if k["bab"] == bab]
     masalah, ringkas = [], []
 
-    # 1. Setiap sitasi punya klaim terverifikasi untuk kalimat itu
+    # 1. Setiap sitasi punya klaim terverifikasi untuk kalimat itu, atau (sitasi sekali per
+    #    paragraf, 2026-11-12) untuk kalimat lain di paragraf yang sama
     dipakai = set()
+    par_baris = paragraf_baris(prosa_baris)
     for nomor, b in prosa_baris:
         for kunci in kunci_sitasi(b):
             dipakai.add(kunci)
-            cocok = [k for k in klaim_bab if k["kunci"] == kunci and k["penanda"] in b]
+            cocok = [k for k in klaim_bab if k["kunci"] == kunci
+                     and (k["penanda"] in b or k["penanda"] in par_baris.get(nomor, ""))]
             if not cocok:
                 masalah.append(f"baris {nomor}: sitasi @{kunci} tanpa klaim terverifikasi di klaim.json "
                                f"(kalimat: {b.strip()[:80]}…)")
@@ -108,27 +173,42 @@ def periksa(qmd, bab, prosa_baris, bib_teks):
 
     # 3. Setiap klaim bab ini: penandanya masih ada, buktinya terbukti
     teks_qmd = qmd.read_text(encoding="utf-8")
-    rd_cache, otomatis, manual = {}, 0, 0
+    rd_cache, otomatis, manual, kedua = {}, 0, 0, 0
     for k in klaim_bab:
         if k["penanda"] not in teks_qmd:
             masalah.append(f"klaim usang: penanda '{k['penanda'][:60]}' tidak ada lagi di {qmd.name}")
             continue
+        if k.get("sitasi_di"):
+            # Kalimat klaim tanpa @kunci karena sumbernya sudah disitasi lebih awal di paragraf
+            # yang sama (keputusan 2026-11-12). Klaim tetap diperiksa terhadap sumbernya (di bawah)
+            # dan harus tertaut: paragrafnya menyitasi @kunci sebelum penanda.
+            tertaut = False
+            for par in set(par_baris.values()):
+                i = par.find(k["penanda"])
+                if i >= 0 and k["kunci"] in kunci_sitasi(par[:i]):
+                    tertaut = True
+            if not tertaut:
+                masalah.append(f"klaim @{k['kunci']} bertanda sitasi_di ('{k['sitasi_di'][:40]}'), tetapi paragraf "
+                               f"penanda '{k['penanda'][:50]}' tidak menyitasi @{k['kunci']} sebelumnya; "
+                               "sitasi sumber itu pada kemunculan pertama di paragraf")
         for bukti in k["bukti"]:
             jenis, kutip = bukti["jenis"], bukti.get("kutipan", "")
             label = f"@{k['kunci']} ({jenis})"
             if jenis == "berkas":
-                f = SUMBER / bukti["berkas"]
-                if not f.exists():
-                    masalah.append(f"{label}: sumber lokal {bukti['berkas']} tidak tersedia")
+                versi, rel, mentah = cari_bukti(akar_sumber, bukti["berkas"], kutip)
+                if versi == "tanpa berkas":
+                    masalah.append(f"{label}: sumber lokal {bukti['berkas']} tidak tersedia "
+                                   f"(sumber utama maupun {VERSI_KEDUA}/)")
                     continue
-                mentah = f.read_text(encoding="utf-8")
-                if normal(kutip) not in normal(mentah):
-                    masalah.append(f"{label}: kutipan tidak ditemukan di {bukti['berkas']}: '{kutip}'")
+                if versi is None:
+                    masalah.append(f"{label}: kutipan tidak ditemukan di {' maupun '.join(rel)}: '{kutip}'")
                     continue
                 hlm = halaman(mentah, kutip)
                 letak = f"hlm. PDF {hlm}" if hlm else "tanpa penanda halaman"
-                ringkas.append(f"{label} {bukti['berkas']} {letak}, {bukti.get('lokasi', '')}: terbukti")
+                ringkas.append(f"{label} {rel} [{versi}] {letak}, {bukti.get('lokasi', '')}: terbukti")
                 otomatis += 1
+                if versi != "utama":
+                    kedua += 1
             elif jenis in ("rd", "deskripsi", "citation"):
                 if jenis == "rd":
                     kunci_cache = (bukti["paket"], bukti["topik"])
@@ -167,5 +247,6 @@ def periksa(qmd, bab, prosa_baris, bib_teks):
             else:
                 masalah.append(f"{label}: jenis bukti tidak dikenal")
     ringkas.insert(0, f"{len(dipakai)} pustaka disitasi; {otomatis} bukti diperiksa ulang otomatis, "
-                      f"{manual} bukti web tercatat")
+                      f"{manual} bukti web tercatat"
+                      + (f"; {kedua} bukti hanya cocok di sumber versi kedua ({VERSI_KEDUA}/)" if kedua else ""))
     return masalah, ringkas

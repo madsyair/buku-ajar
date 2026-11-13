@@ -29,6 +29,12 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-SLOP       frasa basa-basi dan kosakata khas tulisan mesin (bahasa Indonesia)
   G-LARANGAN   kata terlarang di naskah (bawaan: nama teknik pengajaran)
   G-ISTILAH    istilah yang sudah diputuskan diganti (konfig.json "istilah_terlarang")
+  G-RUJUKAN-SERI rujukan lintas buku dalam seri ("Buku N Bab M", "Buku N (*Judul*) Bab M",
+               "Subbab M.K Buku N", "Lampiran A Buku N", "buku kedua seri ini") menunjuk buku,
+               bab, subbab bernomor, dan lampiran yang ada, dengan judul buku yang benar; jumlah
+               bab dari _quarto.yml tiap buku atau dari rancangan di konfig.json "seri" (buku
+               yang belum ditulis); pola lama "rujukan_terlarang" ditolak; hanya bab, prakata,
+               lampiran, dan kunci; tanpa konfig "seri" dilewati (SERI_KONFIG=berkas.json)
   G-TEPI       tidak ada isi melewati tepi halaman > 3 pt (setelah --render)
   G-TAG        PDF bertag: Tagged yes, pohon struktur Document/H1/P/Figure, /Lang id-ID
                (setelah --render; TAG=0 mematikan untuk proyek tanpa DocumentMetadata)
@@ -40,13 +46,24 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
                (simbol tanpa keterangan, arti ganda, pemenggalan) untuk reviewer rumus
   G-STRUKTUR   pengantar bab 120+ kata (studi kasus/cerita), subbab ringkas
                (≤ subbab_maks_kata), Rangkuman/Ringkasan di akhir bab (bukan buku kunci)
+  G-PERTANYAAN (WARNING, tidak menggagalkan) subbab bernomor tanpa kalimat tanya di paragraf
+               prosa pertamanya; pengecualian judul: konfig "pertanyaan_kecuali"
+  G-SITASI-ULANG satu sumber disitasi sekali per paragraf prosa (berkas bab); WARNING pada tahap
+               draf, GAGAL pada --tahap akhir; kalimat lanjutan tanpa @kunci dicatat di klaim.json
+               dengan "sitasi_di" dan tetap diperiksa G-REFERENSI
   G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
                panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
   G-DOCX-RUMUS rumus Word asli (OMML) di DOCX: jumlah m:oMath >= rumus sumber - toleransi,
                tanpa TeX mentah di teks biasa, tanpa gambar rumus (setelah --render; DOCX_RUMUS=0)
-  G-DOCX       Word: ukuran halaman = ukuran buku, gambar di dalam bidang teks, tanpa ikon
-               kotak, tanpa "??"/@rujukan mentah, judul Heading1 bernomor (setelah --render; DOCX=0)
+  G-DOCX       Word: ukuran halaman dan margin = ukuran buku, gambar di dalam bidang teks dan
+               berteks alternatif, tanpa ikon kotak, tanpa "??"/@rujukan mentah, judul Heading1
+               bernomor; dengan word-otomatis.lua: SEQ = objek bernomor, REF ke bookmark yang ada,
+               TOC isi/gambar/tabel, hak cipta sebelum daftar isi; dengan zotero-word.lua: setiap
+               sitasi bidang ADDIN ZOTERO_ITEM berJSON sah (itemData tersemat, plainCitation =
+               hasil), tanpa sitasi statis, satu ZOTERO_BIBL, ZOTERO_PREF_n (setelah --render; DOCX=0)
+  G-SELARAS    PROTOTIPE (WARNING, nonaktif bawaan): nilai sama di tabel dan narasi dengan
+               desimal sama (harness/selaras_angka.py; SELARAS=warning|gagal)
   G-HURUF      semua huruf tersemat di PDF buku dan PDF gambar termasuk keluarga opsi
                "huruf" di konfig.json (_bersama/huruf.py; setelah --render; HURUF=0 mematikan)
 
@@ -64,6 +81,7 @@ Pemakaian:
   python3 harness/harness.py --tag-pdf buku1/_book/buku.pdf     # G-TAG saja
   python3 harness/harness.py --docx-rumus buku.docx --sumber bab01.qmd ...   # G-DOCX-RUMUS saja
   python3 harness/harness.py --docx-cek buku.docx [--ukuran unesco]          # G-DOCX saja
+  python3 harness/harness.py --selaras buku1/bab05.qmd               # G-SELARAS saja
   python3 harness/harness.py --huruf-pdf gambar/x.pdf [--huruf springer]   # G-HURUF saja
 """
 import argparse
@@ -121,8 +139,15 @@ KONFIG_BAWAAN = {
     "rerata_kata_kalimat_maks": 20,
     "kalimat_maks_kata": 35,
     "sitasi_per_1000_kata_maks": 4,
+    # G-PERTANYAAN (WARNING): judul subbab (awalan, tanpa beda huruf besar/kecil) yang tidak
+    # diperiksa kalimat tanya di paragraf prosa pertamanya
+    "pertanyaan_kecuali": ["Ringkasan", "Rangkuman", "Latihan", "Contoh utama", "Bacaan lanjut"],
     # Istilah yang sudah diputuskan penulis: pola regex -> saran (dan tanggal keputusan)
     "istilah_terlarang": [],
+    # G-RUJUKAN-SERI: buku-buku dalam satu seri, {"buku": {"N": {"folder", "judul",
+    # "bab" dan "lampiran" untuk buku yang belum ditulis, "sumber"}}, "rujukan_terlarang": [...]};
+    # kosong = gerbang dilewati (buku tunggal)
+    "seri": {},
     # Opsi huruf (libertinus, springer, crc, stix), profil ukuran (seri, springer,
     # crc, wiley), dan gaya Word ("windows": Times New Roman/Courier New/Cambria Math);
     # diterapkan oleh _bersama/huruf.py, diperiksa G-HURUF.
@@ -357,6 +382,26 @@ POLA_KONJ = re.compile(
     r"|sebelum(?!\s+itu|nya)|sejak(?!\s+itu)|selama(?!\s+itu))\b")
 
 
+# Singkatan bertitik yang bukan akhir kalimat (selain SINGKATAN di G-PARAGRAF).
+SINGKATAN_KONJ = ["mis.", "misal.", "dkk.", "dll.", "dsb.", "dst.", "hlm.", "s.d.", "vs.", "bdk.",
+                  "a.l.", "sbb.", "No.", "no.", "Vol.", "vol.", "ed.", "Ed.", "Prof.", "Dr.", "et al.",
+                  "e.g.", "i.e.", "cf.", "Jl.", "Bab.", "Gbr."]
+POLA_AKHIR_KALIMAT = re.compile(r"[.!?][\"”’)*_]*\s+(?=[\"“‘(*_]*[A-Z0-9])")
+
+
+def _awal_kalimat_konj(teks, posisi):
+    """Indeks awal kalimat yang memuat teks[posisi]. Titik pada singkatan (dkk., mis.)
+    dan angka (1.000; desimal seri memakai koma, 0,5) bukan batas kalimat."""
+    t = teks[:posisi]
+    for s in sorted(set(SINGKATAN_KONJ + SINGKATAN), key=len, reverse=True):
+        t = re.sub(r"(?<![\w.])" + re.escape(s), lambda m: m.group(0).replace(".", "§"), t)
+    t = re.sub(r"(?<=\d)\.(?=\d)", "§", t)
+    awal = 0
+    for m in POLA_AKHIR_KALIMAT.finditer(t):
+        awal = m.end()
+    return awal
+
+
 def gerbang_konjungsi(qmd, peng):
     prosa, _ = pilah_qmd(qmd.read_text(encoding="utf-8"))
     abaikan = peng.get("konjungsi-abaikan", [])
@@ -369,16 +414,24 @@ def gerbang_konjungsi(qmd, peng):
         for m in re.finditer(r",\s+(karena|sebab)\s+itu\b", bersih):
             masalah.append(f"baris {nomor}: '{m.group(1)} itu' penghubung antarkalimat di tengah kalimat; "
                            f"pecah kalimat ('. Karena itu, …') atau tulis '… karena …'")
+        for m in re.finditer(r",\s+jadi\b(?!\s+(?:sebuah|satu|dua|bahan|masalah)\b)", bersih):
+            masalah.append(f"baris {nomor}: 'jadi' penghubung antarkalimat (EYD V B.5) di tengah kalimat; "
+                           f"pecah kalimat ('. Jadi, …') atau tulis '… sehingga …'/'… maka …'")
         for m in POLA_KONJ.finditer(bersih):
             sisa = bersih[m.end():]
             sisip = re.match(r"([^,.;:]*),", sisa)
             if sisip and len(sisip.group(1).split()) <= 3:
                 continue  # keterangan sisipan, mis. ", bila perlu,"
-            segmen = re.split(r"[,;:(]", bersih[:m.start()])
+            awal = _awal_kalimat_konj(bersih, m.start())
+            segmen = re.split(r"[;:(]|,(?!\d)", bersih[awal:m.start()])  # 0,5 bukan pemisah
             if len(segmen) >= 2 and re.match(
                     r"\s*(?:bukan|misalnya|yaitu|yakni|seperti|termasuk|terutama|khususnya|antara lain"
                     r"|kecuali|selain|tidak hanya|baik)\b", segmen[-1]):
                 continue  # koma menutup sisipan/aposisi (EYD V B.13)
+            if len(segmen) == 1 and re.fullmatch(
+                    r"\s*[*_]*(?:Jadi|Namun|Akibatnya|Artinya|Maka|Sebaliknya|Selain itu|Oleh karena itu"
+                    r"|Karena itu|Dengan demikian|Dengan kata lain|Misalnya|Contohnya)[*_]*\s*", segmen[0]):
+                continue  # "Jadi, bila …": anak kalimat mendahului induk di awal kalimat
             konteks = bersih[max(0, m.start() - 50):m.end() + 30]
             if any(a in bersih for a in abaikan):
                 continue
@@ -888,12 +941,121 @@ def _attr(tag, nama):
     return int(m.group(1)) if m else 0
 
 
-def masalah_docx(docx, ukuran_mm=None, bernomor=False):
+def _teks_xml(par):
+    return "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par))
+
+
+SKEMA_CSL_CITATION = "https://github.com/citation-style-language/schema/raw/master/csl-citation.json"
+
+
+def bidang_word(document_xml, statis=None):
+    """Bidang kompleks Word (fldChar begin/separate/end, termasuk bersarang)
+    sebagai daftar (kode, teks hasil). Bila `statis` berupa list, tautan
+    sitasi (w:hyperlink ke bookmark ref-<kunci>) di luar bidang Zotero dicatat."""
+    import xml.etree.ElementTree as ET
+    W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
+    tumpukan, hasil_bidang = [], []
+    for el in ET.fromstring(document_xml).iter():
+        if el.tag == W + "hyperlink" and statis is not None \
+                and (el.get(W + "anchor") or "").startswith("ref-") \
+                and not any("ZOTERO_" in "".join(f["kode"]) for f in tumpukan):
+            statis.append(el.get(W + "anchor"))
+        if el.tag == W + "fldChar":
+            jenis = el.get(W + "fldCharType")
+            if jenis == "begin":
+                tumpukan.append({"kode": [], "hasil": [], "tahap": "kode"})
+            elif jenis == "separate" and tumpukan:
+                tumpukan[-1]["tahap"] = "hasil"
+            elif jenis == "end" and tumpukan:
+                f = tumpukan.pop()
+                teks = "".join(f["hasil"])
+                hasil_bidang.append(("".join(f["kode"]), teks))
+                if tumpukan and tumpukan[-1]["tahap"] == "hasil":
+                    tumpukan[-1]["hasil"].append(teks)
+        elif el.tag == W + "instrText" and tumpukan:
+            tumpukan[-1]["kode"].append(el.text or "")
+        elif el.tag in (W + "t", W + "tab") and tumpukan and tumpukan[-1]["tahap"] == "hasil":
+            tumpukan[-1]["hasil"].append(el.text or "" if el.tag == W + "t" else "\t")
+    return hasil_bidang
+
+
+def masalah_zotero(docx):
+    """Sitasi Zotero hidup (scripts/zotero-word.lua): setiap sitasi bidang
+    ADDIN ZOTERO_ITEM CSL_CITATION dengan JSON sah (citationID, schema,
+    plainCitation = teks hasil bidang, citationItems dengan uris dan itemData
+    berjudul/berjenis/berpenulis/bertahun), tanpa tautan sitasi ref-<kunci>
+    di luar bidang Zotero, tepat satu ZOTERO_BIBL, dan ZOTERO_PREF_1..n
+    (<= 255 karakter) di docProps/custom.xml yang tersambung menjadi
+    <data data-version="3"> dengan <style id=...>. Dokumen tanpa sitasi lulus."""
+    import zipfile
+    import xml.etree.ElementTree as ET
+    with zipfile.ZipFile(docx) as z:
+        statis = []
+        semua = bidang_word(z.read("word/document.xml"), statis)
+        custom = z.read("docProps/custom.xml").decode("utf-8") if "docProps/custom.xml" in z.namelist() else ""
+    masalah, item, bibl = [], 0, 0
+    if statis:
+        masalah.append(f"{len(statis)} sitasi statis (tautan ke ref-… di luar bidang Zotero), mis. "
+                       f"{', '.join(sorted(set(statis))[:5])}: pasang zotero-word.lua (at: post-render)")
+    for kode, teks in semua:
+        k = kode.strip()
+        if k.startswith("ADDIN ZOTERO_ITEM"):
+            item += 1
+            try:
+                d = json.loads(k[k.index("{"): k.rindex("}") + 1])
+            except ValueError as e:
+                masalah.append(f"JSON ZOTERO_ITEM tidak sah: {e}: {k[:70]}")
+                continue
+            p = d.get("properties", {})
+            if not d.get("citationID") or d.get("schema") != SKEMA_CSL_CITATION:
+                masalah.append(f"ZOTERO_ITEM tanpa citationID/schema: {k[:70]}")
+            if p.get("plainCitation") != teks:
+                masalah.append(f"plainCitation {p.get('plainCitation')!r} != hasil bidang {teks!r}")
+            if not d.get("citationItems"):
+                masalah.append("ZOTERO_ITEM tanpa citationItems")
+            for b in d.get("citationItems", []):
+                it = b.get("itemData", {})
+                if not b.get("uris") or not it.get("title") or not it.get("type") \
+                        or not (it.get("author") or it.get("editor")) or not it.get("issued"):
+                    masalah.append(f"citationItem {b.get('id')} tanpa uris/title/type/author/issued")
+        elif k.startswith("ADDIN ZOTERO_BIBL"):
+            bibl += 1
+            if not k.endswith("CSL_BIBLIOGRAPHY") or not teks.strip():
+                masalah.append("ZOTERO_BIBL tanpa CSL_BIBLIOGRAPHY atau hasil kosong")
+    if not item:
+        return masalah
+    if bibl != 1:
+        masalah.append(f"{bibl} bidang ZOTERO_BIBL (seharusnya 1)")
+    potong = {}
+    if custom:
+        for prop in ET.fromstring(custom):
+            m = re.fullmatch(r"ZOTERO_PREF_(\d+)", prop.get("name", ""))
+            if m:
+                potong[int(m.group(1))] = "".join(prop.itertext())
+    if not potong or sorted(potong) != list(range(1, len(potong) + 1)) \
+            or any(len(v) > 255 for v in potong.values()):
+        masalah.append("ZOTERO_PREF_1.. (maks. 255 karakter) tidak ada atau tidak berurutan di docProps/custom.xml")
+    else:
+        try:
+            d = ET.fromstring("".join(potong[i] for i in sorted(potong)))
+            if d.get("data-version") != "3" or d.find("style") is None or not d.find("style").get("id"):
+                masalah.append("ZOTERO_PREF tanpa data-version 3 atau <style id>")
+        except ET.ParseError as e:
+            masalah.append(f"ZOTERO_PREF bukan XML: {e}")
+    return masalah
+
+
+def masalah_docx(docx, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True, zotero=True):
     """Pemeriksaan otomatis keluaran Word (daftar periksa
-    assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, gambar
-    tidak melebihi bidang teks, tanpa ikon kotak (gambar <= 0,2 inci), tanpa
-    "??" atau rujukan @fig-/@sec-/@tbl-/@eq- mentah, ada Heading1, dan judul
-    bernomor bila number-sections."""
+    assets/templat-tinjauan-docx.md): ukuran halaman = ukuran buku, margin =
+    margin ukuran di konfig.json, gambar tidak melebihi bidang teks dan
+    berteks alternatif, tanpa ikon kotak (gambar <= 0,2 inci), tanpa "??" atau
+    rujukan @fig-/@sec-/@tbl-/@eq- mentah, ada Heading1, dan judul bernomor
+    bila number-sections. otomatis=True (word-otomatis.lua terpasang): jumlah
+    bidang SEQ Gambar/Tabel/Persamaan = jumlah objek bernomor, setiap REF
+    menunjuk bookmark yang ada, bidang TOC daftar isi/gambar/tabel ada, dan
+    halaman hak cipta (gaya "Hak Cipta") sebelum daftar isi. zotero=True
+    (zotero-word.lua terpasang): masalah_zotero."""
     import zipfile
     with zipfile.ZipFile(docx) as z:
         xml = z.read("word/document.xml").decode("utf-8", errors="replace")
@@ -902,11 +1064,17 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False):
     pgsz = re.search(r"<w:pgSz [^>]*>", sect[-1]).group(0) if sect else ""
     pgmar = re.search(r"<w:pgMar [^>]*>", sect[-1]).group(0) if sect else ""
     w, h = _attr(pgsz, "w:w"), _attr(pgsz, "w:h")
+    mm = 25.4 / 1440
     if ukuran_mm:
-        mm = 25.4 / 1440
         if abs(w * mm - ukuran_mm[0]) > 2 or abs(h * mm - ukuran_mm[1]) > 2:
             masalah.append(f"halaman {w * mm:.0f} × {h * mm:.0f} mm, seharusnya {ukuran_mm[0]} × {ukuran_mm[1]} mm "
                            "(reference-doc ukuran buku dari huruf.py)")
+    if margin_mm:
+        nyata = [_attr(pgmar, f"w:{k}") * mm for k in ("left", "right", "top", "bottom")]
+        if any(abs(a - b) > 1 for a, b in zip(nyata, margin_mm)):
+            masalah.append("margin kiri/kanan/atas/bawah " + "/".join(f"{a:.0f}" for a in nyata) +
+                           " mm, seharusnya " + "/".join(f"{b:g}" for b in margin_mm) +
+                           " mm seperti PDF (reference-doc dari huruf.py untuk ukuran di konfig.json)")
     bidang = (w - _attr(pgmar, "w:left") - _attr(pgmar, "w:right")) * 635  # EMU
     for tag in re.findall(r"<wp:extent [^>]*>", xml):
         cx = _attr(tag, "cx")
@@ -914,24 +1082,76 @@ def masalah_docx(docx, ukuran_mm=None, bernomor=False):
             masalah.append(f"gambar {cx / 914400:.2f} in melebihi bidang teks {bidang / 914400:.2f} in")
         if cx <= 0.2 * 914400:
             masalah.append(f"gambar kecil {cx / 914400:.2f} in (ikon kotak? set callout-icon: false di format docx)")
+    for tag in re.findall(r"<wp:docPr [^>]*>", xml):
+        m = re.search(r'descr="([^"]*)"', tag)
+        if not m or not m.group(1).strip():
+            nama = re.search(r'name="([^"]*)"', tag)
+            masalah.append(f"gambar tanpa teks alternatif ({nama.group(1) if nama else '?'}): "
+                           "isi fig-alt atau keterangan (word-otomatis.lua)")
     teks = " ".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", xml))
     if "??" in teks:
         masalah.append("'??' di teks: rujukan silang atau sitasi tidak terselesaikan")
     for r in sorted(set(re.findall(r"@(?:fig|sec|tbl|eq|lst|thm)-[\w-]+", teks)))[:10]:
         masalah.append(f"rujukan mentah '{r}' di teks")
     judul = []
-    for par in re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S):
-        st = re.search(r'<w:pStyle w:val="(Heading\d)"', par)
-        if st:
-            judul.append((st.group(1), "".join(re.findall(r"<w:t(?: [^>]*)?>([^<]*)</w:t>", par)).strip()))
+    paragraf = re.findall(r"<w:p[ >].*?</w:p>", xml, flags=re.S)
+    keterangan = {"Gambar": 0, "Tabel": 0}
+    nomor_persamaan = 0
+    for par in paragraf:
+        st = re.search(r'<w:pStyle w:val="([^"]+)"', par)
+        gaya = st.group(1) if st else ""
+        if re.fullmatch(r"Heading\d", gaya):
+            judul.append((gaya, _teks_xml(par).strip()))
+        elif any("Caption" in g for g in re.findall(r'<w:pStyle w:val="([^"]+)"', par)):
+            # Quarto: pPr kedua berisi ImageCaption sesudah pPr gaya paragraf
+            m = re.match(r"\s*(Gambar|Tabel)[\s\u00a0]+[\dA-Z]+(?:\.\d+)?", _teks_xml(par))
+            if m:
+                keterangan[m.group(1)] += 1
+        elif gaya == "NomorPersamaan":
+            nomor_persamaan += 1
     if not any(g == "Heading1" for g, _ in judul):
         masalah.append("tidak ada judul bergaya Heading1")
     if bernomor and not any(g == "Heading1" and re.match(r"\d+\.?\s", s) for g, s in judul):
         masalah.append("judul bab tidak bernomor di Word (number-sections)")
+    if zotero:
+        masalah += masalah_zotero(docx)
+    if not otomatis:
+        return masalah
+    # --- fitur otomatis Word (scripts/word-otomatis.lua)
+    instr = re.findall(r"<w:instrText[^>]*>([^<]*)</w:instrText>", xml)
+    seq = {n: sum(1 for i in instr if re.match(rf"\s*SEQ {n}\b", i)) for n in ("Gambar", "Tabel", "Persamaan")}
+    statis = 0
+    for om in re.findall(r"<m:oMath>.*?</m:oMath>", xml, flags=re.S):
+        # "\qquad(1.1)" tanpa word-otomatis.lua: spasi lebar lalu nomor; kurungnya
+        # bisa teks atau pembatas m:d
+        if re.search(r"(?:\(|\s)\s*[\dA-Z]+\.\d+\s*\)?\s*$", "".join(re.findall(r"<m:t[^>]*>([^<]*)</m:t>", om))):
+            statis += 1
+    harap = {"Gambar": keterangan["Gambar"], "Tabel": keterangan["Tabel"], "Persamaan": nomor_persamaan + statis}
+    for n in ("Gambar", "Tabel", "Persamaan"):
+        if seq[n] != harap[n]:
+            masalah.append(f"{seq[n]} bidang SEQ {n}, objek bernomor {harap[n]}"
+                           + (f" ({statis} nomor persamaan statis di dalam rumus)" if n == "Persamaan" and statis else "")
+                           + ": pasang word-otomatis.lua (at: post-render) di _quarto.yml")
+    bookmark = set(re.findall(r'<w:bookmarkStart [^>]*w:name="([^"]+)"', xml))
+    for r in sorted({m.group(1) for i in instr for m in [re.match(r"\s*REF\s+(\S+)", i)] if m} - bookmark)[:10]:
+        masalah.append(f"REF {r} menunjuk bookmark yang tidak ada")
+    toc = [(i, k) for k, i in enumerate(instr) if re.match(r"\s*TOC\b", i)]
+    if not any(r"\o" in i for i, _ in toc):
+        masalah.append("bidang TOC daftar isi tidak ada (toc: false di docx dan word-otomatis.lua)")
+    for n, daftar in (("Gambar", "Daftar Gambar"), ("Tabel", "Daftar Tabel")):
+        if harap[n] and not any(f'\\c "{n}"' in i for i, _ in toc):
+            masalah.append(f"bidang TOC {daftar} (\\c \"{n}\") tidak ada")
+    pos_hc = xml.find('<w:pStyle w:val="HakCipta"')
+    pos_toc = xml.find("TOC \\o")
+    if pos_hc < 0:
+        masalah.append('halaman hak cipta (gaya "Hak Cipta") tidak ada di Word')
+    elif pos_toc >= 0 and pos_hc > pos_toc:
+        masalah.append("halaman hak cipta sesudah daftar isi; seharusnya sesudah halaman judul, sebelum daftar isi")
     return masalah
 
 
-def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False):
+def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False, margin_mm=None, otomatis=True,
+                 zotero=True):
     if docx is None:
         daftar = list((buku / "_book").glob("*.docx"))
         if not daftar:
@@ -940,10 +1160,13 @@ def gerbang_docx(buku, docx=None, ukuran_mm=None, bernomor=False):
         docx = daftar[0]
         modul = _modul_huruf()
         if modul is not None:
-            ukuran_mm = modul.ukuran(KONFIG.get("ukuran", "b5"))["kertas"]
+            uk = modul.ukuran(KONFIG.get("ukuran", "b5"))
+            ukuran_mm, margin_mm = uk["kertas"], uk["margin"]
         yml = (buku / "_quarto.yml").read_text(encoding="utf-8")
         bernomor = bool(re.search(r"^number-sections:\s*true", yml, flags=re.M))
-    masalah = masalah_docx(docx, ukuran_mm, bernomor)
+        otomatis = "word-otomatis.lua" in yml
+        zotero = "zotero-word.lua" in yml
+    masalah = masalah_docx(docx, ukuran_mm, bernomor, margin_mm, otomatis, zotero)
     catat("G-DOCX", not masalah, "\n".join(sorted(set(masalah))[:40]))
 
 
@@ -1414,9 +1637,225 @@ def _kata(baris):
     return re.findall(r"[A-Za-zÀ-ÿ][\w'-]*", teks)
 
 
+def peringatan_pertanyaan(teks):
+    """G-PERTANYAAN (WARNING): subbab bernomor (## atau ### tanpa .unnumbered) yang paragraf prosa
+    pertamanya tidak memuat kalimat tanya ('?' di luar kode dan rumus). Kembalikan daftar pesan."""
+    kecuali = [k.lower() for k in KONFIG["pertanyaan_kecuali"]]
+    prosa, _ = pilah_qmd(teks)
+    # kelompokkan baris per judul subbab bernomor
+    bagian, saat_ini, dalam_math = [], None, False
+    for nomor, b in prosa:
+        m = re.match(r"^(#{2,3})\s+(.*?)\s*(\{[^}]*\})?\s*$", b)
+        if m and not dalam_math:
+            atribut = m.group(3) or ""
+            if ".unnumbered" in atribut or ".unlisted" in atribut:
+                saat_ini = None
+            else:
+                saat_ini = (nomor, m.group(2).strip(), [])
+                bagian.append(saat_ini)
+            continue
+        if re.match(r"^#{1}\s", b) and not dalam_math:
+            saat_ini = None
+            continue
+        if saat_ini is None:
+            continue
+        if b.strip().startswith("$$"):
+            dalam_math = not (b.strip().count("$$") == 2) and not dalam_math
+            continue
+        if dalam_math:
+            continue
+        saat_ini[2].append(b)
+    pesan = []
+    for nomor, judul, baris in bagian:
+        if any(judul.lower().startswith(k) for k in kecuali):
+            continue
+        # paragraf prosa pertama: lewati baris kosong, pagar kotak, daftar, tabel, gambar, komentar
+        paragraf, mulai = [], False
+        for b in baris:
+            t = b.strip()
+            if not t:
+                if mulai:
+                    break
+                continue
+            if re.match(r"^(:::|\||!\[|<|[-*+]\s|\d+[.)]\s)", t) or re.fullmatch(r"\{#[^}]*\}", t):
+                if mulai:
+                    break
+                continue
+            mulai = True
+            paragraf.append(bersihkan_baris_prosa(b))
+        if not paragraf:
+            continue  # subbab tanpa paragraf prosa (hanya daftar atau kode)
+        if "?" not in " ".join(paragraf):
+            pesan.append(f"baris {nomor}: subbab '{judul[:50]}' tidak dibuka pertanyaan wajar pembaca; "
+                         "paragraf prosa pertamanya tanpa kalimat tanya (siklus subbab, SKILL.md)")
+    return pesan
+
+
+def _berkas_bab(qmd):
+    """G-STRUKTUR, G-PERTANYAAN, G-GAYA-AJAR, G-SITASI-ULANG hanya untuk berkas bab (babXX.qmd), bukan
+    index (prakata), lampiran-*, glosarium, references, riwayat-penulis, atau kunci-*."""
+    return re.match(r"bab", Path(qmd).stem) is not None
+
+
+def gerbang_pertanyaan(qmd):
+    """G-PERTANYAAN, tingkat WARNING: tidak masuk daftar gerbang (tidak menggagalkan status)."""
+    if not _berkas_bab(qmd):
+        return []
+    pesan = peringatan_pertanyaan(qmd.read_text(encoding="utf-8"))
+    if pesan:
+        print(f"[PERINGATAN] G-PERTANYAAN: {len(pesan)} subbab")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
+# ---------------------------------------------------------------- G-SITASI-ULANG
+# Keputusan penulis 2026-11-12: buku ajar menulis sitasi seminimal mungkin. Dalam
+# satu paragraf, satu sumber cukup disitasi sekali, pada kemunculan pertama;
+# kalimat sesudahnya tanpa sitasi ("Sumber yang sama juga menunjukkan …") dan
+# klaimnya tetap tertaut di klaim.json lewat sitasi paragraf itu (G-REFERENSI).
+# Rujukan silang Quarto (@sec-, @fig-, @tbl-, @eq-, @lst-, dan awalan teorema)
+# bukan sitasi.
+AWALAN_RUJUKAN_SILANG = ("sec", "fig", "tbl", "eq", "lst", "thm", "lem", "cor", "prp", "cnj",
+                         "def", "exm", "exr", "sol", "rem")
+POLA_KUNCI_SITASI = re.compile(r"(?<![\w.\\@])@([A-Za-z][\w:.#$%&+?<>~/-]*[\w])")
+POLA_KURUNG_SITASI = re.compile(r"\[([^\[\]]*@[^\[\]]*)\]")
+
+
+def _rujukan_silang(kunci):
+    awal = kunci.split("-", 1)[0].lower()
+    return "-" in kunci and awal in AWALAN_RUJUKAN_SILANG
+
+
+def _kosongkan(pola, teks, bendera=0):
+    """Ganti cocokan dengan spasi sepanjang aslinya (baris baru dipertahankan) agar
+    posisi karakter tetap menunjuk ke baris yang sama."""
+    return re.sub(pola, lambda m: re.sub(r"[^\n]", " ", m.group(0)), teks, flags=bendera)
+
+
+def paragraf_prosa(teks):
+    """Paragraf prosa bab: daftar paragraf, masing-masing daftar (nomor_baris, teks_bersih).
+    Di luar YAML, chunk, dan blok kode; komentar HTML, kode sebaris, dan rumus dikosongkan.
+    Batas paragraf: baris kosong, judul, pagar ::: , awal butir daftar; baris tabel dilewati."""
+    prosa, _ = pilah_qmd(teks)
+    asli = teks.splitlines()
+    baris = [""] * len(asli)
+    for nomor, b in prosa:
+        baris[nomor - 1] = b
+    gabung = "\n".join(baris)
+    gabung = _kosongkan(r"<!--.*?-->", gabung, re.S)
+    gabung = _kosongkan(r"`[^`\n]*`", gabung)
+    gabung = _kosongkan(r"\$\$.*?\$\$", gabung, re.S)
+    gabung = _kosongkan(r"(?<!\\)\$[^$\n]*(?<!\\)\$", gabung)
+    bersih = gabung.split("\n")
+    hasil, saat_ini = [], []
+    for i, b in enumerate(bersih):
+        t = baris[i].strip()
+        putus = (not t or t.startswith("#") and re.match(r"^#{1,6}\s", t) or t.startswith(":::")
+                 or t.startswith("|") or re.fullmatch(r"\{#[^}]*\}", t) is not None)
+        butir = re.match(r"^\s*(?:[-*+]|\d+[.)])\s+", baris[i]) is not None
+        if putus or butir:
+            if saat_ini:
+                hasil.append(saat_ini)
+            saat_ini = []
+            if putus:
+                continue
+        saat_ini.append((i + 1, b))
+    if saat_ini:
+        hasil.append(saat_ini)
+    return hasil
+
+
+def _sitasi_paragraf(par):
+    """Kemunculan sitasi dalam satu paragraf: daftar (kunci, nomor_baris, lokator)."""
+    teks = "\n".join(b for _, b in par)
+    awal_baris, pos = [], 0
+    for nomor, b in par:
+        awal_baris.append((pos, nomor))
+        pos += len(b) + 1
+
+    def baris_dari(posisi):
+        nomor = par[0][0]
+        for p, n in awal_baris:
+            if p <= posisi:
+                nomor = n
+        return nomor
+
+    muncul, dipakai = [], []
+    for m in POLA_KURUNG_SITASI.finditer(teks):
+        dipakai.append((m.start(), m.end()))
+        geser = m.start(1)
+        for bagian in m.group(1).split(";"):
+            k = POLA_KUNCI_SITASI.search(bagian)
+            if k and not _rujukan_silang(k.group(1)):
+                lokator = bagian[k.end():].strip().lstrip(",").strip()
+                muncul.append((k.group(1), baris_dari(geser + k.start()), " ".join(lokator.split())))
+            geser += len(bagian) + 1
+    for k in POLA_KUNCI_SITASI.finditer(teks):
+        if any(a <= k.start() < b for a, b in dipakai) or _rujukan_silang(k.group(1)):
+            continue
+        lok = re.match(r"\s*\[([^\]@]*)\]", teks[k.end():])  # @kunci [hlm. 5]
+        muncul.append((k.group(1), baris_dari(k.start()), " ".join(lok.group(1).split()) if lok else ""))
+    return sorted(muncul, key=lambda x: (x[1], teks.find("@" + x[0])))
+
+
+def gabung_lokator(lokator):
+    """['hlm. 5', 'hlm. 9'] -> 'hlm. 5, 9'; label berbeda -> 'hlm. 5, bab 3'."""
+    pisah = [re.match(r"^(\D*?)\s*(\d.*)$", x) for x in lokator]
+    label = {m.group(1) for m in pisah if m}
+    if all(pisah) and len(label) == 1 and label != {""}:
+        return f"{label.pop()} " + ", ".join(m.group(2) for m in pisah)
+    return ", ".join(lokator)
+
+def temuan_sitasi_ulang(teks):
+    """Satu sumber disitasi lebih dari sekali dalam satu paragraf. Kembalikan daftar pesan
+    'baris N: @kunci K× …' (N = baris kemunculan pertama)."""
+    pesan = []
+    for par in paragraf_prosa(teks):
+        per_kunci = {}
+        for kunci, nomor, lokator in _sitasi_paragraf(par):
+            per_kunci.setdefault(kunci, []).append((nomor, lokator))
+        for kunci, daftar in sorted(per_kunci.items(), key=lambda x: x[1][0][0]):
+            if len(daftar) < 2:
+                continue
+            ulang = sorted({n for n, _ in daftar[1:]} - {daftar[0][0]})
+            letak = f" (ulang di baris {', '.join(map(str, ulang))})" if ulang else ""
+            p = (f"baris {daftar[0][0]}: @{kunci} disitasi {len(daftar)}× dalam satu paragraf{letak}; "
+                 "sitasi sekali pada kemunculan pertama, kalimat berikutnya tanpa sitasi atau "
+                 "'Sumber yang sama …'")
+            lokator = []
+            for _, lok in daftar:
+                if lok and lok not in lokator:
+                    lokator.append(lok)
+            if len(lokator) > 1:
+                p += (f"; lokator berbeda ({' | '.join(lokator)}): gabungkan di sitasi pertama, "
+                      f"mis. [@{kunci}, {gabung_lokator(lokator)}]")
+            elif lokator:
+                p += f"; lokator '{lokator[0]}' cukup di sitasi pertama"
+            pesan.append(p)
+    return pesan
+
+
+def gerbang_sitasi_ulang(qmd, ketat=False):
+    """G-SITASI-ULANG: WARNING pada tahap draf (tidak menggagalkan), GAGAL pada --tahap akhir
+    (ketat=True). Hanya berkas bab (babXX.qmd), seperti G-STRUKTUR."""
+    if not _berkas_bab(qmd):
+        return []
+    pesan = temuan_sitasi_ulang(Path(qmd).read_text(encoding="utf-8"))
+    if ketat:
+        catat("G-SITASI-ULANG", not pesan, "\n".join(pesan[:60]))
+    elif pesan:
+        print(f"[PERINGATAN] G-SITASI-ULANG: {len(pesan)} sitasi berulang dalam paragraf")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
 def gerbang_struktur(qmd, buku):
     """Pengantar menarik, subbab ringkas, rangkuman di akhir bab (keputusan penulis 2026-11-10)."""
     if any(Path(buku).name.startswith(a) for a in KONFIG["struktur_abaikan_buku"]):
+        return
+    if not _berkas_bab(qmd):  # index, lampiran-*, glosarium, references, riwayat-penulis
         return
     teks = qmd.read_text(encoding="utf-8")
     bagian = _bagian_bab(teks)
@@ -1461,6 +1900,8 @@ def gerbang_struktur(qmd, buku):
 
 def gerbang_gaya_ajar(qmd):
     """Tahap gaya akhir (references/gaya-buku-ajar.md §6): sapaan, kalimat, kepadatan sitasi."""
+    if not _berkas_bab(qmd):
+        return
     teks = qmd.read_text(encoding="utf-8")
     prosa, _ = pilah_qmd(teks)
     isi, sitasi, dalam_bacaan, dalam_kotak, dalam_math = [], 0, False, 0, False
@@ -1570,6 +2011,185 @@ def gerbang_istilah(qmd, peng):
     catat("G-ISTILAH", not t, "\n".join(t[:60]))
 
 
+# ---------------------------------------------------------------- G-RUJUKAN-SERI
+# Rujukan lintas buku dalam satu seri ("Buku 2 Bab 7", "Buku 1 (*Judul*) Bab 14",
+# "Subbab 5.8 Buku 2", "Buku 4 Subbab 1.8", "Lampiran A Buku 2", "buku kedua seri ini")
+# harus menunjuk buku yang ada dan bab, subbab, atau lampiran yang ada di buku itu.
+# Jumlah bab dibaca dari _quarto.yml setiap buku (berkas babNN.qmd di daftar
+# chapters); buku yang belum ditulis atau baru sebagian memakai "bab" dan
+# "lampiran" dari konfigurasi seri (rancangan). Konfigurasi: kunci "seri" di
+# harness/konfig.json, atau berkas JSON yang ditunjuk variabel SERI_KONFIG:
+#   "seri": {"buku": {"1": {"folder": "buku1", "judul": "Judul Buku 1"},
+#                      "5": {"folder": "buku5", "judul": "...", "bab": 8,
+#                            "lampiran": ["A", "B", "C"], "sumber": "rancangan ..."}},
+#            "rujukan_terlarang": [{"pola": "regex", "saran": "..."}]}
+# "folder" relatif terhadap akar proyek (atau terhadap folder berkas SERI_KONFIG).
+# Hanya berkas bab, prakata (index.qmd), lampiran-*, dan kunci-babNN yang diperiksa.
+ORDINAL_BUKU = {"pertama": 1, "kedua": 2, "ketiga": 3, "keempat": 4, "kelima": 5,
+                "keenam": 6, "ketujuh": 7, "kedelapan": 8, "kesembilan": 9, "kesepuluh": 10}
+_NO = r"(?:\d+(?:\.\d+)?|[A-Z](?![\w]))"
+_ITEM = rf"(?>{_NO}(?:\s*(?:–|--|-)\s*{_NO}|\s+sampai\s+(?:(?:[Bb]ab|[Ss]ubbab)\s+)?{_NO})?)"
+_DAFTAR = (rf"{_ITEM}(?:(?:\s*,\s*(?:dan\s+|atau\s+)?|\s+dan\s+|\s+atau\s+|\s+serta\s+)"
+           rf"(?:(?:Bab|Subbab|Lampiran)\s+)?{_ITEM}(?!\s+buku\s+ini))*")
+_SATUAN = rf"(?P<jenis>[Bb]ab|[Ss]ubbab|[Ll]ampiran)\s+(?P<daftar>{_DAFTAR})"
+# ordinal hanya bila jelas menunjuk seri: "buku kedua seri ini", "buku pertama dari seri"
+_BUKU = (r"(?:Buku\s+(?P<n>\d+)|[Bb]uku\s+(?P<ord>" + "|".join(ORDINAL_BUKU)
+         + r")\s+(?:seri\s+ini|dari\s+seri|dalam\s+seri))")
+POLA_SERI_MAJU = re.compile(rf"\b(?P<buku>{_BUKU})(?P<judul>\s*\((?:[^()]|\([^()]*\))*\))?(?:\s*,)?\s*(?:{_SATUAN})?")
+POLA_SERI_MUNDUR = re.compile(rf"\b{_SATUAN}\s+(?:(?:di|dalam|dari|pada)\s+)?{_BUKU}")
+
+
+def _berkas_rujukan_seri(qmd):
+    """G-RUJUKAN-SERI: berkas bab (babNN), prakata (index), lampiran-*, dan kunci-babNN
+    (seperti _berkas_bab(), fikstur bab<nama> ikut); bukan glosarium, references, riwayat-penulis."""
+    return re.match(r"^(bab[\w-]*|index|lampiran-[\w-]+|kunci-bab[\w-]*)$", Path(qmd).stem) is not None
+
+
+def _isi_quarto(folder):
+    """(daftar berkas bab berurutan, daftar huruf lampiran) dari _quarto.yml sebuah buku."""
+    q = Path(folder) / "_quarto.yml"
+    if not q.exists():
+        return None, None
+    teks = q.read_text(encoding="utf-8")
+    bab, lampiran, di_lampiran = [], [], False
+    for b in teks.splitlines():
+        if re.match(r"^\s*appendices\s*:", b):
+            di_lampiran = True
+        elif re.match(r"^\s*(chapters|parts?)\s*:", b):
+            di_lampiran = False
+        m = re.match(r"^\s*-\s*(?:file:\s*)?[\"']?([\w./-]+\.qmd)", b)
+        if not m:
+            continue
+        nama = Path(m.group(1)).stem
+        if re.match(r"^(kunci-)?bab\d+$", nama) and not di_lampiran:
+            bab.append(Path(folder) / m.group(1))
+        ml = re.match(r"^lampiran-([a-z])$", nama)
+        if ml:
+            lampiran.append(ml.group(1).upper())
+    return bab, lampiran
+
+
+def _subbab_bernomor(berkas):
+    """Banyaknya subbab bernomor (## tanpa .unnumbered) di luar blok kode."""
+    if not Path(berkas).exists():
+        return None
+    n, dalam = 0, False
+    for b in Path(berkas).read_text(encoding="utf-8").splitlines():
+        if re.match(r"^\s*(```|~~~)", b):
+            dalam = not dalam
+            continue
+        if not dalam and re.match(r"^##\s", b) and not re.search(r"\.unnumbered|\{-\}", b):
+            n += 1
+    return n
+
+
+def muat_seri(konfig=None, akar=None):
+    """Peta buku seri: {N: {"judul", "bab", "lampiran", "subbab": {M: K}, "asal"}}.
+    Tanpa konfigurasi seri, kembalikan None (gerbang dilewati)."""
+    if konfig is None:
+        jalur = os.environ.get("SERI_KONFIG")
+        if jalur:
+            konfig = json.loads(Path(jalur).read_text(encoding="utf-8"))
+            konfig = konfig.get("seri", konfig)
+            akar = Path(jalur).resolve().parent
+        else:
+            konfig = KONFIG.get("seri") or {}
+    akar = Path(akar or AKAR)
+    if not konfig.get("buku"):
+        return None
+    peta = {}
+    for kunci, isi in konfig["buku"].items():
+        n = int(kunci)
+        bab_q, lamp_q = _isi_quarto(akar / isi["folder"]) if isi.get("folder") else (None, None)
+        jml_q = len(bab_q) if bab_q else 0
+        jml_k = int(isi.get("bab", 0))
+        jml = max(jml_q, jml_k)
+        asal = (f"_quarto.yml {isi['folder']}" if jml_q >= jml_k and jml_q
+                else f"konfigurasi seri ({isi.get('sumber', 'rancangan')})")
+        subbab = {i + 1: _subbab_bernomor(f) for i, f in enumerate(bab_q or [])}
+        peta[n] = {"judul": isi.get("judul", ""), "bab": jml, "asal": asal,
+                   "lampiran": sorted(set(lamp_q or []) | set(isi.get("lampiran", []))),
+                   "subbab": {m: k for m, k in subbab.items() if k is not None}}
+    peta["_terlarang"] = konfig.get("rujukan_terlarang", [])
+    return peta
+
+
+def _butir_daftar(daftar):
+    """'1, 3, dan 4' / '7–8' / 'Bab 2 dan Bab 4' / '5.3' → daftar nomor (rentang dibuka)."""
+    hasil = []
+    for bag in re.split(r",\s*(?:dan\s+|atau\s+)?|\s+dan\s+|\s+atau\s+|\s+serta\s+", daftar):
+        bag = re.sub(r"^(?:[Bb]ab|[Ss]ubbab|[Ll]ampiran)\s+", "", bag.strip())
+        m = re.match(rf"^({_NO})\s*(?:–|--|-|\s+sampai\s+(?:(?:[Bb]ab|[Ss]ubbab)\s+)?)\s*({_NO})$", bag)
+        if m:
+            hasil += [m.group(1), m.group(2)]
+        elif bag:
+            hasil.append(bag)
+    return hasil
+
+
+def _nomor_buku(m):
+    return int(m.group("n")) if m.group("n") else ORDINAL_BUKU[m.group("ord").lower()]
+
+
+def temuan_rujukan_seri(teks, seri):
+    """Daftar pesan 'baris N: …' untuk rujukan lintas buku yang tidak sah."""
+    pesan = []
+    teks = _kosongkan(r"<!--.*?-->", teks, re.S)
+    for i, b in enumerate(teks.splitlines(), 1):
+        for a in seri.get("_terlarang", []):
+            for m in re.finditer(a["pola"], b):
+                pesan.append(f"baris {i}: '{m.group(0)}' — pola rujukan terlarang: {a['saran']}")
+        cocok = [(m, "maju") for m in POLA_SERI_MAJU.finditer(b)]
+        cocok += [(m, "mundur") for m in POLA_SERI_MUNDUR.finditer(b)]
+        for m, arah in cocok:
+            n = _nomor_buku(m)
+            kutip = " ".join(m.group(0).split())
+            if n not in seri:
+                ada = ", ".join(str(k) for k in sorted(x for x in seri if isinstance(x, int)))
+                pesan.append(f"baris {i}: '{kutip}' — Buku {n} tidak ada di seri (buku: {ada})")
+                continue
+            info = seri[n]
+            if arah == "maju":
+                mj = re.match(r"\(\s*\*([A-Z][^*]+)\*", (m.group("judul") or "").strip()) or \
+                    re.match(r"(?:\s+seri\s+ini)?\s*,\s*\*([A-Z][^*]+)\*", b[m.end("buku"):])
+                if mj and info["judul"] and " ".join(mj.group(1).split()) != info["judul"]:
+                    pesan.append(f"baris {i}: '{kutip}' — judul Buku {n} adalah *{info['judul']}*, "
+                                 f"bukan *{mj.group(1)}*")
+            if not m.group("jenis"):
+                continue
+            jenis = m.group("jenis").lower()
+            for no in _butir_daftar(m.group("daftar")):
+                if jenis == "lampiran" or re.fullmatch(r"[A-Z]", no):
+                    if no not in info["lampiran"]:
+                        pesan.append(f"baris {i}: '{kutip}' — Buku {n} tidak punya Lampiran {no} "
+                                     f"(lampiran: {', '.join(info['lampiran']) or 'tidak ada'})")
+                    continue
+                bab, _, sub = no.partition(".")
+                if not bab.isdigit():
+                    continue
+                if not 1 <= int(bab) <= info["bab"]:
+                    pesan.append(f"baris {i}: '{kutip}' — Buku {n} hanya {info['bab']} bab "
+                                 f"(menurut {info['asal']}); Bab {bab} tidak ada")
+                elif sub and sub.isdigit():
+                    k = info["subbab"].get(int(bab))
+                    if k is not None and not 1 <= int(sub) <= k:
+                        pesan.append(f"baris {i}: '{kutip}' — Buku {n} Bab {bab} hanya {k} subbab "
+                                     f"bernomor; Subbab {bab}.{sub} tidak ada")
+    return pesan
+
+
+def gerbang_rujukan_seri(qmd, seri=None):
+    """G-RUJUKAN-SERI: lewati bila seri tidak dikonfigurasi atau berkas bukan bab, prakata,
+    lampiran, atau kunci."""
+    if not _berkas_rujukan_seri(qmd):
+        return
+    seri = seri if seri is not None else muat_seri()
+    if not seri:
+        return
+    p = temuan_rujukan_seri(Path(qmd).read_text(encoding="utf-8"), seri)
+    catat("G-RUJUKAN-SERI", not p, "\n".join(p[:60]))
+
+
 # ---------------------------------------------------------------- G-LN
 # Keputusan seri Bayesian 2026-11-07 (bawaan skill): logaritma natural ditulis
 # ln di naskah (prosa, rumus, tabel, gambar); kode R/Stan dan keluarannya tetap
@@ -1622,6 +2242,35 @@ def gerbang_haljudul(buku):
     catat("G-HALJUDUL", not masalah, "\n".join(masalah))
 
 
+# ---------------------------------------------------------------- G-SELARAS (prototipe)
+def gerbang_selaras(qmd, md=None, ketat=None):
+    """G-SELARAS (prototipe, dari seri Bayesian 2026-11-11): nilai yang sama di tabel dan di prosa yang
+    merujuknya harus ditulis dengan jumlah desimal yang sama (tabel 0,254 dan narasi
+    0,25 untuk sel yang sama → temuan). Logika di harness/selaras_angka.py; aturan di
+    references/aturan-gaya-dan-tampilan.md ("Angka, desimal, dan keselarasan tabel–narasi"). Tingkat awal WARNING (tidak
+    menggagalkan). Belum dipanggil untuk setiap bab: main() menjalankannya hanya bila
+    SELARAS=warning atau SELARAS=gagal; SELARAS=gagal (atau ketat=True) mencatatnya
+    sebagai gerbang yang dapat GAGAL."""
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import selaras_angka
+    if ketat is None:
+        ketat = os.environ.get("SELARAS") == "gagal"
+    qmd = Path(qmd)
+    if md is None:
+        md = qmd.parent / "build" / f"{qmd.stem}.knit.md"
+    pesan = [f"{t['label']} (baris prosa {t['baris_prosa']}): tabel {t['tabel']} "
+             f"({t['d_tabel']} desimal) ≠ narasi {t['prosa']} ({t['d_prosa']} desimal)"
+             + (f" dari `r {t['expr']}`" if t["expr"] else "") + f" [{t['yakin']}]"
+             for t in selaras_angka.periksa(qmd, md)]
+    if ketat:
+        catat("G-SELARAS", not pesan, "\n".join(pesan[:40]))
+    elif pesan:
+        print(f"[PERINGATAN] G-SELARAS: {len(pesan)} angka tabel–narasi beda desimal")
+        for p in pesan[:40]:
+            print("    " + p)
+    return pesan
+
+
 # ---------------------------------------------------------------- utama
 def main():
     ap = argparse.ArgumentParser()
@@ -1629,7 +2278,7 @@ def main():
     ap.add_argument("--bab")
     ap.add_argument("--render", action="store_true")
     ap.add_argument("--tahap", choices=["draf", "akhir"], default="draf",
-                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR")
+                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR; G-SITASI-ULANG menjadi GAGAL")
     ap.add_argument("--tag-pdf", metavar="PDF",
                     help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
     ap.add_argument("--huruf-pdf", metavar="PDF", nargs="+",
@@ -1640,14 +2289,19 @@ def main():
     ap.add_argument("--sumber", nargs="*", default=[], help="berkas .qmd sumber untuk --docx-rumus")
     ap.add_argument("--docx-cek", metavar="DOCX", help="hanya jalankan G-DOCX pada DOCX ini (uji fikstur)")
     ap.add_argument("--ukuran", default="b5", help="ukuran buku untuk --docx-cek")
+    ap.add_argument("--selaras", metavar="QMD", help="jalankan G-SELARAS saja pada bab ini "
+                    "(build/<bab>.knit.md bila ada; WARNING, SELARAS=gagal untuk ketat)")
     a = ap.parse_args()
+    if a.selaras:
+        gerbang_selaras(a.selaras)
+        sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
     if a.tag_pdf:
         gerbang_tag(None, pdf=Path(a.tag_pdf))
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
     if a.docx_cek:
         modul = _modul_huruf()
-        gerbang_docx(None, docx=Path(a.docx_cek),
-                     ukuran_mm=modul.ukuran(a.ukuran)["kertas"] if modul else None)
+        uk = modul.ukuran(a.ukuran) if modul else {}
+        gerbang_docx(None, docx=Path(a.docx_cek), ukuran_mm=uk.get("kertas"), margin_mm=uk.get("margin"))
         for g, ok, r in hasil:
             print(f"{g}: {'LULUS' if ok else 'GAGAL'}" + (f"\n{r}" if r else ""))
         sys.exit(0 if all(ok for _, ok, _ in hasil) else 1)
@@ -1677,6 +2331,7 @@ def main():
     gerbang_sitasi(qmd, buku)
     gerbang_larangan(qmd, peng)
     gerbang_istilah(qmd, peng)
+    gerbang_rujukan_seri(qmd)
     if os.environ.get("LN", "1") == "1":
         gerbang_ln(qmd, peng)
     bukti_ref = gerbang_referensi(qmd, ident, buku)
@@ -1690,6 +2345,10 @@ def main():
         gerbang_konjungsi(qmd, peng)
     gerbang_rumus(qmd, peng)
     gerbang_struktur(qmd, buku)
+    w_pertanyaan = gerbang_pertanyaan(qmd)
+    w_sitasi_ulang = gerbang_sitasi_ulang(qmd, ketat=a.tahap == "akhir")
+    if a.tahap == "akhir":
+        w_sitasi_ulang = []  # tercatat sebagai gerbang (GAGAL/LULUS)
     if a.tahap == "akhir":
         gerbang_gaya_ajar(qmd)
     m_eq = cek_persamaan(qmd)
@@ -1697,6 +2356,8 @@ def main():
     if os.environ.get("ATRIBUSI_MANUAL", "1") == "1":
         m = cek_atribusi_manual(qmd, buku)
         catat("G-ATRIBUSI", not m, "\n".join(m[:40]))
+    if os.environ.get("SELARAS") in ("warning", "gagal"):  # prototipe; belum untuk semua bab
+        gerbang_selaras(qmd, md)
     gerbang_lampiran(buku, a.bab, AKAR / KONFIG["lampiran"] / a.buku)
     warning = []
     if md:
@@ -1723,9 +2384,19 @@ def main():
     if warning:
         baris += ["", "## WARNING EYD yang ditinjau manual", ""]
         baris += [f"- {t['kategori']}: '{t['temuan']}' → {t['saran']}" for t in warning]
+    if w_pertanyaan:
+        baris += ["", "## WARNING G-PERTANYAAN yang ditinjau manual", ""]
+        baris += [f"- {t}" for t in w_pertanyaan]
+    if w_sitasi_ulang:
+        baris += ["", "## WARNING G-SITASI-ULANG (GAGAL pada --tahap akhir)", ""]
+        baris += [f"- {t}" for t in w_sitasi_ulang]
     laporan.parent.mkdir(parents=True, exist_ok=True)
     laporan.write_text("\n".join(baris) + "\n", encoding="utf-8")
     print(f"\nStatus: {'LULUS' if lulus else 'GAGAL'} — laporan: {laporan}")
+    if w_pertanyaan:
+        print(f"Catatan: {len(w_pertanyaan)} WARNING G-PERTANYAAN perlu ditinjau manual (lihat laporan).")
+    if w_sitasi_ulang:
+        print(f"Catatan: {len(w_sitasi_ulang)} WARNING G-SITASI-ULANG; GAGAL pada --tahap akhir (lihat laporan).")
     if warning:
         print(f"Catatan: {len(warning)} WARNING EYD perlu ditinjau manual (lihat laporan).")
     sys.exit(0 if lulus else 1)

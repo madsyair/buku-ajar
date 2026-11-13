@@ -1,0 +1,12 @@
+{
+ "seri": {
+  "buku": {
+   "1": {"folder": "buku-satu", "judul": "Buku Contoh Pertama"},
+   "2": {"folder": "buku-dua", "judul": "Buku Contoh Kedua"},
+   "3": {"judul": "Buku Contoh Ketiga", "bab": 6, "lampiran": ["A"], "sumber": "rancangan fikstur"}
+  },
+  "rujukan_terlarang": [
+   {"pola": "Buku 2,? Bab [45]\\b", "saran": "Bab 4–5 lama Buku 2 kini Buku 3 Bab 1–2 (fikstur)"}
+  ]
+ }
+}

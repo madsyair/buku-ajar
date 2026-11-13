@@ -1,0 +1,11 @@
+# Fikstur G-RUJUKAN-SERI: buku 2 berisi tiga bab tanpa lampiran
+project:
+  type: book
+book:
+  title: "Buku Contoh Kedua"
+  chapters:
+    - index.qmd
+    - bab01.qmd
+    - bab02.qmd
+    - bab03.qmd
+    - glosarium.qmd

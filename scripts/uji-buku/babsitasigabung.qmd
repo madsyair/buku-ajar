@@ -1,0 +1,6 @@
+# Bab sitasi gabung {#sec-sitasi-gabung}
+
+Prior beta untuk peluang binomial menghasilkan posterior beta [@gelman2013]. Sumber yang sama juga menunjukkan bahwa rerata posterior terletak di antara rerata prior dan proporsi data.
+
+Contoh regresi dalam buku itu memakai data nyata [@gelman2021].
+Simulasi dari model yang dicocokkan membantu kita memahami ketidakpastian prediksi.

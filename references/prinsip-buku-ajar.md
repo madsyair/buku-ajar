@@ -38,6 +38,7 @@ Dasar empiris untuk teks tertulis berasal dari penelitian **pertanyaan sisipan**
 - **1–3 pertanyaan sungguhan per subbab** (pegangan kerja, bukan angka penelitian). Minimal satu berjenis asumsi atau bukti, bukan hanya klarifikasi. Enam jenis: klarifikasi, asumsi, alasan/bukti, sudut pandang, implikasi, pertanyaan tentang pertanyaan.
 - **Setiap pertanyaan dijawab** di teks, catatan, atau kunci. Tanpa pertanyaan retoris beruntun, tanpa pertanyaan menggiring ("Bukankah jelas…?").
 - Nama teknik tidak ditulis di naskah (G-LARANGAN).
+- Pertanyaan ini adalah unsur 1 dan 5 dari **siklus gabungan per subbab** (`SKILL.md`, bagian "Siklus gabungan per subbab"; unsur 2 dan 6 ada di bagian 4). G-PERTANYAAN (WARNING) menandai subbab yang paragraf prosa pertamanya tanpa kalimat tanya.
 
 ## 4. Uji penjelasan sederhana (label internal: gaya menjelaskan-ulang/"Feynman")
 
@@ -50,6 +51,8 @@ Sebagai **disiplin penulis** (perancang kerangka, penulis):
 3. Sederhanakan struktur kalimat, **jangan isi**. Kalimat sederhana yang salah ("nilai-p adalah peluang H₀ benar") lebih berbahaya daripada kalimat teknis yang benar.
 
 Sebagai **uji pembaca** (agen pembaca): baca subbab, tutup, jelaskan ulang dalam ≤ 5 kalimat; bagian yang hilang atau keliru adalah celah naskah. Catat tempat tersendat, jangan membela naskah.
+
+Disiplin penulis (langkah 1) dan uji pembaca ini adalah unsur 2 dan 6 dari **siklus gabungan per subbab**: pertanyaan di kalimat pertama → penjelasan tanpa notasi → intuisi → rumus → angka dari kode dan tafsirannya → pertanyaan asumsi atau "kapan gagal" yang dijawab → uji jelaskan-ulang oleh peran 10–12 (`SKILL.md`).
 
 ## 5. Beban kognitif dan tampilan
 

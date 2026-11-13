@@ -29,6 +29,21 @@ Label internal skill: gaya **bertanya** ("Sokratik") dan gaya **menjelaskan-ulan
 
 Rinci: `references/prinsip-buku-ajar.md` (ringkasan operasional kajian; daftar periksa butir 1–35), `references/aturan-gaya-dan-tampilan.md`, `references/istilah-statistika.md`.
 
+## Siklus gabungan per subbab
+
+Gaya bertanya dan gaya menjelaskan-ulang bekerja sebagai **satu siklus** di setiap subbab:
+
+1. pertanyaan wajar pembaca di kalimat pertama;
+2. penjelasan tanpa notasi;
+3. intuisi → rumus;
+4. angka dari kode buku dan tafsirannya;
+5. pertanyaan asumsi atau "kapan gagal" yang dijawab;
+6. uji jelaskan-ulang oleh pembaca uji (peran 10–12).
+
+Nama teknik tetap label internal dan G-LARANGAN tetap berlaku. Perancang kerangka mencantumkan keenam unsur per subbab (`agents/02-…`), penulis memeriksanya di daftar periksa (`agents/04-…`), dan G-PERTANYAAN (WARNING) menandai subbab yang tidak dibuka pertanyaan (`references/harness-dan-gerbang.md`). Rinci: `references/prinsip-buku-ajar.md` bagian 3–4.
+
+Hemat token (model per peran, gerbang sebelum agen, agen paralel terbatas): `agents/00-orkestrator.md`, bagian "Hemat token".
+
 ## Peran
 
 Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar periksa, kriteria lulus, larangan). Baca berkas peran sebelum menjalankannya; beri subagen jalur berkas, bukan ringkasan dari ingatan.
@@ -62,6 +77,8 @@ Setiap peran punya berkas di `agents/` (masukan, keluaran, langkah, daftar perik
 | 24 | Editor penerbitan (buku utuh) | `agents/24-editor-penerbitan.md` | `ulasan/editor-penerbitan.md`: keputusan siap terbit, temuan, lembar gaya, daftar periksa produksi | tidak |
 
 Peninjau (05–12, 16–22, 24, pemeriksa kunci) adalah **subagen baru berkonteks bersih** yang hanya membaca berkas. Peran 23 selalu agen lain dari 22.
+
+**Model per peran.** Setiap peran punya model bawaan (opus, sonnet, haiku; fable sedang dievaluasi, belum bawaan), tabelnya di `agents/00-orkestrator.md` (Hemat token). Agar modelnya otomatis, pasang peran sebagai jenis agen Claude Code: `siapkan_proyek.py --pasang-agen` menyalin `claude-agents/buku-ajar-NN-*.md` ke `<proyek>/.claude/agents/` (bawaan: tidak dipasang). Tiap berkas hanya merujuk ke `agents/NN-*.md`; orkestrator boleh menaikkan atau menurunkan satu tingkat.
 
 **Buku multidisiplin.** Bila isi buku memadukan beberapa disiplin (mis. statistika matematis, pemodelan statistik, komputasi, *machine learning*, statistika resmi/survei, ekonomi, kesehatan, spasial), setiap disiplin ditulis penulis ahli bidangnya (04a) hanya pada bagian yang ditugaskan rancangan, lalu penulis pemadu (04b) yang menguasai semua bidang buku menggabungkan dan melengkapinya menjadi satu bab. 04a + 04b menggantikan 04; untuk buku satu disiplin, 04 tetap dipakai. **Aturan penugasan reviewer**: setiap bagian ditinjau minimal oleh reviewer ahli disiplinnya + reviewer bahasa (07) + editor (09); reviewer tidak meninjau bagian yang ia tulis. Pemetaan bawaan: statistika matematis → 06; pemodelan statistik → 16; komputasi → 08; *machine learning* → 17; statistika resmi/survei → 18; ekonomi, kesehatan, spasial, domain lain → 19; pedagogi → 20 (wajib untuk multidisiplin); kelayakan sebagai buku ajar → 21 (wajib untuk setiap buku, pada rancangan, setiap bab, dan buku utuh); bahasa → 07; reviewer isi 05 memeriksa klaim dan angka seluruh bab. Bila alat subagen tidak tersedia, jalankan peran berurutan dengan membaca ulang dari berkas dan tulis "tanpa isolasi konteks" di berkas ulasan. Penulis tidak pernah meninjau tulisannya sendiri.
 
@@ -101,7 +118,7 @@ Akhir    : render semua buku berurutan ─▶ anatomi/tipografi (butir 33–35) 
 
 ## Harness engineering
 
-Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 31 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan dan struktur (G-JUDUL, G-PERSAMAAN, G-HALJUDUL, **G-RUMUS** untuk rumus dan simbol, **G-STRUKTUR** untuk pengantar, subbab ringkas, dan rangkuman), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN, G-LN untuk ln di rumus naskah; **G-GAYA-AJAR** pada `--tahap akhir` untuk sapaan, panjang kalimat, dan kepadatan sitasi), dan render (G-RENDER, G-LOG untuk log LaTeX stabil, G-TAG untuk PDF bertag, G-TEPI, G-PENGGALAN).
+Aturan yang dapat diperiksa mesin **wajib** menjadi gerbang yang dapat dieksekusi, bukan sekadar instruksi. Harness (`scripts/harness.py`, disalin ke `<proyek>/harness/`) menjalankan 32 gerbang per bab: kode berjalan dan lampiran mandiri (G-KODE, G-LAMPIRAN), angka inline (G-ANGKA), keluaran/lebar (G-KELUARAN, G-LEBAR-KODE, G-LEBAR-KELUARAN, G-BOCOR, G-PYTHON), rujukan dan sitasi (G-RUJUKAN, **G-RUJUKAN-SERI** untuk rujukan lintas buku dalam seri, G-SITASI, G-ATRIBUSI, **G-REFERENSI** dengan registri klaim berkutipan verbatim), tampilan dan struktur (G-JUDUL, G-PERSAMAAN, G-HALJUDUL, **G-RUMUS** untuk rumus dan simbol, **G-STRUKTUR** untuk pengantar, subbab ringkas, dan rangkuman), bahasa (G-EYD lewat skill eyd, G-KONJUNGSI, G-GAYA, G-PARAGRAF, G-SLOP, G-ISTILAH, G-LARANGAN, G-LN untuk ln di rumus naskah; **G-GAYA-AJAR** pada `--tahap akhir` untuk sapaan, panjang kalimat, dan kepadatan sitasi), dan render (G-RENDER, G-LOG untuk log LaTeX stabil, G-TAG untuk PDF bertag, G-TEPI, G-PENGGALAN).
 
 ```bash
 python3 harness/harness.py --buku <buku> --bab babXX            # agen bab

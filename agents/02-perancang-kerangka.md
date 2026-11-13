@@ -18,7 +18,7 @@ Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka
 1. **Rancangan rinci**: susun bab dalam bagian; judul bab berupa frasa nomina sejajar; label bab `sec-…`; anggaran per bab; kotak Ingat dengan nomor dan judul final bab sumber.
 2. **Data per bab**: muat setiap dataset (Rscript), catat dimensi, peubah kunci, nilai hilang, status riil/sintetis **dengan kutipan Rd**, sitasi; dataset yang ditolak beserta alasan.
 3. **Per bab, per metode**: jawab enam pertanyaan perencanaan (apa masalahnya, mengapa bukan cara naif, kapan dipakai dan asumsinya, bagaimana menghitung, bagaimana menafsirkan, kapan gagal). Ini **daftar periksa**, bukan subjudul.
-4. **Rantai pertanyaan**: pembuka bab menyebut pertanyaan pembaca yang muncul dari bab sebelumnya. Setiap subbab diberi: label, subjudul frasa (bukan kalimat tanya), **pertanyaan wajar pembaca** yang menggerakkannya (akan menjadi kalimat pertama prosa), butir isi berurutan intuisi → rumus → interpretasi, klaim bersumber dengan kunci, gambar/tabel berlabel, dan **penjelasan sederhana tanpa notasi** (2–5 kalimat). Bila penjelasan sederhana tidak dapat ditulis, kembali ke sumber.
+4. **Rantai pertanyaan**: pembuka bab menyebut pertanyaan pembaca yang muncul dari bab sebelumnya. Setiap subbab diberi: label, subjudul frasa (bukan kalimat tanya), **pertanyaan wajar pembaca** yang menggerakkannya (akan menjadi kalimat pertama prosa), butir isi berurutan intuisi → rumus → interpretasi, klaim bersumber dengan kunci, gambar/tabel berlabel, dan **penjelasan sederhana tanpa notasi** (2–5 kalimat). Bila penjelasan sederhana tidak dapat ditulis, kembali ke sumber. Kerangka mencantumkan **keenam unsur siklus subbab** (`SKILL.md`): pertanyaan pembuka, penjelasan tanpa notasi, intuisi → rumus, angka dari kode beserta tafsirannya, pertanyaan asumsi atau "kapan gagal" beserta jawabannya, dan uji jelaskan-ulang oleh pembaca uji (peran 10–12).
 5. **Contoh utama enam langkah**: Pertanyaan dan data · Model · Hitung · Periksa · Interpretasikan · Uji kepekaan; sebut langkah/kotak alur kerja yang baru di bab ini.
 6. **Gambar**: maks. sesuai anggaran (mis. 4 gambar data + 1 TikZ); setiap gambar dengan judul ≤ 12 kata, panel, data parquet, dan apa yang harus terlihat.
 7. **Miskonsepsi** 1–2 per bab dan analogi (dengan kalimat batas).
@@ -33,6 +33,7 @@ Menurunkan rancangan buku menjadi **rancangan rinci** (semua bab) dan **kerangka
 - [ ] Prasyarat dan notasi di awal bab; kotak Ingat ≤ 2, konsep bukan daftar istilah.
 - [ ] Enam pertanyaan perencanaan terjawab untuk setiap metode.
 - [ ] Subjudul frasa nama konsep; pertanyaan ada di kalimat pertama prosa.
+- [ ] Setiap subbab mencantumkan keenam unsur siklus (pertanyaan, penjelasan tanpa notasi, intuisi → rumus, angka dan tafsiran, pertanyaan asumsi/kapan gagal dijawab, uji jelaskan-ulang).
 - [ ] Setiap prosedur baru punya contoh terselesaikan; contoh berikutnya dipudarkan.
 - [ ] Ada simulasi untuk intuisi bila relevan; data simulasi dilabeli.
 - [ ] Setiap latihan hitungan dapat dijawab pasti (kriteria, parameter, *seed* lengkap).

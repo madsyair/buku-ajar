@@ -56,5 +56,11 @@
       {"cara": "halaman hak cipta dari situs Cambridge University Press", "sumber": "https://assets.cambridge.org/97811070/23987/frontmatter/9781107023987_frontmatter.pdf", "tanggal": "2026-10-20", "hasil": "Regression and Other Stories; First published 2021; ISBN 978-1-107-02398-7; DOI 10.1017/9781139161879"},
       {"cara": "teks penuh PDF penulis (dokumen Project ros.md)", "sumber": "harness/sumber/ros.md", "tanggal": "2026-10-20", "hasil": "isi bagian 1.2, 3.5, dan 15.2 diperiksa ulang otomatis oleh harness"}
     ]
+  },
+  "contoh2026": {
+    "identitas": "URL https://example.org/fikstur-sumber-ganda (fikstur uji, teks rekaan)",
+    "verifikasi": [
+      {"cara": "fikstur uji harness: teks rekaan di uji-buku/sumber/contoh-sumber.md dan uji-buku/sumber/versi2/contoh-sumber.md", "sumber": "uji-buku/sumber/", "tanggal": "2026-11-12", "hasil": "dipakai babsumberganda untuk menguji pencarian bukti di sumber utama lalu versi kedua"}
+    ]
   }
 }
