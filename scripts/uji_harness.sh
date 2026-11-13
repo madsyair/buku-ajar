@@ -269,5 +269,37 @@ else echo "SALAH: babbaik seharusnya LULUS G-RUJUKAN-SERI"; status=1; fi
 # Jenis agen Claude Code (claude-agents/ di skill; .claude/agents/ di proyek bila --pasang-agen):
 # frontmatter sah, model ∈ {opus, sonnet, haiku, fable}, setiap peran di agents/ punya pasangan.
 python3 harness/uji_agen.py || status=1
+# G-DAG-STAN (arahan penulis 2026-11-13): DAG TikZ sesuai dengan program Stan bab yang sama.
+# babdagstan: simpul $\kappa$ tanpa padanan, parameter `tau` tidak digambar, batas plat M tidak
+# ada di program (tiga temuan). babdagstancocok: alpha/beta lewat berkas padanan (Intercept, b),
+# zb dikecualikan, z_n diabaikan lewat komentar TikZ, c_0 = laju_c lewat komentar HTML; tanpa
+# arahan padanan itu, c_0 harus ditandai. WARNING pada draf, GAGAL pada --tahap akhir.
+temuan=$(python3 -c "import sys; sys.path.insert(0, 'harness'); import dag_stan
+for p in dag_stan.periksa('harness/uji-buku/babdagstan.qmd')[0]: print(p)")
+if echo "$temuan" | grep -qF 'simpul parameter $\kappa$' && echo "$temuan" | grep -qF 'parameter program `tau`' \
+   && echo "$temuan" | grep -qF 'batas plat `M`' && [ "$(echo "$temuan" | grep -c "^baris 5:")" = "3" ]; then
+  echo "benar: G-DAG-STAN menandai simpul, parameter, dan plat yang tidak cocok"
+else echo "SALAH: G-DAG-STAN seharusnya tiga temuan di baris 5 (dapat: $temuan)"; status=1; fi
+temuan=$(python3 -c "import sys, pathlib, re, tempfile; sys.path.insert(0, 'harness'); import dag_stan
+f = pathlib.Path('harness/uji-buku/babdagstancocok.qmd')
+print(len(dag_stan.periksa(f)[0]))
+g = pathlib.Path(tempfile.mkdtemp()) / 'babdagstantanpa.qmd'
+g.write_text(re.sub(r'<!-- dag-stan: padanan.*?-->', '', f.read_text(encoding='utf-8')), encoding='utf-8')
+print(*[p.split(': ')[-1] for p in dag_stan.periksa(g)[0]], sep='|'); g.unlink()")
+if [ "$temuan" = "0
+simpul data \$c_0\$ (c_0) tanpa padanan di program" ]; then
+  echo "benar: babdagstancocok lolos G-DAG-STAN; tanpa arahan padanan c_0 ditandai"
+else echo "SALAH: babdagstancocok (dapat: $temuan)"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babdagstan 2>&1)
+if echo "$keluaran" | grep -q "^Status:" && echo "$keluaran" | grep -q "\[PERINGATAN\] G-DAG-STAN" \
+   && ! echo "$keluaran" | grep -q "\[GAGAL\] G-DAG-STAN"; then
+  echo "benar: babdagstan memberi PERINGATAN G-DAG-STAN pada tahap draf"
+else echo "SALAH: babdagstan seharusnya hanya PERINGATAN G-DAG-STAN pada tahap draf"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babdagstan --tahap akhir 2>&1)
+if echo "$keluaran" | grep -q "\[GAGAL\] G-DAG-STAN"; then echo "benar: babdagstan GAGAL di G-DAG-STAN (--tahap akhir)"
+else echo "SALAH: babdagstan seharusnya GAGAL di G-DAG-STAN (--tahap akhir)"; status=1; fi
+keluaran=$(python3 harness/harness.py --buku harness/uji-buku --bab babdagstancocok --tahap akhir 2>&1)
+if echo "$keluaran" | grep -q "\[LULUS\] G-DAG-STAN"; then echo "benar: babdagstancocok LULUS G-DAG-STAN (--tahap akhir)"
+else echo "SALAH: babdagstancocok seharusnya LULUS G-DAG-STAN (--tahap akhir)"; status=1; fi
 rm -rf lampiran-kode/harness harness/laporan/harness_uji-buku-*
 exit $status

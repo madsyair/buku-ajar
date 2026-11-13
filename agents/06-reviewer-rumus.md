@@ -27,6 +27,7 @@ Memastikan setiap rumus benar dan sesuai sumber, setiap penurunan dapat diikuti 
 7. **Syarat yang hilang**: prior *proper* untuk Savage–Dickey, data terpusat untuk bentuk ridge, aproksimasi "kira-kira" yang perlu batas berlaku.
 8. Rumus tampilan yang berisiko melewati tepi (panjang) ditandai.
 9. **Penulisan rumus dan simbol** (`references/rumus-dan-simbol.md`): tinjau setiap WARNING G-RUMUS di laporan harness, terutama R5 (simbol tanpa keterangan), R10 (satu simbol dua arti), dan R7 (pemenggalan). Jalankan `python3 harness/cek_rumus.py <buku>/bab*.qmd` untuk konsistensi lintas bab, dan bandingkan simbol di narasi, tabel, label sumbu gambar, dan nama objek kode.
+10. **DAG dan program Stan** (G-DAG-STAN): untuk setiap DAG yang punya program Stan di bab yang sama atau di lampiran, tinjau WARNING G-DAG-STAN, lalu periksa sendiri yang tidak diperiksa mesin: arah setiap panah terhadap ketergantungan di program, plat terhadap dimensi, dan pemetaan simbol DAG ke nama program (mis. `Intercept` terpusat brms lawan $\alpha$, `z` tak terpusat) yang dinyatakan di keterangan. Program brms diperiksa dengan `stancode(readRDS("fit/…"))`, bukan dugaan.
 
 ## Daftar periksa (kajian butir 8; pelajaran 6–8)
 

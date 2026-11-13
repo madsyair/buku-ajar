@@ -1,0 +1,56 @@
+# DAG yang sesuai dengan program
+
+Fikstur G-DAG-STAN yang harus lulus. Program memakai `Intercept` dan `b` untuk $\alpha$ dan $\beta$ menurut berkas padanan, peubah baku `zb` dikecualikan lewat berkas yang sama, dan $c_0$ dipadankan dengan `laju_c` lewat arahan.
+
+<!-- dag-stan: padanan c_0 = laju_c -->
+
+```{tikz}
+%| label: fig-dag-cocok
+%| fig-cap: "DAG yang sesuai"
+%| echo: false
+% dag-stan: abaikan z karena dimarginalkan
+\begin{tikzpicture}
+  \tikzset{par/.style={latent, draw=blue}, gq/.style={latent, dashed}}
+  \node[par] (a) {$\alpha$};
+  \node[par, right=of a] (b) {$\beta$};
+  \node[par, right=of b] (s) {$\sigma$};
+  \node[const, above=of b] (c0) {$c_0$};
+  \node[latent, dotted, left=of a] (z) {$z_n$};
+  \node[det, below=of a] (mu) {$\mu_n$};
+  \node[obs, below=of mu] (y) {$y_n$};
+  \node[obs, left=of mu] (x) {$x_n$};
+  \node[gq, right=of y] (yb) {$\tilde{y}$};
+  \edge {c0} {b};
+  \edge {a, b, x} {mu};
+  \edge {mu, s} {y};
+  \edge {a, b, s} {yb};
+  \plate {p} {(x)(mu)(y)} {$n = 1, \dots, N$};
+\end{tikzpicture}
+```
+
+```{r}
+#| label: tulis-program
+#| echo: false
+kode_reg <- "data {
+  int<lower=1> N;
+  vector[N] Y;
+  vector[N] x;
+  real<lower=0> laju_c;
+}
+parameters {
+  vector[1] zb;
+  real Intercept;
+  real<lower=0> sigma;
+}
+transformed parameters {
+  vector[1] b = zb / laju_c;
+}
+model {
+  zb ~ std_normal();
+  Y ~ normal(Intercept + x * b[1], sigma);
+}
+generated quantities {
+  real y_baru = normal_rng(Intercept, sigma);
+}
+"
+```

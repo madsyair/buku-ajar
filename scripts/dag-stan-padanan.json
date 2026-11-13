@@ -1,0 +1,29 @@
+{
+  "_keterangan": "Padanan lazim simbol DAG (dinormalkan) dengan nama di program Stan, untuk G-DAG-STAN (dag_stan.py). Kunci: simbol tanpa garis miring balik (alpha, sigma_alpha, R2). Nilai: nama di program yang dianggap padanannya. data_brms: bila program buatan brms (memuat lprior/Xc), simpul data selain respons cukup bila salah satu nama ini ada (prediktor masuk lewat matriks X). parameter_tanpa_simpul: pola regex parameter program yang wajar tidak digambar (peubah baku parameterisasi tak terpusat); nyatakan di keterangan gambar. dekorasi: akhiran nama untuk \\tilde, \\hat, \\bar.",
+  "padanan": {
+    "alpha": ["Intercept", "b_Intercept"],
+    "beta": ["b"],
+    "gamma": ["b", "b_sigma", "Intercept_sigma", "b_zi", "Intercept_zi", "b_hu", "Intercept_hu", "b_phi", "Intercept_phi"],
+    "delta": ["b", "b_phi", "Intercept_phi"],
+    "theta": ["b"],
+    "tau": ["Intercept", "b_Intercept"],
+    "mu_alpha": ["Intercept", "b_Intercept"],
+    "mu_beta": ["b"],
+    "sigma_alpha": ["sd_1"],
+    "sigma_beta": ["sd_1", "sd_2"],
+    "tau_alpha": ["sd_1"],
+    "rho": ["cor_1", "L_1"],
+    "R2": ["R2D2_R2"],
+    "R_2": ["R2D2_R2"],
+    "phi": ["R2D2_phi", "phi"],
+    "tau2": ["R2D2_tau2"],
+    "b": ["b", "zb"],
+    "y": ["Y"],
+    "x": ["X", "Xc"],
+    "J": ["N_1", "J_1"],
+    "K": ["K", "Kc"]
+  },
+  "data_brms": ["X", "Xc", "offsets", "Z_1_1", "J_1"],
+  "parameter_tanpa_simpul": ["z_\\d+", "zb", "zs_\\d+_\\d+", "L_\\d+"],
+  "dekorasi": {"tilde": ["baru", "tilde", "new"], "hat": ["hat"], "bar": ["bar"]}
+}

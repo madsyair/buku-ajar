@@ -1,0 +1,31 @@
+# DAG yang tidak sesuai dengan program
+
+Fikstur G-DAG-STAN yang harus ditandai. DAG memuat simpul $\kappa$ yang tidak ada di program, program memuat parameter `tau` yang tidak digambar, dan batas plat $M$ tidak ada di program.
+
+```{tikz}
+%| label: fig-dag-salah
+%| fig-cap: "DAG yang tidak sesuai"
+%| echo: false
+\begin{tikzpicture}
+  \tikzset{par/.style={latent, draw=blue}}
+  \node[par] (mu) {$\mu$};
+  \node[latent, right=of mu] (k) {$\kappa$};
+  \node[obs, below=of mu] (y) {$y_j$};
+  \edge {mu, k} {y};
+  \plate {p} {(y)} {$j = 1, \dots, M$};
+\end{tikzpicture}
+```
+
+```stan
+data {
+  int<lower=1> J;
+  vector[J] y;
+}
+parameters {
+  real mu;
+  real<lower=0> tau;
+}
+model {
+  y ~ normal(mu, tau);
+}
+```

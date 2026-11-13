@@ -51,6 +51,10 @@ gerbang baru ada di references/harness-dan-gerbang.md skill. Gerbang:
   G-SITASI-ULANG satu sumber disitasi sekali per paragraf prosa (berkas bab); WARNING pada tahap
                draf, GAGAL pada --tahap akhir; kalimat lanjutan tanpa @kunci dicatat di klaim.json
                dengan "sitasi_di" dan tetap diperiksa G-REFERENSI
+  G-DAG-STAN   DAG TikZ (fig-dag-*, bayesnet) dan program Stan bab yang sama: simpul parameter
+               dan data punya padanan nama, parameter program tergambar, batas plat ada di
+               program (harness/dag_stan.py, dag-stan-padanan.json); bab dan lampiran;
+               WARNING pada tahap draf, GAGAL pada --tahap akhir (2026-11-13)
   G-GAYA-AJAR  (hanya --tahap akhir) sapaan (bawaan kita, tanpa Anda), kata "pembaca" sebagai pelaku,
                panjang kalimat, kepadatan sitasi per 1.000 kata (references/gaya-buku-ajar.md)
   G-HALJUDUL   _quarto.yml tanpa subtitle; date ISO; date-format "[Draf revisi ke-N · ]..." (DRAF=1)
@@ -2271,6 +2275,29 @@ def gerbang_selaras(qmd, md=None, ketat=None):
     return pesan
 
 
+# ---------------------------------------------------------------- G-DAG-STAN
+def gerbang_dag_stan(qmd, ketat=False):
+    """G-DAG-STAN (arahan penulis 2026-11-13): setiap DAG TikZ sesuai dengan program Stan
+    di bab yang sama. Logika di dag_stan.py (identik di harness seri dan skill buku-ajar).
+    Berkas bab dan lampiran saja. WARNING pada tahap draf (tidak menggagalkan), GAGAL pada
+    --tahap akhir (ketat=True), seperti G-SITASI-ULANG."""
+    qmd = Path(qmd)
+    if not (_berkas_bab(qmd) or qmd.stem.startswith("lampiran")):
+        return []
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import dag_stan
+    pesan, info = dag_stan.periksa(qmd)
+    if info:
+        print(f"[INFO] G-DAG-STAN: {len(info)} DAG — " + "; ".join(info))
+    if ketat:
+        catat("G-DAG-STAN", not pesan, "\n".join(pesan[:60]))
+    elif pesan:
+        print(f"[PERINGATAN] G-DAG-STAN: {len(pesan)} ketidaksesuaian DAG–program Stan")
+        for x in pesan[:40]:
+            print("    " + x)
+    return pesan
+
+
 # ---------------------------------------------------------------- utama
 def main():
     ap = argparse.ArgumentParser()
@@ -2278,7 +2305,7 @@ def main():
     ap.add_argument("--bab")
     ap.add_argument("--render", action="store_true")
     ap.add_argument("--tahap", choices=["draf", "akhir"], default="draf",
-                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR; G-SITASI-ULANG menjadi GAGAL")
+                    help="akhir: sesudah tahap gaya (peran 22–23), tambah G-GAYA-AJAR; G-SITASI-ULANG dan G-DAG-STAN menjadi GAGAL")
     ap.add_argument("--tag-pdf", metavar="PDF",
                     help="hanya jalankan G-TAG pada PDF ini (uji fikstur, PDF hasil render)")
     ap.add_argument("--huruf-pdf", metavar="PDF", nargs="+",
@@ -2349,6 +2376,9 @@ def main():
     w_sitasi_ulang = gerbang_sitasi_ulang(qmd, ketat=a.tahap == "akhir")
     if a.tahap == "akhir":
         w_sitasi_ulang = []  # tercatat sebagai gerbang (GAGAL/LULUS)
+    w_dag = gerbang_dag_stan(qmd, ketat=a.tahap == "akhir")
+    if a.tahap == "akhir":
+        w_dag = []  # tercatat sebagai gerbang (GAGAL/LULUS)
     if a.tahap == "akhir":
         gerbang_gaya_ajar(qmd)
     m_eq = cek_persamaan(qmd)
@@ -2390,6 +2420,9 @@ def main():
     if w_sitasi_ulang:
         baris += ["", "## WARNING G-SITASI-ULANG (GAGAL pada --tahap akhir)", ""]
         baris += [f"- {t}" for t in w_sitasi_ulang]
+    if w_dag:
+        baris += ["", "## WARNING G-DAG-STAN (GAGAL pada --tahap akhir)", ""]
+        baris += [f"- {t}" for t in w_dag]
     laporan.parent.mkdir(parents=True, exist_ok=True)
     laporan.write_text("\n".join(baris) + "\n", encoding="utf-8")
     print(f"\nStatus: {'LULUS' if lulus else 'GAGAL'} — laporan: {laporan}")
@@ -2397,6 +2430,8 @@ def main():
         print(f"Catatan: {len(w_pertanyaan)} WARNING G-PERTANYAAN perlu ditinjau manual (lihat laporan).")
     if w_sitasi_ulang:
         print(f"Catatan: {len(w_sitasi_ulang)} WARNING G-SITASI-ULANG; GAGAL pada --tahap akhir (lihat laporan).")
+    if w_dag:
+        print(f"Catatan: {len(w_dag)} WARNING G-DAG-STAN; GAGAL pada --tahap akhir (lihat laporan).")
     if warning:
         print(f"Catatan: {len(warning)} WARNING EYD perlu ditinjau manual (lihat laporan).")
     sys.exit(0 if lulus else 1)
