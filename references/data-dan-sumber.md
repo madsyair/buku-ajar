@@ -84,7 +84,7 @@ Satu daftar JSON untuk seluruh proyek; setiap entri satu klaim pada satu kalimat
 
 ### Registri identitas (`harness/referensi.json`)
 
-Per kunci bib: `identitas` (DOI/ISBN/URL) dan daftar `verifikasi` (`cara`, `sumber`, `tanggal`, `hasil`). Setiap entri `pustaka.bib` yang disitasi wajib punya DOI, ISBN, atau URL, dan entri `referensi.json` yang terverifikasi (halaman penerbit, katalog perpustakaan, `citation()`). Entri bib tidak disusun dari ingatan.
+Per kunci bib: `identitas` (DOI/ISBN/URL) dan daftar `verifikasi` (`cara`, `sumber`, `tanggal`, `hasil`). Setiap entri `pustaka.bib` yang disitasi wajib punya DOI, ISBN, atau URL, dan entri `referensi.json` yang terverifikasi (halaman penerbit, katalog perpustakaan, `citation()`). Entri bib tidak disusun dari ingatan. Pengecualian beralasan untuk dokumen tanpa alamat daring (misalnya salindia paparan lembaga): entri bib boleh tanpa DOI/ISBN/URL bila `referensi.json` mencatat `"tanpa_id": {"alasan": "…", "salinan_lokal": "<berkas di harness/sumber/>"}` dan salinan lokal itu ada; keputusan ini milik penulis dan dicatat di `KEPUTUSAN-RANCANGAN.md`.
 
 ### Menulis registri secara aman
 

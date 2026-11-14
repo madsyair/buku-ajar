@@ -165,9 +165,16 @@ def periksa(qmd, bab, prosa_baris, bib_teks):
         if kunci not in entri_bib:
             masalah.append(f"@{kunci} tidak ada di pustaka.bib")
             continue
-        if not re.search(r"\b(doi|isbn|url)\s*=", entri_bib[kunci]):
-            masalah.append(f"@{kunci} tidak punya DOI, ISBN, atau URL di pustaka.bib")
         r = ref.get(kunci)
+        if not re.search(r"\b(doi|isbn|url)\s*=", entri_bib[kunci]):
+            # Pengecualian beralasan (keputusan penulis 2026-11-14): dokumen tanpa alamat daring
+            # (mis. salindia lembaga) boleh tanpa DOI/ISBN/URL bila referensi.json mencatat
+            # "tanpa_id" berisi alasan dan salinan lokal yang benar-benar ada di harness/sumber/.
+            tid = (r or {}).get("tanpa_id") or {}
+            salinan = tid.get("salinan_lokal", "")
+            if not (tid.get("alasan") and salinan and (akar_sumber / salinan).exists()):
+                masalah.append(f"@{kunci} tidak punya DOI, ISBN, atau URL di pustaka.bib "
+                               "(atau catat \"tanpa_id\" {alasan, salinan_lokal} di referensi.json)")
         if not r or not r.get("verifikasi"):
             masalah.append(f"@{kunci} belum diverifikasi di referensi.json")
 
