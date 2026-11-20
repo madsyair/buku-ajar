@@ -59,6 +59,8 @@ Satu agen pemeriksa per buku kunci (konteks bersih), hanya membaca:
 
 ## Alur kerja
 
+Kunci suatu bab baru ditulis sesudah bab induk lolos telaah T2 dengan tabel **kesiapan latihan untuk kunci** (`agents/21-penelaah-pakar-buku-ajar.md`). Latihan yang belum siap diperbaiki dulu di bab induk. Temuan soal (di atas) dipakai untuk masalah yang baru tampak saat kunci disusun.
+
 1. Kerangka proyek buku kunci (sebelum menulis): `_quarto.yml`, preamble, prakata, bab rintisan.
 2. Penulisan per kelompok bab (paralel, satu agen per kelompok, satu agen per berkas).
 3. Pemeriksaan independen per buku; perbaikan.

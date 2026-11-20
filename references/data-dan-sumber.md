@@ -30,6 +30,10 @@ Label kategori, satuan, dan arti peubah ditulis **sesuai dokumentasi Rd** (dan s
 - Bila data lembaga tidak tersedia (tingkat wilayah halus, galat baku), boleh **simulasi berbasis peta** (poligon, ketetanggaan, luas, hierarki wilayah) dengan parameter eksplisit dan, bila mungkin, dikalibrasi ke angka agregat resmi; selalu disebut "data simulasi berbasis peta".
 - Data contoh bawaan paket yang tampak seperti data wilayah nyata (mis. matriks ketetanggaan contoh) diperiksa dokumentasinya; sebut apa adanya ("matriks contoh 5 × 5 untuk data simulasi paket, bukan peta provinsi").
 
+### Data yang diketik dari artikel
+
+Data yang hanya tersedia sebagai tabel di artikel atau buku diketik ulang, lalu **dicocokkan sel demi sel** dengan gambar halaman PDF (bukan dengan teks konversi, yang sering menggeser kolom). Hasilnya disimpan sebagai berkas data (`<buku>/data/<sumber>/<nama>.csv`) bersama `SUMBER.md`: kunci sitasi, halaman dan nomor tabel, tanggal pengetikan, dan catatan pencocokan. Bab membaca berkas itu, bukan angka yang diketik di chunk. Contoh seri: data 23 rumah sakit Datta dkk.
+
 ### Batasan data di prakata
 
 Setiap buku memuat subbagian prakata **"Data yang digunakan dan batasannya"**: jenis data (riil, sintetis paket, simulasi), alasan memakai simulasi, data lembaga yang belum dapat dipakai dan sebabnya, dan rujukan ke lampiran **Sumber Data** (daftar lengkap per bab: paket dan versi, sumber asli, status, lisensi, tanggal unduh). Lampiran ditulis setelah bab terakhir.
@@ -46,6 +50,38 @@ Hanya sumber yang **teksnya dapat dibuka dan dicocokkan**:
 - hitungan ulang (ekspresi R yang hasilnya dibandingkan dengan angka sumber).
 
 Sumber yang tidak dapat dibuka **tidak disitasi** dan isinya tidak disebut seolah dikutip. Peninjau literatur menyusun daftar **sumber yang perlu diunggah penulis** (judul, alasan, bab yang membutuhkan) alih-alih mengarang.
+
+Baris pertama setiap `harness/sumber/<kunci>.md` adalah komentar asal: berkas PDF asal, tanggal konversi, cara konversi, dan **pemetaan halaman PDF → halaman terbit** (mis. `<!-- asal: gelman2013.pdf; pymupdf4llm 2026-11-20; hlm. terbit = hlm. PDF − 14 -->`). Setiap halaman ditandai `<!-- Page n -->`. Pemetaan ini yang dipakai untuk lokasi klaim dan lokator sitasi, karena halaman PDF dan halaman terbit jarang sama. Versi lain buku yang sama (pracetak arXiv lawan versi terbit, bab lepas lawan buku lengkap) mengikuti aturan `versi2/` di atas.
+
+### Daftar unggah
+
+Daftar sumber yang perlu diunggah penulis (`naskah/sumber-perlu-diunggah.md`; di seri asal `harness/daftar-unggah.md`) terdiri atas empat tabel dan diperbarui setiap kali sumber masuk:
+
+| Tabel | Isi |
+|---|---|
+| A | prioritas: dibutuhkan bab yang sedang atau akan ditulis |
+| B | opsional: memperkaya, tetapi bab dapat ditulis tanpanya |
+| C | bukti sementara hanya dari web atau sumber sekunder; perlu teks primer sebelum disitasi |
+| D | tidak perlu lagi (sudah ada, diganti sumber lain), dengan alasannya |
+
+Setiap baris: judul, alasan, bab yang membutuhkan, cara memperoleh. Setiap laporan bab dan laporan orkestrator kepada penulis **menyebut sumber [PERLU UNGGAH]**, juga bila daftarnya kosong (permintaan penulis seri, 2026-11-20).
+
+### Wiki referensi dan konversi PDF
+
+Bila banyak sumber diunggah sekaligus (seri asal: 18 buku dan 11 artikel), sumber masuk lewat **wiki referensi** (pola Karpathy LLM Wiki; skill karpathy-llm-wiki bila terpasang) sebelum disalin ke `harness/sumber/`:
+
+- `raw/`: teks lengkap setiap sumber dengan penanda `[hlm. PDF n]`;
+- `wiki/`: satu ringkasan per sumber dengan bagian "Bahan yang bisa memperkaya seri" (bab sasaran dan halaman), artikel konsep lintas sumber, `index.md`, dan `log.md`.
+
+Wiki menjadi masukan kajian celah (`loop-kerja.md`, "Tambahan dari referensi baru dan bab yang dikunci") dan audit istilah (hitungan pemakaian istilah di referensi). Wiki bukan bukti klaim; bukti tetap kutipan verbatim dari `harness/sumber/`.
+
+**Urutan konversi PDF** (berhenti pada cara pertama yang menghasilkan teks bersih):
+
+1. **pymupdf4llm** tanpa OCR (`use_ocr=False`) untuk PDF yang berlapis teks;
+2. **`pdftotext` tanpa `-layout`** untuk PDF dengan lapisan OCR lama penerbit, agar dua kolom terbaca berurutan;
+3. **Tesseract** (lewat PyMuPDF, pixmap RGB; pixmap abu-abu menghasilkan teks kosong) untuk pindaian; halaman yang memuat dua halaman buku per lembar dipotong menjadi setengah kiri dan kanan sebelum OCR.
+
+**Rumus tidak diambil dari teks konversi**: rumus sering rusak di ketiga cara. Untuk rumus yang **dipakai** di naskah atau di registri saja, render gambar halamannya (mis. `alat/render_halaman.py`), transkripsikan ke LaTeX, cocokkan balik dengan teks `raw/`, dan beri catatan "(transkripsi dari gambar hlm. PDF n)" di salinan sumber. Contoh seri: Jaccard berupa pindaian dua halaman per lembar.
 
 Urutan prioritas jenis sumber (dari buku-praktikum, tetap berlaku): buku teks dan monograf penerbit akademik; artikel bertelaah; dokumentasi resmi perangkat lunak (untuk perilaku fungsi, bukan teori); publikasi lembaga resmi (data, definisi); pracetak bila tidak ada padanan, dengan catatan. Draf buku boleh disitasi bila penulis memutuskan, dengan entri pustaka yang menandainya sebagai draf.
 

@@ -13,7 +13,7 @@ Berkas ini memuat keputusan istilah bawaan skill, disarikan dari keputusan penul
 7. Nama fungsi, argumen, keluarga distribusi paket ditulis sebagai kode dan tidak dimiringkan atau diterjemahkan (`pp_check()`, `family`, `zi`).
 8. Singkatan (GLM, LOO, ESS, DAG, MRP) ditulis tegak; kepanjangannya disebut sekali.
 9. Satu istilah dipakai konsisten di seluruh seri. Perubahan istilah adalah keputusan penulis yang dicatat bertanggal di `KEPUTUSAN-RANCANGAN.md` dan berlaku surut ke bab yang sudah selesai (dijalankan sebagai putaran penyuntingan).
-10. Istilah yang sudah diganti dimasukkan ke `harness/konfig.json` kunci `istilah_terlarang` agar gerbang G-ISTILAH mencegahnya muncul lagi.
+10. Istilah yang sudah diganti dimasukkan ke `harness/konfig.json` kunci `istilah_terlarang` agar gerbang G-ISTILAH mencegahnya muncul lagi. Setiap keputusan yang menolak bentuk Indonesia ("bukan X") menambah polanya **pada komit yang sama** dengan keputusannya (`harness-dan-gerbang.md`, bagian 4). Istilah Indonesia yang belum populer diaudit reviewer bahasa dalam mode audit istilah (`agents/07-reviewer-bahasa.md`).
 
 ## Keputusan bawaan
 
@@ -46,6 +46,7 @@ Berkas ini memuat keputusan istilah bawaan skill, disarikan dari keputusan penul
 | logaritma natural | **ln** di naskah (prosa, rumus, tabel, gambar, glosarium); kode R/Stan tetap `log()` | `\log` tanpa basis di rumus; "log" untuk logaritma natural di prosa | Lihat bagian "Logaritma natural". Gerbang G-LN. |
 | fake data | data palsu (data yang disimulasikan dari model dengan parameter yang ditetapkan sendiri) | | |
 | effective sample size | ukuran sampel efektif (ESS) *bulk*/*tail* | | Glosa sekali per bab bila dilaporkan. |
+| prior yang bergantung pada data | lihat bagian "Prior yang bergantung pada data" | "prior ditetapkan dari data" | Keputusan seri 2026-11-19/20. |
 | *divergent transition* | *divergent transition* (tanda bahwa *sampler* gagal menjelajahi bagian posterior yang melengkung tajam) | | |
 
 ## Istilah *fit* (keputusan seri, 2026-11-07)
@@ -58,6 +59,21 @@ Dasar: kajian pemakaian di seri (tiga bentuk bersaing: "mencocokkan", *fit* miri
 - Dihindari: "mengestimasi model" (yang diestimasi parameter), "penyesuaian/pengepasan model", "nilai dugaan/taksiran", "di-*fit*". Masukkan ke `istilah_terlarang` di `konfig.json` bila buku sudah selesai disunting.
 - "Mencocokkan" yang **berarti membandingkan** (hasil dengan grid, kunci dengan keluaran) diganti "membandingkan" agar kata itu hanya punya satu arti teknis.
 - **Kemunculan pertama di setiap buku** menyebut istilah Inggrisnya: "mencocokkan model dengan data (*fit*; prosesnya *model fitting*)"; entri ditambahkan ke glosarium dan `keputusan-istilah.md`.
+
+## Prior yang bergantung pada data (keputusan seri, 2026-11-19/20)
+
+Contoh baku pola **payung → bentuk khusus → prosedur** untuk satu keluarga konsep. Pola ini dipakai juga untuk keluarga istilah lain: satu istilah payung, bentuk khusus yang menyebut apa yang diambil dari data, dan nama prosedurnya.
+
+| Lapis | Bentuk dipakai | Arti |
+|---|---|---|
+| Payung | prior yang bergantung pada data | setiap prior yang memakai data yang sama dengan *likelihood* |
+| Bentuk khusus | parameter prior (hiperparameter) ditetapkan dari data | nilai hiperparameter diambil dari ringkasan data |
+| Hasil prosedur | prior empiris | prior hasil prosedur Bayes empiris |
+| Prosedur | Bayes empiris | mengestimasi hiperparameter dari distribusi marginal data, lalu memakainya sebagai prior |
+
+- Ditolak: "prior ditetapkan dari data" (yang ditetapkan adalah hiperparameternya), juga bentuk lain untuk konsep yang sama di buku berbeda ("diambil dari data", "disetel dari data"). Pola penolakannya masuk `istilah_terlarang`.
+- Bila prior seperti ini dipakai, naskah menyatakan bahwa prior itu **tidak boleh mendominasi** karena data dipakai dua kali, lalu menunjukkan pemeriksaannya (mis. perbandingan dengan prior yang tidak bergantung pada data).
+- Definisi hiperparameter sama di semua buku seri; pemeriksa seri (`agents/25-pemeriksa-seri.md`) memeriksanya.
 
 ## Logaritma natural (keputusan seri, 2026-11-07)
 

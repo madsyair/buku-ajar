@@ -30,6 +30,21 @@ bash harness/uji_harness.sh                              # semua baris harus "be
 
 Prasyarat perangkat: R (knitr, arrow; paket bab), Quarto ≥ 1.6, TeX Live (diuji 2023) dengan **LuaLaTeX** (Debian: `texlive-luatex` untuk `lualatex-math`, `texlive-latex-extra`, `texlive-fonts-extra` untuk huruf Libertinus Serif/Mono/Math dan `libertinus-type1`/`libertinust1math` bagi TikZ; paket `indentfirst`, `draftwatermark`, `needspace`, `fvextra`, `tcolorbox`, `pdfpages` bila memakai sampul), Python 3 (matplotlib menemukan OTF Libertinus di folder TeX Live atau lewat `kpsewhich`), poppler-utils (`pdftotext` untuk audit PDF, `pdfinfo` untuk G-TAG), `pikepdf` opsional (cek `/Lang` G-TAG), skill **eyd** terpasang (`eyd/scripts/periksa.py`; atau set `SKILL_EYD=<jalur>`).
 
+### Menyiapkan komputer penulis (lokal, contoh seri 2026-11-20)
+
+Di luar kontainer, lingkungan dicatat di `harness/lingkungan-lokal.sh` dan dimuat sebelum harness (`. harness/lingkungan-lokal.sh`). Isinya juga mencatat versi minimum paket (`references/harness-dan-gerbang.md`, "Lingkungan dan versi paket"). Pegangan dari komputer penulis seri:
+
+| Komponen | Cara |
+|---|---|
+| R dengan bspm | paket biner dari sistem; untuk versi CRAN terbaru jalankan `bspm::disable()` lalu `install.packages(…, type = "source")` |
+| CmdStan | jalurnya lewat variabel `CMDSTAN` (dibaca cmdstanr) |
+| Quarto | dipasang di `~/.local` (tanpa hak *root*); `quarto --version` dicek sesudah memuat skrip |
+| TinyTeX | tambahkan `tex-gyre-math` (`tlmgr install tex-gyre-math`) untuk opsi huruf springer |
+| Skill eyd | `SKILL_EYD=<jalur skill eyd>` bila tidak ditemukan otomatis |
+| Tesseract | `eng.traineddata` di `~/.local/share/tessdata` (`TESSDATA_PREFIX`) untuk konversi PDF pindaian (`references/data-dan-sumber.md`, "Wiki referensi dan konversi PDF") |
+
+Cek ruang disk (`df -h`) sebelum konversi PDF besar atau pembuatan cache model; yang dibersihkan hanya cache yang dapat dibuat ulang, dengan persetujuan penulis (`agents/00-orkestrator.md`, Hemat token).
+
 ## Yang perlu disesuaikan per proyek
 
 Semua yang khusus proyek ada di `harness/konfig.json` (contoh: `assets/konfig.json`):

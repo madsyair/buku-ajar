@@ -17,6 +17,10 @@ Keluaran: `[LULUS]/[GAGAL] G-…` per gerbang, rincian temuan (baris qmd atau kn
 
 Variabel lingkungan: `JUDUL_GAMBAR`, `ATRIBUSI_MANUAL`, `KONJUNGSI`, `TEPI`, `TAG`, `LN`, `DRAF` (bawaan 1; set 0 hanya untuk masa transisi atau versi terbit, dan catat alasannya), `SKILL_EYD`, `SKILL_GAYA` (jalur skrip skill pendukung bila tidak ditemukan otomatis), `RETICULATE_PYTHON`.
 
+### Lingkungan dan versi paket
+
+Proyek menyimpan `harness/lingkungan-lokal.sh`: variabel lingkungan (`CMDSTAN`, `SKILL_EYD`, `TESSDATA_PREFIX`, jalur Quarto) dan **versi minimum** paket yang dipakai bab (mis. brms, cmdstanr, loo, posterior). Skrip itu dimuat sebelum harness (`. harness/lingkungan-lokal.sh`) dan mencetak peringatan bila versi terpasang berbeda dari yang tercatat. Pemeriksaan ini belum menjadi gerbang `harness.py`; hasilnya dibaca orkestrator sebelum rajut. Keluaran fungsi yang formatnya berubah antarversi dibaca lewat **helper yang tahan versi** di `_bersama/` (contoh seri: loo 2.10.1 mengubah keluaran `loo_compare()`, padahal bab di *cloud* dan bab lokal ditulis untuk versi berbeda; pakai helper seperti `bandingkan_loo()`). Isi skrip untuk komputer penulis: `scripts/README.md`, "Menyiapkan komputer penulis".
+
 ## 2. Daftar gerbang
 
 | Gerbang | Tahap | Memeriksa | Sumber aturan |
@@ -114,6 +118,7 @@ Setiap kali penulis membuat **keputusan gaya baru**, orkestrator menjalankan pro
 1. **Catat keputusan** bertanggal di `KEPUTUSAN-RANCANGAN.md`: isi, cakupan (semua buku/satu buku), berlaku surut atau tidak, nama gerbang yang menegakkannya.
 2. **Klasifikasikan** apakah keputusan dapat diperiksa mesin:
    - **pola kata** (istilah, larangan kata) → tambah entri `istilah_terlarang` atau `larangan` di `konfig.json`; tidak perlu menyunting kode;
+     **aturan G-ISTILAH (2026-11-20)**: setiap keputusan PAKAI-INGGRIS (atau keputusan istilah lain) yang menolak bentuk Indonesia ("bukan X") **wajib** menambah pola X ke `istilah_terlarang` **pada komit yang sama** dengan keputusan di `keputusan-istilah.md`. Kata umum yang bermakna ganda tidak dijadikan pola tunggal; pakai frasa ("kemungkinan maksimum", bukan "kemungkinan"). Pemicu: di seri asal G-ISTILAH lama hanya berisi dua pola sehingga "derau" lolos dua minggu sesudah diputuskan *noise*; pola derau, *maximum likelihood*, *pseudo-prior*, dan "prior ditetapkan dari data" baru ditambahkan 2026-11-20;
    - **struktur qmd** (judul, label, opsi chunk, kotak) → fungsi baru di `harness.py` dengan pola `gerbang_x(qmd, peng)` yang memanggil `catat("G-X", lulus, rincian)`, lalu dipanggil di `main()` (boleh di balik variabel lingkungan `X=1` selama masa transisi);
    - **hasil rajut** (keluaran, prosa terevaluasi) → fungsi yang menerima `md` (`build/<bab>.knit.md`);
    - **hasil render** (PDF, log LaTeX, Word) → fungsi di cabang `if a.render:`;

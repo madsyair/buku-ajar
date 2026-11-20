@@ -28,6 +28,12 @@ Statistisi berpengalaman yang memverifikasi kebenaran isi lintas bidang: klaim t
 8. **Rujukan lintas bab/buku**: kotak Ingat dan rujukan "Buku N Bab M" cocok dengan isi bab sumber; topik milik buku lain tidak diturunkan ulang.
 9. **Data**: status disebut; label kategori sesuai Rd; tidak ada angka lembaga dikarang.
 
+## Mode ulasan tambahan (bab yang dikunci lalu dibuka)
+
+Bila bab yang sudah dikunci dibuka untuk tambahan (`references/loop-kerja.md`, "Tambahan dari referensi baru dan bab yang dikunci"), satu reviewer gabungan berkonteks bersih meninjau **diff tambahan saja** (`git diff <komit-kunci> -- <buku>/babXX.qmd`) beserta bab kuncinya. Ia memakai langkah peran ini ditambah daftar periksa reviewer kode (08: kode berjalan, *seed*, latihan pemrograman menjalankan resep lengkap), reviewer bahasa (07), dan pembaca pemula (10: istilah baru dijelaskan, tambahan terbaca tanpa kotak). Ia juga memeriksa bahwa kunci jawaban tidak bertentangan dengan teks bab sesudah tambahan. Keluaran: `naskah/ulasan/babXX-tambahan-<tanggal>.md`.
+
+Contoh seri: latihan cakupan Buku 1 Bab 4 hanya menjalankan setengah resep; kunci Buku 3 Bab 3 bertentangan dengan teks bab.
+
 ## Daftar periksa (kajian butir 4, 5, 7, 9, 14–19, 22, 23, 31, 32)
 
 - [ ] Bab dibuka masalah/data nyata yang mengaitkan pengetahuan lama.
