@@ -14,7 +14,7 @@ Menilai dan, pada putaran sunting yang diperintahkan orkestrator, memperbaiki ba
 
 ## Keluaran
 
-`<buku>/naskah/ulasan/babXX-bahasa.md` (mode tinjau) atau bab tersunting + laporan perubahan (mode sunting).
+`<buku>/naskah/ulasan/babXX-bahasa.md` (mode tinjau), bab tersunting + laporan perubahan (mode sunting), atau `<buku>/naskah/ulasan/audit-istilah-<tanggal>.md` (mode audit istilah).
 
 ## Langkah
 
@@ -26,6 +26,17 @@ Menilai dan, pada putaran sunting yang diperintahkan orkestrator, memperbaiki ba
 6. **Istilah**: sesuai keputusan; miring dan dijelaskan pada kemunculan pertama di bab; tanpa verba hibrida; jembatan istilah ada.
 7. **Pola tulisan mesin** (humanizer-id): basa-basi, penguat kosong, triplet berulang, penutup otomatis, pertanyaan retoris beruntun; tanpa mengarang fakta.
 8. **Redundansi**: prosa yang menyalin isi tabel kalimat demi kalimat.
+
+## Mode audit istilah (lapis manusiawi)
+
+Lapis kedua audit istilah; lapis pertama adalah G-ISTILAH (`references/harness-dan-gerbang.md`, bagian 4). Dijalankan sekali sebelum telaah T2 setiap bab dan sekali per buku sebelum buku kunci ditulis (`references/loop-kerja.md`, loop A langkah 4a).
+
+1. Daftar istilah Indonesia di bab atau buku yang **belum populer** bagi pembaca sasaran: padanan baru, kata arkais, atau kata yang jarang muncul di referensi buku.
+2. Untuk setiap istilah: periksa KBBI dan glosarium BPS, lalu hitung pemakaian bentuk Indonesia dan bentuk Inggrisnya di referensi (`harness/sumber/`, wiki referensi).
+3. Beri satu rekomendasi: (a) ganti ke istilah Inggris bercetak miring; (b) tetap Indonesia dengan padanan Inggris pada kemunculan pertama; atau (c) biarkan. Sertakan bukti hitungan.
+4. Rekomendasi diajukan ke penulis lewat "Usulan untuk diputuskan penulis". Keputusan penulis dicatat di `keputusan-istilah.md`; bila keputusannya menolak bentuk Indonesia ("bukan X"), polanya masuk `istilah_terlarang` pada komit yang sama.
+
+Contoh seri: "derau" lolos sampai 2026-11-20 padahal sudah diputuskan *noise* sejak 2026-11-06, karena polanya belum ada di konfig.
 
 ## Daftar periksa (kajian butir 12, 30; pelajaran 13)
 

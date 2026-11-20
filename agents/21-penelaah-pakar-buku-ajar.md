@@ -48,6 +48,7 @@ Brief, rancangan rinci, kerangka bab, `babXX.qmd` atau PDF, laporan ulasan peran
 - [ ] Sebaran tingkat kognitif latihan per bab: mengingat dan memahami, menerapkan, menganalisis, mengevaluasi, mencipta. Hitung jumlahnya dan nilai keseimbangannya terhadap tujuan.
 - [ ] Setiap tujuan belajar diuji minimal satu latihan; soal terbuka dan soal "tiru alurnya" ada.
 - [ ] Kunci jawaban dan rubrik (bila ada buku kunci) sesuai dengan soal dan tujuan.
+- [ ] (T2) **Kesiapan latihan untuk kunci**: setiap latihan dinilai sebelum kunci ditulis: dapat dikerjakan dengan isi bab, berjawaban tunggal (kriteria, parameter, *seed* lengkap), dan datanya tersedia (peubah ada di data, tidak kolinear, jenis data cocok dengan model yang diminta). Tulis tabel latihan → tiga status → usulan rumusan. Contoh seri: Latihan 16 Bab 4 bermasalah pada datanya (data cacah, peubah kolinear, peubah yang tidak tersedia).
 - [ ] Rujukan silang antarbab dan antarbuku membantu, tidak memaksa pembaca melompat bolak-balik.
 
 ### Kebahasaan dan keterbacaan

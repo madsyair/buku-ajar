@@ -26,7 +26,12 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
    Paket minimum bila sumber daya terbatas: reviewer isi+rumus (satu agen), reviewer kode, satu pembaca pemula independen; seri statistika memakai pasangan "verifikasi independen" + "pembaca independen".
 2a. **Uji pembaca pemula independen (wajib, setiap bab)**: subagen pembaca 10 baru berkonteks bersih, tidak membaca ulasan lain; satu agen boleh membaca 3–5 bab berurutan, tetapi menulis satu laporan per bab (`naskah/ulasan/babXX-pembaca-pemula-independen.md`). Instruksi: `assets/templat-instruksi-pembaca-independen.md`. Bila subagen tidak tersedia, bab belum boleh dinyatakan selesai; catat sebagai butir terbuka di `STATUS.md`.
 3. **Editor memutuskan** atas temuan yang bertentangan (pemula minta penjelasan tambahan vs mahir minta ringkas) dan menyusun daftar kerja berurutan prioritas: MAYOR ketepatan → MAYOR keterbacaan → MINOR.
+3a. **Kajian literatur dan periksa lintas buku** (paralel, sesudah editor dan sebelum perbaikan; wajib bila bab menulis atau memperluas teori; untuk bab baru dijalankan sebelum kerangka):
+   - peninjau literatur dalam mode kajian literatur (`agents/03-peninjau-literatur.md`) mencocokkan setiap klaim teori, rumus, dan atribusi dengan halaman atau persamaan sumber primer → `naskah/ulasan/babXX-kajian-literatur.md` (tabel klaim → status → sumber, BibTeX terverifikasi, [PERLU UNGGAH]);
+   - pemeriksa seri (`agents/25-pemeriksa-seri.md`) memeriksa definisi, istilah, notasi, rujuk silang, dan isi yang sudah diajarkan di buku lain → `naskah/ulasan/babXX-periksa-seri.md` (daftar rujuk silang dan daftar ketidakselarasan).
+   Butir yang menyentuh keputusan penulis (ketidakselarasan antarbuku, perubahan cakupan teori) masuk "Usulan untuk diputuskan penulis" sebelum perbaikan dimulai.
 4. **Perbaikan** oleh penulis bab atau penyunting (bukan peninjau, bukan agen yang menulis laporan), dengan instruksi tertulis (`assets/templat-instruksi-perbaikan-pembaca.md`). Setiap temuan isi diperiksa dulu seperti reviewer isi (hitung ulang, registri); temuan yang keliru ditulis "tidak diterapkan" beserta bukti. Lalu harness sampai LULUS, lalu bagian Tindak lanjut di setiap berkas ulasan. MINOR yang butuh contoh baru atau keputusan penulis ditunda dan masuk "Usulan untuk diputuskan penulis" (bagian di bawah).
+4a. **Audit istilah dua lapis**: lapis mesin adalah G-ISTILAH setiap kali harness dijalankan (`harness-dan-gerbang.md`, bagian 4: setiap keputusan "bukan X" menambah pola pada komit yang sama); lapis manusiawi adalah reviewer bahasa dalam mode audit istilah (`agents/07-reviewer-bahasa.md`), sekali sebelum telaah T2 dan sekali per buku sebelum buku kunci.
 5. **Telaah pakar buku ajar** (`agents/21-penelaah-pakar-buku-ajar.md`, T2): setelah perbaikan putaran ulasan, penelaah menilai kelayakan bab sebagai bab buku ajar (materi, penyajian, kebahasaan, desain) dan memberi rekomendasi; temuannya masuk daftar kerja editor seperti temuan lain. Telaah rancangan (T1) dijalankan sebelum bab pertama ditulis, dan telaah buku utuh (T3) setelah render semua bab.
 6. **Render** oleh orkestrator (berurutan), pemeriksaan G-RENDER/G-TEPI/G-PENGGALAN/G-HURUF dan tampilan PDF; luapan dan tampilan diperbaiki, harness `--render` diulang.
 7. **Tinjau dan perbaiki keluaran Word** (orkestrator, sesudah render): jalankan gerbang Word (G-DOCX-RUMUS, G-DOCX; ikut `--render`), lalu tinjau DOCX dengan daftar periksa `assets/templat-tinjauan-docx.md` dan tulis temuannya ke `naskah/ulasan/tinjauan-docx-<tanggal>.md`. Perbaiki **di sumber** (reference-doc lewat `_bersama/huruf.py`, filter Lua, `.qmd`, `_quarto.yml`), bukan di berkas DOCX, render ulang, dan ulangi sampai bersih. **Batas 3 putaran**; temuan yang tersisa sesudah putaran ke-3 dicatat dan dieskalasi ke penulis.
@@ -36,6 +41,7 @@ kerangka ─▶ tulis ─▶ harness ─▶ [ulasan independen paralel] ─▶ e
 - harness LULUS dengan `--render` (semua gerbang aktif, termasuk G-LOG);
 - daftar periksa DOCX bersih atau sisa temuannya tercatat (maks. 3 putaran tinjau-perbaiki Word);
 - laporan pembaca pemula independen bab itu ada dan setiap temuannya bertindak lanjut;
+- bila bab menulis atau memperluas teori: laporan kajian literatur dan periksa seri ada, dan setiap butirnya bertindak lanjut atau diputuskan penulis; laporan bab menyebut sumber [PERLU UNGGAH];
 - rekomendasi penelaah pakar buku ajar (21) untuk bab minimal "layak dengan perbaikan kecil";
 - tidak ada temuan MAYOR terbuka di berkas ulasan mana pun (setiap MAYOR punya tindak lanjut "diperbaiki" atau keputusan penulis);
 - setiap MINOR punya tindak lanjut (diperbaiki atau alasan tidak diterapkan);
@@ -99,6 +105,26 @@ laporan 21 / ulasan ─▶ penyunting: tindak lanjut (diperbaiki | tidak diterap
 ```
 
 Format setiap butir: nomor; sumber (mis. "R-m6, telaah rancangan"; "Buku 2 Bab 1, MINOR 8"); pertanyaan dalam satu kalimat; pilihan; **rekomendasi** dengan alasan singkat; akibat bagi bab, kunci, dan buku lain; **nilai bawaan sementara** yang dipakai penulis bab sampai ada jawaban (ditandai "diputuskan sementara, menunggu penulis"). Usulan satu buku ditaruh di `01-rancangan-rinci.md`; usulan lintas buku di `naskah-bersama/usulan-penulis-<tanggal>.md`. Pesan ke penulis menutup daftar dengan "Jawab 'setuju semua', atau sebut nomor yang diubah." Jawaban dicatat bertanggal; butir yang ditolak atau diubah (contoh seri: "setuju kecuali butir 8") dicatat beserta pilihan penulis.
+
+## Tambahan dari referensi baru dan bab yang dikunci
+
+Bab yang sudah lolos loop A dan kuncinya selesai dianggap **dikunci** (catat komitnya di `STATUS.md`). Referensi baru yang diunggah penulis sering memperlihatkan bahan yang dapat memperkaya bab, termasuk bab yang dikunci.
+
+```
+referensi baru ─▶ wiki referensi + salinan harness/sumber/ (data-dan-sumber.md)
+   ─▶ 03 kajian celah: naskah-bersama/rancangan-tambahan-referensi-<tanggal>.md ─▶ keputusan penulis
+   ─▶ bab draf/direncanakan: masuk kerangka atau loop A biasa
+   ─▶ bab dikunci (prioritas 1 atau keputusan penulis): tambahan ─▶ harness ─▶ ulasan tambahan (05, mode ulasan tambahan)
+      ─▶ perbaikan ─▶ kunci disesuaikan (loop C) ─▶ harness induk + kunci ─▶ dikunci lagi (komit)
+```
+
+1. **Kajian celah** (peninjau literatur): setiap usulan tambahan menyebut sumber dan halaman, bab sasaran, jenis **KECIL** (satu paragraf, contoh, rujukan) atau **BESAR** (subbab, contoh utama, latihan baru), prioritas 1–3, dan status bab (dikunci, draf, direncanakan). Berkas ditutup bagian "Keputusan penulis" dengan nilai bawaan sementara per butir.
+2. **Bab yang dikunci hanya dibuka untuk prioritas 1**, kecuali penulis memutuskan lain.
+3. **Ulasan ulang khusus tambahan**: satu reviewer gabungan berkonteks bersih (isi, kode, bahasa, pemula) meninjau diff tambahan saja beserta kuncinya (`agents/05-reviewer-isi.md`, "Mode ulasan tambahan"). Tambahan teori juga melewati kajian literatur dan periksa seri (loop A langkah 3a), terbatas pada diff.
+4. **Anggaran halaman**: penulis membandingkan perkiraan halaman sesudah tambahan dengan keputusan panjang di kerangka (`agents/04-penulis.md`, langkah 11). Kelebihan diajukan ke penulis sebelum tambahan berikutnya, bukan ditemukan di akhir. Contoh seri: Buku 5 Bab 4 naik dari ±31 ke ±40–42 halaman lewat tiga putaran tanpa peringatan dini.
+5. Bab dikunci lagi bila harness induk dan kunci LULUS, ulasan tambahan tanpa MAYOR terbuka, dan kunci tidak bertentangan dengan teks bab.
+
+Batas: 2 putaran ulasan tambahan per bab. Eskalasi: tambahan BESAR pada bab yang dikunci, atau tambahan yang mengubah latihan yang sudah berkunci.
 
 ## Loop B — literatur dan klaim
 

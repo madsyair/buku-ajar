@@ -121,3 +121,55 @@ Kesalahan yang **berulang** ditemukan peninjau independen pada Buku 1–3 dan ku
 *Gejala*: agen penyunting berhenti di tengah tugas ketika batas pemakaian tercapai atau kontainer dimulai ulang. Agen baru yang dijalankan sebagai gantinya tidak tahu langkah yang sudah selesai sehingga berisiko mengulang pekerjaan atau menimpa suntingan setengah jadi; proses latar (render, rajut) yang ditunggu sudah mati.
 
 *Pencegahan*: lanjutkan agen yang terhenti lewat pesan ke agen yang sama dengan menyebut langkah terakhirnya; anggap proses latar mati dan jalankan ulang yang diperlukan; periksa `git status` per berkas sebelum memberi tugas baru (`agents/00-orkestrator.md`, bagian Pemulihan).
+
+## Pelajaran 2026-11-20 (Buku 5 Bab 4, tambahan referensi, perubahan seri)
+
+Bagian 20–27 disarikan dari proses 2026-11-19 dan 2026-11-20 (`naskah-bersama/usulan-skill-buku-ajar-2026-11-20.md` seri).
+
+## 20. Rujukan dan rumus teori tidak dicocokkan dengan sumber primer
+
+*Gejala*: rujukan Gelman tertulis hlm. 460, padahal isinya di hlm. 124; rumus τ0 tidak tepat; $m_\mathrm{eff} = \operatorname{tr}(S)$ diatribusikan ke penulis yang salah. Ketiganya baru tertangkap saat teori dicocokkan dengan sumber primer.
+
+*Pencegahan*: kajian literatur per bab sebelum teori ditulis atau diperluas (`agents/03-peninjau-literatur.md`, mode kajian literatur; `loop-kerja.md`, loop A langkah 3a): setiap klaim teori, rumus, dan atribusi dicocokkan dengan halaman atau persamaan sumber primer; rumus dari gambar halaman.
+
+## 21. Definisi dan istilah berbeda antarbuku
+
+*Gejala*: definisi hiperparameter berbeda antarbuku; satu konsep ditulis "diambil dari data" di satu buku dan "disetel dari data" di buku lain; "prior ditetapkan dari data" berulang padahal yang ditetapkan hiperparameternya.
+
+*Pencegahan*: periksa lintas buku per bab (`agents/25-pemeriksa-seri.md`) bersamaan dengan kajian literatur; ketidakselarasan diputuskan penulis; pola istilah seri untuk prior yang bergantung pada data (`istilah-statistika.md`).
+
+## 22. Istilah yang sudah ditolak lolos lagi
+
+*Gejala*: "derau" muncul lagi di bab baru padahal sudah diputuskan *noise* sejak 2026-11-06, karena `istilah_terlarang` proyek hanya berisi dua pola.
+
+*Pencegahan*: keputusan "bukan X" menambah pola pada komit yang sama (`harness-dan-gerbang.md`, bagian 4); audit istilah tak lazim oleh reviewer bahasa (`agents/07-reviewer-bahasa.md`, mode audit istilah).
+
+## 23. Tambahan pada bab yang dikunci merusak latihan dan kunci
+
+*Gejala*: latihan cakupan tambahan di Buku 1 Bab 4 hanya menjalankan setengah resep; kunci Buku 3 Bab 3 bertentangan dengan teks bab sesudah tambahan; Buku 5 Bab 4 naik dari ±31 ke ±40–42 halaman lewat tiga putaran tanpa peringatan dini.
+
+*Pencegahan*: bab yang dikunci hanya dibuka untuk prioritas 1; ulasan ulang khusus diff tambahan beserta kuncinya; perkiraan halaman dibandingkan dengan kerangka setiap putaran (`loop-kerja.md`, "Tambahan dari referensi baru dan bab yang dikunci").
+
+## 24. Contoh replikasi yang tidak terulang
+
+*Gejala*: data `sae::incomedata` tidak mengulang pola yang dilaporkan Marhuenda dkk., padahal contoh bab dirancang untuk mereplikasi artikel itu.
+
+*Pencegahan*: uji asap sebelum menulis contoh (`agents/04-penulis.md`, langkah 8a); bila tidak terulang, contoh ditulis dari tabel sumber tanpa kode dan keputusannya dicatat. Data yang diketik dari tabel artikel dicocokkan sel demi sel dengan gambar halaman (`data-dan-sumber.md`).
+
+## 25. Latihan yang tidak siap dikunci
+
+*Gejala*: Latihan 16 Bab 4 bermasalah pada datanya: data cacah, peubah yang saling kolinear, dan peubah yang tidak tersedia. Masalahnya baru tampak saat kunci akan ditulis.
+
+*Pencegahan*: telaah T2 menilai kesiapan latihan untuk kunci (dapat dikerjakan, berjawaban tunggal, data tersedia) sebelum kunci ditulis (`agents/21-penelaah-pakar-buku-ajar.md`; `kunci-jawaban.md`, Alur kerja).
+
+## 26. Keluaran paket berubah antarversi
+
+*Gejala*: loo 2.10.1 mengubah keluaran `loo_compare()`; bab yang ditulis di *cloud* dan bab yang ditulis di komputer penulis mengandaikan versi yang berbeda.
+
+*Pencegahan*: versi minimum dicatat di `harness/lingkungan-lokal.sh` dan diperingatkan bila berbeda; keluaran yang formatnya berubah dibaca lewat helper tahan versi seperti `bandingkan_loo()` (`harness-dan-gerbang.md`, "Lingkungan dan versi paket").
+
+## 27. Agen serentak pada berkas dan registri bersama
+
+*Gejala*: beberapa agen menulis `klaim.json` bersamaan dan satu klaim sempat tertimpa; penyeragaman istilah dan tambahan referensi bersinggungan di Buku 1 Bab 14 dan Buku 3 Bab 1–2; berkas dari sesi lain (`petunjuk.qmd`, `peta-seri.qmd`, `_bersama/riwayat-penulis.qmd`) muncul di *working tree*.
+
+*Pencegahan*: kepemilikan berkas disebut di setiap brief; komit berkas sendiri dengan `git commit -- <path>`; registri bersama di-*stage* per bagian; tanpa reset, stash, atau amend; perubahan sesi lain tidak disentuh dan dilaporkan (`agents/00-orkestrator.md`, Menjalankan agen dan Titik simpan git).
